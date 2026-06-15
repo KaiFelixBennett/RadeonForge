@@ -27,6 +27,17 @@ plt.rcParams.update({"font.size": 12, "axes.titlesize": 14, "axes.titleweight": 
                      "figure.dpi": 150, "savefig.bbox": "tight", "axes.grid": True,
                      "grid.alpha": 0.25})
 
+# 60-query comprehensive eval — all four tested models (same set = fair comparison)
+ev = {t: load(f"eval_{t}.json") for t in ["e2b", "12b", "qwen08", "qwen2b"]}
+C_QWEN08, C_QWEN2B = "#16a34a", "#9333ea"
+# (name, eval-key, Q4_K_M size GB, color, marker)
+ALL = [
+    ("gemma-E2B",    "e2b",    3.2, C_E2B,    "o"),
+    ("gemma-12B",    "12b",    6.9, C_12B,    "s"),
+    ("Qwen3.5-0.8B", "qwen08", 0.5, C_QWEN08, "^"),
+    ("Qwen3.5-2B",   "qwen2b", 1.2, C_QWEN2B, "D"),
+]
+
 def acc(d, k):  return d["metrics"][k]["level_accuracy"] * 100
 def tacc(d, k): return d["metrics"][k]["type_accuracy"] * 100
 def toks(d, k): return d["metrics"][k]["avg_out_tokens"]
@@ -51,62 +62,68 @@ ax.set_title("QLoRA training loss on one AMD Radeon R9700 (RDNA4)\nBoth converge
 ax.legend()
 save(fig, "01_training_loss.png")
 
-# 2) Accuracy base -> fine-tuned (hard set) — the core proof
-fig, ax = plt.subplots(figsize=(7.5, 6))
+# 2) Accuracy base -> fine-tuned — ALL FOUR models (60-query eval)
+fig, ax = plt.subplots(figsize=(8.5, 6))
 x = [0, 1]
-for d, c, m, lbl in [(hard_e2b, C_E2B, "o", "E2B (small)"), (hard_12b, C_12B, "s", "12B (large)")]:
-    ys = [acc(d, "base"), acc(d, "finetuned")]
-    ax.plot(x, ys, "-", marker=m, color=c, lw=2.8, markersize=10, label=lbl)
+for name, k, gb, c, mk in ALL:
+    ys = [acc(ev[k], "base"), acc(ev[k], "finetuned")]
+    ax.plot(x, ys, "-", marker=mk, color=c, lw=2.6, markersize=11, label=name)
     for xi, yi in zip(x, ys):
-        ax.annotate(f"{yi:.0f}%", (xi, yi), textcoords="offset points", xytext=(0, 10),
-                    ha="center", color=c, fontweight="bold")
+        ax.annotate(f"{yi:.0f}%", (xi, yi), textcoords="offset points",
+                    xytext=(0, 9 if xi == 1 else -17), ha="center", color=c, fontsize=10, fontweight="bold")
 ax.set_xticks(x); ax.set_xticklabels(["Base\n(no fine-tune)", "Fine-tuned"])
-ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(50, 100); ax.set_xlim(-0.25, 1.25)
-ax.set_title("Fine-tuning lifts routing accuracy\nHard, policy-focused eval (21 queries)")
-ax.legend()
+ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(25, 102); ax.set_xlim(-0.32, 1.32)
+ax.set_title("Fine-tuning lifts routing accuracy — all four models\nComprehensive 60-query, policy-focused eval")
+ax.legend(loc="center right")
 save(fig, "02_accuracy_before_after.png")
 
-# 3) The policy insight: comparison queries learned (of 5)
-labels = ["Base\n(either model)", "E2B\nfine-tuned", "12B\nfine-tuned"]
-vals = [comp_ok(hard_e2b, "base"), comp_ok(hard_e2b, "finetuned"), comp_ok(hard_12b, "finetuned")]
-cols = [C_BASE, C_E2B, C_12B]
-fig, ax = plt.subplots(figsize=(7.5, 5.5))
-bars = ax.bar(labels, vals, color=cols, width=0.6)
-for b, v in zip(bars, vals):
-    ax.annotate(f"{v}/5", (b.get_x() + b.get_width() / 2, v), textcoords="offset points",
-                xytext=(0, 6), ha="center", fontweight="bold", fontsize=13)
-ax.set_ylim(0, 5.6); ax.set_ylabel("Comparison queries routed correctly (of 5)")
-ax.set_title("Teaching a rule that contradicts the model's instinct\nThe SMALLER model learns it (5/5); the bigger one resists (1/5) — same 158 examples")
+# 3) The policy insight: document-comparison queries learned — all four models
+def comp_total(d):
+    return sum(1 for q in d["queries"] if q["base"]["expected_type"] == "comparison")
+ncomp = comp_total(ev["e2b"])
+names = [m[0] for m in ALL]
+base_c = [100 * comp_ok(ev[k], "base") / ncomp for _, k, _, _, _ in ALL]
+ft_c = [100 * comp_ok(ev[k], "finetuned") / ncomp for _, k, _, _, _ in ALL]
+xpos = list(range(len(ALL))); w = 0.38
+fig, ax = plt.subplots(figsize=(9.5, 5.5))
+b1 = ax.bar([p - w / 2 for p in xpos], base_c, w, color=C_BASE, label="Base")
+b2 = ax.bar([p + w / 2 for p in xpos], ft_c, w, color=C_QWEN08, label="Fine-tuned")
+for b in list(b1) + list(b2):
+    ax.annotate(f"{b.get_height():.0f}%", (b.get_x() + b.get_width() / 2, b.get_height()),
+                textcoords="offset points", xytext=(0, 3), ha="center", fontsize=10,
+                fontweight="bold" if b in list(b2) else "normal")
+ax.set_xticks(xpos); ax.set_xticklabels(names)
+ax.set_ylim(0, 115); ax.set_ylabel(f"Comparison queries correct (%, of {ncomp})")
+ax.set_title("The hardest policy: routing document-comparisons to summaries (L0)\nEvery base fails it; fine-tuning fixes it (all four models)")
+ax.legend(loc="upper right")
 save(fig, "03_policy_comparison.png")
 
-# 4) Small = more usable: same accuracy, more speed, less size
-fig, ax = plt.subplots(figsize=(8, 5.5))
-pts = [("E2B fine-tuned", 117, acc(hard_e2b, "finetuned"), 3.2, C_E2B),
-       ("12B fine-tuned", 53, acc(hard_12b, "finetuned"), 6.9, C_12B)]
-for name, tps, ac, gb, c in pts:
-    ax.scatter(tps, ac, s=gb * 90, color=c, alpha=0.85, edgecolors="white", linewidths=1.5, zorder=3)
-    ax.annotate(f"{name}\n{tps} tok/s · {ac:.0f}% · {gb} GB", (tps, ac),
-                textcoords="offset points", xytext=(0, -38 if c == C_12B else 16), ha="center", color=c)
-ax.set_xlabel("Serving speed (tokens/sec, R9700)"); ax.set_ylabel("Hard-set accuracy (%)")
-ax.set_xlim(30, 135); ax.set_ylim(70, 90)
-ax.set_title("Same accuracy, ~2x the speed, half the size\nFor this task the small fine-tune is the more usable model")
+# 4) Accuracy vs size — efficiency frontier, all four models
+fig, ax = plt.subplots(figsize=(8.5, 6))
+for name, k, gb, c, mk in ALL:
+    a = acc(ev[k], "finetuned")
+    ax.scatter(gb, a, s=340, color=c, edgecolors="white", linewidths=1.5, zorder=3)
+    ax.annotate(f"{name}\n{gb} GB / {a:.0f}%", (gb, a), textcoords="offset points",
+                xytext=(0, 18), ha="center", color=c, fontsize=10, fontweight="bold")
+ax.set_xlabel("Q4_K_M size in GB  (smaller = less VRAM, faster)")
+ax.set_ylabel("Fine-tuned routing accuracy (%)")
+ax.set_xlim(0, 7.8); ax.set_ylim(82, 102)
+ax.set_title("Accuracy vs model size — the efficiency frontier (all four)\nThe SMALLEST model (Qwen-0.8B) is also the most accurate router")
 save(fig, "04_speed_vs_accuracy.png")
 
-# 5) Output length: fine-tuning makes answers concise (efficiency)
-fig, ax = plt.subplots(figsize=(7.5, 5))
-groups = ["E2B", "12B"]
-base_t = [toks(hard_e2b, "base"), toks(hard_12b, "base")]
-ft_t = [toks(hard_e2b, "finetuned"), toks(hard_12b, "finetuned")]
-xpos = range(len(groups)); w = 0.35
+# 5) Output length base vs fine-tuned — all four models
+fig, ax = plt.subplots(figsize=(9, 5))
+base_t = [toks(ev[k], "base") for _, k, _, _, _ in ALL]
+ft_t = [toks(ev[k], "finetuned") for _, k, _, _, _ in ALL]
+xpos = list(range(len(ALL))); w = 0.38
 b1 = ax.bar([p - w / 2 for p in xpos], base_t, w, color=C_BASE, label="Base")
 b2 = ax.bar([p + w / 2 for p in xpos], ft_t, w, color=C_E2B, label="Fine-tuned")
-for bars in (b1, b2):
-    for b in bars:
-        ax.annotate(f"{b.get_height():.0f}", (b.get_x() + b.get_width() / 2, b.get_height()),
-                    textcoords="offset points", xytext=(0, 4), ha="center", fontsize=11)
-ax.set_xticks(list(xpos)); ax.set_xticklabels(groups)
+for b in list(b1) + list(b2):
+    ax.annotate(f"{b.get_height():.0f}", (b.get_x() + b.get_width() / 2, b.get_height()),
+                textcoords="offset points", xytext=(0, 4), ha="center", fontsize=10)
+ax.set_xticks(xpos); ax.set_xticklabels(names)
 ax.set_ylabel("Avg output length (tokens)")
-ax.set_title("Fine-tuning also makes outputs concise\nShorter = faster + cheaper per call (hard set)")
+ax.set_title("Fine-tuning makes outputs concise — all four models\nShorter = faster + cheaper per call (60-query eval)")
 ax.legend()
 save(fig, "05_output_length.png")
 
