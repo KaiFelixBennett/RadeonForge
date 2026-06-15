@@ -34,5 +34,10 @@ python "$LLAMA_CPP/convert_hf_to_gguf.py" "$MERGED" --outtype f16 --outfile gemm
 "$LLAMA_CPP/build/bin/llama-quantize" gemma4-12b-f16.gguf "$OUT" Q4_K_M
 
 echo "== done: $OUT =="
-echo "Test: $LLAMA_CPP/build/bin/llama-cli -m $OUT -p 'Hallo' --temp 1.0 --top-p 0.95 --top-k 64"
 echo "Note: gemma-4-12B is multimodal (gemma4_unified); this exports the TEXT tower only."
+echo
+echo "Next — SERVE on the GPU (RDNA4): build the HIP backend, then use serve.sh."
+echo "  scripts/build_llamacpp_hip.sh        # builds llama-server for gfx1201"
+echo "  MODEL=$OUT examples/gemma4-12b-qlora/serve.sh"
+echo "IMPORTANT: serve with --chat-template-file gemma4-chat-template.jinja — llama.cpp's"
+echo "--jinja mis-renders Gemma-4's embedded template (see docs/gemma4-notes.md 'Serving')."

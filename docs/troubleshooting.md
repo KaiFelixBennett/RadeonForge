@@ -16,7 +16,9 @@ The gotcha → fix table. Most of these are **silent** failures (no error, just 
 | Random training crashes | Compute-wave-save-restore on RDNA4 | WSL kernel cmdline `amdgpu.cwsr_enable=0` |
 | OOM on 12B QLoRA in 32 GB | Activations | `gradient_checkpointing=True`, batch 1 + grad-accum, shorter `max_length`, leave host VRAM headroom |
 | PEFT error on tied weights | `modules_to_save` on lm_head+embed_tokens | Use `target_modules="all-linear"`, drop `modules_to_save` |
-| GGUF model echoes literal `<|turn>` / hallucinates user turns | Early/broken embedded chat template | Re-pull latest official GGUF or pass `--chat-template-file` |
+| `/v1/chat/completions` drifts into a "Thinking Process:" monologue (empty `content`, text in `reasoning_content`) | llama.cpp `--jinja` mis-renders Gemma-4's `<|turn>` template (minja ≠ HF jinja) → malformed prompt → base reasoning kicks in | Serve with `--chat-template-file gemma4-chat-template.jinja` (bundled, verified) **+** `--reasoning-budget 0`. See [`examples/gemma4-12b-qlora/serve.sh`](../examples/gemma4-12b-qlora/serve.sh) |
+| GGUF model echoes literal `<|turn>model<|turn>...` forever | Same minja template breakage, exposed once `--reasoning-budget 0` removes the thinking wrapper | Same fix — supply the known-good `--chat-template-file`. The merged HF model + `convert_hf_to_gguf` are fine (verify in transformers via [`test_routing.py`](../examples/gemma4-12b-qlora/test_routing.py)); the bug is purely the server's template engine |
+| Want a template-free serving path | Avoid minja entirely | POST **token-id** prompts to `/completion` (format client-side with `tokenizer.apply_chat_template(..., tokenize=True)`); verified 4/4 on R9700. See RUNBOOK "Serve & verify" |
 | Convert step fails on missing `tokenizer.model` | llama.cpp Gemma converter quirk (#19152) | Ensure merged dir has `tokenizer.json`+`tokenizer_config.json`; use current llama.cpp; or Unsloth `save_pretrained_gguf` |
 
 ## The two snippets you'll always need
