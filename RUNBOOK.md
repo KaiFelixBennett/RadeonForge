@@ -118,6 +118,15 @@ HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/test_routing.py \
 Our result: **8/8 target_level correct**, valid JSON, from the *short* prompt — e.g.
 `"Welche Dokumente kennst du?" → {"query_type":"overview","target_level":0,...}`.
 
+**Prove it changed something — base vs fine-tuned A/B.** A score means little without a control: run the *same* held-out queries through the **untouched base** model and the fine-tuned one, side by side:
+```bash
+HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/ab_test.py \
+    --base google/gemma-4-E2B-it --finetuned /root/aria-pilot/e2b-merged \
+    --out-md examples/gemma4-12b-qlora/PILOT_RESULTS.md \
+    --out-json examples/gemma4-12b-qlora/pilot_ab_results.json
+```
+This writes the full evidence (every output from both models + metrics) to [`PILOT_RESULTS.md`](examples/gemma4-12b-qlora/PILOT_RESULTS.md) / `pilot_ab_results.json`. Our pilot: base **79 %** → tuned **100 %** target_level accuracy, **−19 %** output length. The base's misses were all *domain-policy* cases (it routes "compare two contracts" to L2 detail; our convention is L0 summaries) — exactly the knowledge the tune injects.
+
 ## 7. Merge → GGUF → serve (deployment) — verified end to end
 
 ### 7a. Merge the LoRA adapter into the base (fp16)
