@@ -7,7 +7,8 @@
 | Component | Pinned version | Source |
 |---|---|---|
 | GPU / arch | Radeon AI PRO R9700 · RDNA4 · `gfx1201` · 32 GB | — |
-| Windows host driver | **AMD Adrenalin 26.2.2 for WSL2** | AMD R9700 driver page |
+| Windows host driver | **any recent AMD Adrenalin WSL2 driver** (26.5.x ✓; **not** a downgrade — only needs to provide `libdxcore.so`/`/dev/dxg`) | AMD R9700 driver page |
+| WSL GPU bridge | **`rocdxg-roct` 1.2.0** (`librocdxg`) — install the `.deb`, NOT from the driver, no apt repo | github.com/ROCm/librocdxg/releases |
 | WSL distro | Ubuntu 24.04 (noble); 22.04 jammy also OK | — |
 | ROCm | **7.2.x** (stable; latest 7.2.4, 2026-05-29) | `repo.radeon.com/amdgpu-install/7.2/` |
 | amdgpu-install deb | `amdgpu-install_7.2.70200-1_all.deb` | repo.radeon.com |

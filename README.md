@@ -23,10 +23,10 @@ It is deliberately *not* "yet another ROCm wrapper". The general case (Linux/Ins
 |---|---|---|
 | **Native Windows + ROCm** | ✅ preview | ❌ **No ML training** (AMD: *"No ML training support"*) |
 | **Native Windows + Vulkan** | ✅ (often fastest on RDNA4) | ❌ **not a real path** — upstream Vulkan has no backward-pass kernel; QVAC fork immature (see below) |
-| **WSL2 + ROCm** | ✅ | ✅ **QLoRA/LoRA** — needs Adrenalin **26.2.2** (`librocdxg` bridge) |
+| **WSL2 + ROCm** | ✅ | ✅ **QLoRA/LoRA** — install the `rocdxg-roct` package (`librocdxg`); any Adrenalin WSL2 driver |
 | **Native Linux + ROCm** | ✅ | ✅ **most stable — recommended long-term home** |
 
-**Takeaway:** **train on ROCm, not Vulkan.** On Windows today → **WSL2 + ROCm** (install Adrenalin **26.2.2** for the `librocdxg` bridge). For a serious long-term rig → **native Linux + ROCm**. Vulkan is the *inference* path (great on RDNA4) — it **cannot train** (no backward-pass kernels upstream). Full reasoning + evidence: **[docs/paths-and-stability.md](docs/paths-and-stability.md)**.
+**Takeaway:** **train on ROCm, not Vulkan.** On Windows today → **WSL2 + ROCm** (install the **`rocdxg-roct`** package for the `librocdxg` bridge — any recent Adrenalin WSL2 driver; no downgrade). For a serious long-term rig → **native Linux + ROCm**. Vulkan is the *inference* path (great on RDNA4) — it **cannot train** (no backward-pass kernels upstream). Full reasoning + evidence: **[docs/paths-and-stability.md](docs/paths-and-stability.md)**.
 
 ## Which path — training is ROCm, not Vulkan
 
@@ -37,7 +37,7 @@ It is deliberately *not* "yet another ROCm wrapper". The general case (Linux/Ins
 | OS | Windows + WSL2 (Ubuntu 24.04) | native Ubuntu 24.04 |
 | Training | ✅ QLoRA / LoRA / SFT / DPO | ✅ same, most reliable |
 | Stability | ⚠️ works; WSL/driver updates can break it | ✅ best (most real RDNA4 success evidence) |
-| Prerequisite | **Adrenalin 26.2.2** → `librocdxg` bridge (a *newer* driver may lack it!) | none |
+| Prerequisite | install `rocdxg-roct` .deb → `librocdxg` (any Adrenalin WSL2 driver; **not** a downgrade) | none |
 | Guide | [docs/track-a-wsl2-rocm.md](docs/track-a-wsl2-rocm.md) | same guide, native steps |
 
 **Recommendation:** start on **WSL2 + ROCm** (you're likely 90 % there), move to **native Linux + ROCm** for serious/long-term runs. Use **Vulkan for inference only** ([docs/track-b-vulkan-qvac.md](docs/track-b-vulkan-qvac.md) is an experimental note, not a training recommendation).
