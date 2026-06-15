@@ -5,7 +5,8 @@ A complete, **reproducible** walkthrough of what we actually ran to QLoRA-fine-t
 from a blank Ubuntu to a model that produces correct task output.
 
 > Verified 2026-06-15. Worked example: a HiRAG "query router" (query → routing JSON).
-> Result: **8/8** held-out queries classified correctly. New to fine-tuning? Read
+> Result: **8/8** held-out queries correct in transformers, then **merged → GGUF (Q4_K_M) →
+> served on the GPU, 4/4 correct, ~117 tok/s**. New to fine-tuning? Read
 > [docs/how-finetuning-works.md](docs/how-finetuning-works.md) first — it explains *why* each step exists.
 
 Conventions: commands run **inside WSL2 Ubuntu as your user** unless noted. The venv is `~/.venvs/rdna4-train`.
@@ -117,11 +118,60 @@ HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/test_routing.py \
 Our result: **8/8 target_level correct**, valid JSON, from the *short* prompt — e.g.
 `"Welche Dokumente kennst du?" → {"query_type":"overview","target_level":0,...}`.
 
-## 7. Merge → GGUF → serve (deployment)  *(next step — see export_gguf.sh)*
+## 7. Merge → GGUF → serve (deployment) — verified end to end
+
+### 7a. Merge the LoRA adapter into the base (fp16)
+`convert_hf_to_gguf.py` cannot read PEFT adapters, so merge first (CPU is fine):
 ```bash
-bash examples/gemma4-12b-qlora/export_gguf.sh    # merge LoRA → fp16 → convert → quantize Q4_K_M
+python - <<'PY'
+import torch; from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+BASE="google/gemma-4-E2B-it"; ADAPTER="/root/aria-pilot/e2b-task-a"; OUT="/root/aria-pilot/e2b-merged"
+base=AutoModelForCausalLM.from_pretrained(BASE, dtype=torch.bfloat16, device_map="cpu")
+PeftModel.from_pretrained(base, ADAPTER).merge_and_unload().save_pretrained(OUT, safe_serialization=True)
+AutoTokenizer.from_pretrained(BASE).save_pretrained(OUT)   # converter needs tokenizer.json/_config
+print("merged ->", OUT)
+PY
 ```
-Then serve the GGUF with llama.cpp and confirm it still emits the routing JSON.
+**Sanity-check the merge in transformers before converting** — re-run `test_routing.py` style inference on the merged dir. If it's clean here but broken after serving, the bug is the *template*, not your weights.
+
+### 7b. Build llama.cpp with the HIP backend (for GPU serving)
+The plain CPU `cmake -B build` does **not** build `llama-server` and is slow for inference. Build the GPU backend once:
+```bash
+bash scripts/build_llamacpp_hip.sh         # -> llama.cpp/build-hip/bin/{llama-server,llama-cli,llama-quantize}
+```
+
+### 7c. Convert + quantize → GGUF (Q4_K_M)
+```bash
+python llama.cpp/convert_hf_to_gguf.py /root/aria-pilot/e2b-merged --outtype f16 \
+  --outfile /root/aria-pilot/e2b-f16.gguf
+llama.cpp/build-hip/bin/llama-quantize /root/aria-pilot/e2b-f16.gguf \
+  /root/aria-pilot/e2b-Q4_K_M.gguf Q4_K_M
+# E2B: 8.7 GB f16 -> 3.2 GB Q4_K_M
+```
+
+### 7d. Serve & verify ⚠️ THE CHAT-TEMPLATE GOTCHA
+llama.cpp's `--jinja` engine **mis-renders Gemma-4's `<|turn>` template** — the model either drifts into a "Thinking Process:" monologue (empty `content`) or, with `--reasoning-budget 0`, echoes `<|turn>model<|turn>...`. The merged weights are fine (you proved that in 7a); only the server's template engine is broken. **Two verified fixes:**
+
+```bash
+# FIX A — OpenAI endpoint with the bundled, known-good template:
+MODEL=/root/aria-pilot/e2b-Q4_K_M.gguf bash examples/gemma4-12b-qlora/serve.sh
+# then:
+curl -s localhost:8099/v1/chat/completions -H 'Content-Type: application/json' -d '{
+  "messages":[{"role":"system","content":"<SYS>"},
+              {"role":"user","content":"Analyze this query:\nWelche Dokumente kennst du?"}],
+  "max_tokens":160,"temperature":0}'
+# -> {"...":"...","content":"{\"query_type\":\"overview\",\"target_level\":0,...}"}  finish_reason:"stop"
+```
+```python
+# FIX B — template-free: format client-side, POST token ids to /completion:
+ids = tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True)["input_ids"]
+requests.post("http://127.0.0.1:8099/completion",
+              json={"prompt":[int(i) for i in ids], "n_predict":160, "temperature":0})
+```
+Our pilot result: **4/4 held-out routing queries correct on the GPU** (R9700), `finish_reason:"stop"`, ~117 tok/s.
+
+> For the 12B: identical steps with `BASE=google/gemma-4-12B-it` and your 12B adapter; `serve.sh` defaults to a 12B filename. Same template fix applies.
 
 ## Gotchas recap
 | Symptom | Fix |
@@ -132,3 +182,4 @@ Then serve the GGUF with llama.cpp and confirm it still emits the routing JSON.
 | `Gemma4Processor requires the PIL library` | `pip install pillow` and/or pass `processing_class=tokenizer` |
 | `chat template … missing {% generation %}` | set `assistant_only_loss=False` |
 | loss → 0.0 / grad_norm NaN at step 1 | you used a **paged** optimizer → `optim="adamw_torch"` |
+| served model "thinks" / echoes `<|turn>` | llama.cpp `--jinja` mis-renders Gemma-4 template → `--chat-template-file gemma4-chat-template.jinja` (§7d) |
