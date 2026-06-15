@@ -282,4 +282,24 @@ if os.path.exists(_tps):
              ha="center", fontsize=9, color="#555")
     save(fig, "12_tokens_per_sec.png")
 
+# 13) Router decision — accuracy vs real serving latency (deployable options)
+pts13 = [
+    ("gemma-4-E2B\n(llama.cpp)",        0.60, 88, C_E2B),
+    ("Qwen-0.8B full\n(transformers)",  1.50, 95, "#9aa4b2"),
+    ("Qwen-0.8B LEAN\n(transformers)",  0.63, 95, C_QWEN08),
+]
+fig, ax = plt.subplots(figsize=(9, 6))
+for name, lat, a, c in pts13:
+    ax.scatter(lat, a, s=420, color=c, edgecolors="white", linewidths=1.5, zorder=4)
+    ax.annotate(name, (lat, a), textcoords="offset points", xytext=(0, 20), ha="center",
+                color=c, fontweight="bold", fontsize=10)
+ax.scatter(0.63, 95, s=2400, facecolors="none", edgecolors="#f5b50a", linewidths=3, zorder=5)
+ax.annotate("THE PICK", (0.63, 95), textcoords="offset points", xytext=(0, -34), ha="center",
+            color="#b8860b", fontweight="bold", fontsize=11)
+ax.set_xlabel("Serving latency per query (s)  —  lower = better")
+ax.set_ylabel("Routing accuracy (%)")
+ax.set_xlim(0.35, 1.7); ax.set_ylim(84, 99)
+ax.set_title("The router decision: lean Qwen-0.8B = best of both worlds\nSame latency as gemma-4-E2B, +7 points accuracy (lean output: 72 -> 26 tokens)")
+save(fig, "13_router_decision.png")
+
 print("done ->", OUT)

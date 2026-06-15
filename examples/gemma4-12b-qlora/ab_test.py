@@ -122,6 +122,8 @@ def main():
     ap.add_argument("--out-json", required=True)
     ap.add_argument("--queries", default=None,
                     help="optional JSON: list of {\"q\":..,\"level\":..,\"type\":..} to override the built-in set")
+    ap.add_argument("--sys-file", default=None,
+                    help="optional file with the system prompt (use the SAME one the model was trained with)")
     args = ap.parse_args()
 
     if args.queries:
@@ -129,6 +131,11 @@ def main():
         with open(args.queries, encoding="utf-8") as fh:
             QUERIES = [(d["q"], d["level"], d["type"]) for d in json.load(fh)]
         print(f"loaded {len(QUERIES)} queries from {args.queries}", flush=True)
+    if args.sys_file:
+        global SYS
+        with open(args.sys_file, encoding="utf-8") as fh:
+            SYS = fh.read().strip()
+        print(f"using system prompt from {args.sys_file}", flush=True)
 
     tok = AutoTokenizer.from_pretrained(args.base)
 
