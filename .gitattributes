@@ -1,0 +1,13 @@
+# Force LF on checkout so shell scripts run in WSL2/Linux (no CRLF "bad interpreter").
+* text=auto eol=lf
+*.sh   text eol=lf
+*.py   text eol=lf
+*.yaml text eol=lf
+*.md   text eol=lf
+*.jsonl text eol=lf
+
+# Never normalize binaries
+*.gguf  binary
+*.safetensors binary
+*.png   binary
+*.bin   binary
