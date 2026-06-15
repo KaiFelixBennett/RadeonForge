@@ -1,6 +1,8 @@
 # Track B — Vulkan LoRA (QVAC fork), native Windows, no ROCm
 
-LoRA fine-tuning over the **Vulkan** API using the [QVAC/Tether llama.cpp fork](https://github.com/tetherto/qvac-fabric-llm.cpp). Runs on **native Windows** (or any OS), vendor-agnostic, works **directly on GGUF** — it sidesteps the entire ROCm/bitsandbytes/FlashAttention mess. Verified 2026-06-15 (tag `b7349`).
+> 🛑 **Not a recommended training path (reviewed 2026-06-15).** Vulkan is **inference-only** in practice: upstream llama.cpp/ggml has **no Vulkan backward-pass (`OUT_PROD`) kernel**, and the QVAC fork that adds one has **~zero independent adoption**, a **fine-tune branch ~4.5 months stale**, is **LoRA-only**, and had **no Gemma-4 support** (an outsider patched it — tested on NVIDIA, not AMD/Vulkan). **Train on ROCm (Track A / native Linux); use Vulkan only for inference.** Kept here as an experimental reference. See [paths-and-stability.md](paths-and-stability.md).
+
+LoRA fine-tuning over the **Vulkan** API using the [QVAC/Tether llama.cpp fork](https://github.com/tetherto/qvac-fabric-llm.cpp). Runs on **native Windows** (or any OS), vendor-agnostic, works **directly on GGUF**. Verified 2026-06-15 (tag `b7349`).
 
 ## When to use Track B
 - You want to stay on **native Windows** (no WSL2/ROCm).
