@@ -7,6 +7,7 @@ pass() { echo "  ✅ $1"; }
 warn() { echo "  ⚠️  $1"; }
 fail() { echo "  ❌ $1"; ERR=1; }
 ERR=0
+PY="$(command -v python || command -v python3 || echo python)"   # fresh Ubuntu has python3, not python
 
 echo "== RadeonForge doctor =="
 
@@ -21,7 +22,7 @@ echo "[2] Required env"
 [ -n "${PYTORCH_ALLOC_CONF:-}" ] && pass "PYTORCH_ALLOC_CONF=${PYTORCH_ALLOC_CONF}" || warn "PYTORCH_ALLOC_CONF not set (recommend expandable_segments:True)"
 
 echo "[3] PyTorch + ROCm"
-python - <<'PY'
+"$PY" - <<'PY'
 import sys
 try:
     import torch
@@ -38,7 +39,7 @@ PY
 [ $? -ne 0 ] && ERR=1
 
 echo "[4] bitsandbytes ROCm backend"
-python - <<'PY'
+"$PY" - <<'PY'
 try:
     import bitsandbytes as bnb, torch
     x = torch.randn(8, 8, device="cuda")
@@ -48,7 +49,7 @@ except Exception as e:
 PY
 
 echo "[5] HF stack versions"
-python - <<'PY'
+"$PY" - <<'PY'
 for m in ("transformers","peft","trl","accelerate","datasets"):
     try:
         mod = __import__(m); print(f"  ✅ {m} {getattr(mod,'__version__','?')}")
