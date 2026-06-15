@@ -52,11 +52,11 @@ def save(fig, name):
     # Because it overlaps the data (lines/bars), you can't crop it off and it's
     # awkward for AI inpainting to scrub without disturbing the plot — yet at very
     # low alpha it stays unobtrusive. A single legible mark sits bottom-right.
-    rows = [0.04, 0.26, 0.48, 0.70, 0.92]
+    rows = [0.16, 0.50, 0.84]
     for i, yy in enumerate(rows):
-        xoff = -0.18 + (i % 2) * 0.18
-        for j in range(4):
-            fig.text(xoff + j * 0.36, yy, WM, fontsize=12, color="#5b6472",
+        xoff = -0.10 + (i % 2) * 0.21
+        for j in range(3):
+            fig.text(xoff + j * 0.42, yy, WM, fontsize=12, color="#5b6472",
                      alpha=0.07, rotation=20, ha="left", va="center", zorder=5)
     fig.text(0.995, 0.004, WM, fontsize=8, color="#8a8a8a", alpha=0.7,
              ha="right", va="bottom", zorder=6)
