@@ -110,4 +110,43 @@ ax.set_title("Fine-tuning also makes outputs concise\nShorter = faster + cheaper
 ax.legend()
 save(fig, "05_output_length.png")
 
+# 6) Per-category accuracy (E2B, hard set): where it helps vs where it regressed
+def cat_acc(d, k, typ):
+    qs = [q for q in d["queries"] if q[k]["expected_type"] == typ]
+    return 100 * sum(q[k]["level_correct"] for q in qs) / len(qs) if qs else 0
+cats = ["overview", "comparison", "specific", "deep_dive", "search"]
+base_v = [cat_acc(hard_e2b, "base", c) for c in cats]
+ft_v = [cat_acc(hard_e2b, "finetuned", c) for c in cats]
+xpos = range(len(cats)); w = 0.38
+fig, ax = plt.subplots(figsize=(9, 5.5))
+b1 = ax.bar([p - w / 2 for p in xpos], base_v, w, color=C_BASE, label="Base")
+b2 = ax.bar([p + w / 2 for p in xpos], ft_v, w, color=C_E2B, label="Fine-tuned")
+for bars in (b1, b2):
+    for b in bars:
+        ax.annotate(f"{b.get_height():.0f}", (b.get_x() + b.get_width() / 2, b.get_height()),
+                    textcoords="offset points", xytext=(0, 3), ha="center", fontsize=10)
+ax.set_xticks(list(xpos)); ax.set_xticklabels([c + f"\n(L{ {'overview':0,'comparison':0,'specific':1,'deep_dive':2,'search':2}[c] })" for c in cats])
+ax.set_ylabel("Accuracy (%)"); ax.set_ylim(0, 118)
+ax.set_title("Where fine-tuning helps — and where it exposed a data gap\nE2B, hard set: comparisons 0->100%, but whole-doc summaries (specific) regressed")
+ax.legend(loc="upper left", framealpha=0.95)
+save(fig, "06_per_category_e2b.png")
+
+# 7) Why a hard eval matters: easy set flatters the base model
+fig, ax = plt.subplots(figsize=(8, 5))
+groups = ["E2B", "12B"]
+easy_base = [acc(easy_e2b, "base"), acc(easy_12b, "base")]
+hard_base = [acc(hard_e2b, "base"), acc(hard_12b, "base")]
+xpos = range(len(groups)); w = 0.38
+b1 = ax.bar([p - w / 2 for p in xpos], easy_base, w, color="#86efac", label="Easy set")
+b2 = ax.bar([p + w / 2 for p in xpos], hard_base, w, color="#f59e0b", label="Hard, policy-focused set")
+for bars in (b1, b2):
+    for b in bars:
+        ax.annotate(f"{b.get_height():.0f}%", (b.get_x() + b.get_width() / 2, b.get_height()),
+                    textcoords="offset points", xytext=(0, 3), ha="center", fontsize=11)
+ax.set_xticks(list(xpos)); ax.set_xticklabels(groups)
+ax.set_ylabel("Base-model accuracy (%)"); ax.set_ylim(0, 100)
+ax.set_title("Why a hard eval matters\nThe easy set flatters the base model; the hard set reveals the real gap")
+ax.legend()
+save(fig, "07_easy_vs_hard.png")
+
 print("done ->", OUT)
