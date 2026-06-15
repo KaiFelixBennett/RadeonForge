@@ -149,4 +149,41 @@ ax.set_title("Why a hard eval matters\nThe easy set flatters the base model; the
 ax.legend()
 save(fig, "07_easy_vs_hard.png")
 
+# 8 + 9) Router bake-off (60-query eval): gemma-E2B vs Qwen3.5-0.8B vs Qwen3.5-2B
+try:
+    ev_e2b = load("eval_e2b.json"); ev_q08 = load("eval_qwen08.json"); ev_q2b = load("eval_qwen2b.json")
+    C_QWEN = "#16a34a"
+    models = [("gemma-E2B", ev_e2b, 3.2), ("Qwen3.5-0.8B", ev_q08, 0.5), ("Qwen3.5-2B", ev_q2b, 1.4)]
+    labels = [m[0] for m in models]
+    base_v = [acc(m[1], "base") for m in models]
+    ft_v = [acc(m[1], "finetuned") for m in models]
+    xpos = list(range(len(models))); w = 0.38
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    b1 = ax.bar([p - w / 2 for p in xpos], base_v, w, color=C_BASE, label="Base")
+    b2 = ax.bar([p + w / 2 for p in xpos], ft_v, w, color=C_QWEN, label="Fine-tuned")
+    for b in list(b1) + list(b2):
+        ax.annotate(f"{b.get_height():.0f}%", (b.get_x() + b.get_width() / 2, b.get_height()),
+                    textcoords="offset points", xytext=(0, 3), ha="center",
+                    fontsize=11, fontweight="bold" if b in list(b2) else "normal")
+    ax.set_xticks(xpos); ax.set_xticklabels(labels)
+    ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(0, 110)
+    ax.set_title("Router bake-off (60-query eval): the SMALLEST model wins\nQwen3.5-0.8B fine-tuned = 95% > gemma-E2B 88%, at a fraction of the size")
+    ax.legend()
+    save(fig, "08_bakeoff_accuracy.png")
+
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    cols = [C_E2B, C_QWEN, C_12B]
+    for (name, ev, gb), c in zip(models, cols):
+        a = acc(ev, "finetuned")
+        ax.scatter(gb, a, s=300, color=c, edgecolors="white", linewidths=1.5, zorder=3)
+        ax.annotate(f"{name}\n{gb} GB Q4 / {a:.0f}%", (gb, a),
+                    textcoords="offset points", xytext=(0, 16), ha="center", color=c, fontweight="bold")
+    ax.set_xlabel("Q4_K_M size in GB  (smaller = less VRAM, faster)")
+    ax.set_ylabel("Fine-tuned routing accuracy (%)")
+    ax.set_xlim(0, 3.8); ax.set_ylim(84, 100)
+    ax.set_title("Smaller AND more accurate\nThe 0.8B fine-tune is both the smallest and the best router\n(sizes: E2B & 0.8B measured, 2B approx)")
+    save(fig, "09_bakeoff_size_vs_acc.png")
+except Exception as e:
+    print("bakeoff charts skipped:", repr(e))
+
 print("done ->", OUT)
