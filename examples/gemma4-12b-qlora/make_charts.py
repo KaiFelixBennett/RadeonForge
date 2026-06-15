@@ -46,6 +46,8 @@ def comp_ok(d, k):
                if q[k]["expected_type"] == "comparison" and q[k]["level_correct"])
 
 def save(fig, name):
+    fig.text(0.995, 0.006, "https://github.com/KaiFelixBennett/RadeonForge",
+             ha="right", va="bottom", fontsize=8, color="#8a8a8a", alpha=0.85)
     p = os.path.join(OUT, name)
     fig.savefig(p); plt.close(fig); print("wrote", p)
 
@@ -63,18 +65,20 @@ ax.legend()
 save(fig, "01_training_loss.png")
 
 # 2) Accuracy base -> fine-tuned — ALL FOUR models (60-query eval)
-fig, ax = plt.subplots(figsize=(8.5, 6))
+# Exact numbers live in the legend (base -> fine-tuned); only the well-separated
+# BASE points get an on-plot label, so nothing overlaps at the clustered FT side.
+fig, ax = plt.subplots(figsize=(9.5, 6))
 x = [0, 1]
 for name, k, gb, c, mk in ALL:
-    ys = [acc(ev[k], "base"), acc(ev[k], "finetuned")]
-    ax.plot(x, ys, "-", marker=mk, color=c, lw=2.6, markersize=11, label=name)
-    for xi, yi in zip(x, ys):
-        ax.annotate(f"{yi:.0f}%", (xi, yi), textcoords="offset points",
-                    xytext=(0, 9 if xi == 1 else -17), ha="center", color=c, fontsize=10, fontweight="bold")
+    b, f = acc(ev[k], "base"), acc(ev[k], "finetuned")
+    ax.plot(x, [b, f], "-", marker=mk, color=c, lw=2.6, markersize=11,
+            label=f"{name}:  {b:.0f}% → {f:.0f}%")
+    ax.annotate(f"{b:.0f}%", (0, b), textcoords="offset points", xytext=(-10, 0),
+                ha="right", va="center", color=c, fontsize=10, fontweight="bold")
 ax.set_xticks(x); ax.set_xticklabels(["Base\n(no fine-tune)", "Fine-tuned"])
-ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(25, 102); ax.set_xlim(-0.32, 1.32)
+ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(25, 102); ax.set_xlim(-0.55, 1.15)
 ax.set_title("Fine-tuning lifts routing accuracy — all four models\nComprehensive 60-query, policy-focused eval")
-ax.legend(loc="center right")
+ax.legend(loc="center right", title="base → fine-tuned", fontsize=10)
 save(fig, "02_accuracy_before_after.png")
 
 # 3) The policy insight: document-comparison queries learned — all four models
@@ -166,41 +170,35 @@ ax.set_title("Why a hard eval matters\nThe easy set flatters the base model; the
 ax.legend()
 save(fig, "07_easy_vs_hard.png")
 
-# 8 + 9) Router bake-off (60-query eval): gemma-E2B vs Qwen3.5-0.8B vs Qwen3.5-2B
-try:
-    ev_e2b = load("eval_e2b.json"); ev_q08 = load("eval_qwen08.json"); ev_q2b = load("eval_qwen2b.json")
-    C_QWEN = "#16a34a"
-    models = [("gemma-E2B", ev_e2b, 3.2), ("Qwen3.5-0.8B", ev_q08, 0.5), ("Qwen3.5-2B", ev_q2b, 1.4)]
-    labels = [m[0] for m in models]
-    base_v = [acc(m[1], "base") for m in models]
-    ft_v = [acc(m[1], "finetuned") for m in models]
-    xpos = list(range(len(models))); w = 0.38
-    fig, ax = plt.subplots(figsize=(9, 5.5))
-    b1 = ax.bar([p - w / 2 for p in xpos], base_v, w, color=C_BASE, label="Base")
-    b2 = ax.bar([p + w / 2 for p in xpos], ft_v, w, color=C_QWEN, label="Fine-tuned")
-    for b in list(b1) + list(b2):
-        ax.annotate(f"{b.get_height():.0f}%", (b.get_x() + b.get_width() / 2, b.get_height()),
-                    textcoords="offset points", xytext=(0, 3), ha="center",
-                    fontsize=11, fontweight="bold" if b in list(b2) else "normal")
-    ax.set_xticks(xpos); ax.set_xticklabels(labels)
-    ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(0, 110)
-    ax.set_title("Router bake-off (60-query eval): the SMALLEST model wins\nQwen3.5-0.8B fine-tuned = 95% > gemma-E2B 88%, at a fraction of the size")
-    ax.legend()
-    save(fig, "08_bakeoff_accuracy.png")
+# 8) Router accuracy — all four models, base vs fine-tuned (bar view)
+names = [m[0] for m in ALL]
+base_v = [acc(ev[k], "base") for _, k, _, _, _ in ALL]
+ft_v = [acc(ev[k], "finetuned") for _, k, _, _, _ in ALL]
+xpos = list(range(len(ALL))); w = 0.38
+fig, ax = plt.subplots(figsize=(9.5, 5.5))
+b1 = ax.bar([p - w / 2 for p in xpos], base_v, w, color=C_BASE, label="Base")
+b2 = ax.bar([p + w / 2 for p in xpos], ft_v, w, color=C_QWEN08, label="Fine-tuned")
+for b in list(b1) + list(b2):
+    ax.annotate(f"{b.get_height():.0f}%", (b.get_x() + b.get_width() / 2, b.get_height()),
+                textcoords="offset points", xytext=(0, 3), ha="center", fontsize=10,
+                fontweight="bold" if b in list(b2) else "normal")
+ax.set_xticks(xpos); ax.set_xticklabels([f"{m[0]}\n{m[2]} GB" for m in ALL])
+ax.set_ylabel("Routing accuracy (%)"); ax.set_ylim(0, 110)
+ax.set_title("Router accuracy — all four models (60-query eval)\nFine-tuned: Qwen-0.8B 95% > Qwen-2B 93% > gemma-E2B 88% > gemma-12B 87%")
+ax.legend(loc="upper right")
+save(fig, "08_bakeoff_accuracy.png")
 
-    fig, ax = plt.subplots(figsize=(8, 5.5))
-    cols = [C_E2B, C_QWEN, C_12B]
-    for (name, ev, gb), c in zip(models, cols):
-        a = acc(ev, "finetuned")
-        ax.scatter(gb, a, s=300, color=c, edgecolors="white", linewidths=1.5, zorder=3)
-        ax.annotate(f"{name}\n{gb} GB Q4 / {a:.0f}%", (gb, a),
-                    textcoords="offset points", xytext=(0, 16), ha="center", color=c, fontweight="bold")
-    ax.set_xlabel("Q4_K_M size in GB  (smaller = less VRAM, faster)")
-    ax.set_ylabel("Fine-tuned routing accuracy (%)")
-    ax.set_xlim(0, 3.8); ax.set_ylim(84, 100)
-    ax.set_title("Smaller AND more accurate\nThe 0.8B fine-tune is both the smallest and the best router\n(sizes: E2B & 0.8B measured, 2B approx)")
-    save(fig, "09_bakeoff_size_vs_acc.png")
-except Exception as e:
-    print("bakeoff charts skipped:", repr(e))
+# 9) Fine-tuning GAIN (pp) per model — smaller/newer models gain most
+gains = [acc(ev[k], "finetuned") - acc(ev[k], "base") for _, k, _, _, _ in ALL]
+cols = [m[3] for m in ALL]
+fig, ax = plt.subplots(figsize=(9.5, 5.5))
+bars = ax.bar(xpos, gains, color=cols, width=0.6)
+for b, g in zip(bars, gains):
+    ax.annotate(f"+{g:.0f} pp", (b.get_x() + b.get_width() / 2, g),
+                textcoords="offset points", xytext=(0, 4), ha="center", fontweight="bold", fontsize=12)
+ax.set_xticks(xpos); ax.set_xticklabels([f"{m[0]}\n{m[2]} GB" for m in ALL])
+ax.set_ylabel("Accuracy gain from fine-tuning (pp)"); ax.set_ylim(0, max(gains) + 14)
+ax.set_title("How much each model GAINS from fine-tuning (60-query eval)\nThe biggest model (12B) gains the least (+7 pp); the small Qwens gain most")
+save(fig, "09_bakeoff_size_vs_acc.png")
 
 print("done ->", OUT)
