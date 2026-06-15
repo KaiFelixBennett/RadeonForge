@@ -110,6 +110,20 @@ Two findings worth keeping:
 - **Arch gotcha:** the 12B is `model_type: gemma4_unified` (vs the E2B's `gemma4_audio`) — needed `transformers` 5.12 (`KeyError: 'gemma4_unified'` on 5.8). Same family ≠ same setup.
 - **Bigger base, stronger prior:** the 12B base already hit 86 % and resisted one *policy-override* case (routing "compare two contracts" to detail). 158 samples flipped one of two comparison cases; the smaller E2B flipped both. More data would close it — but the **efficiency** gain is larger on the 12B (−42 % tokens). Detail: [`PILOT_RESULTS_12B.md`](examples/gemma4-12b-qlora/PILOT_RESULTS_12B.md).
 
+## Stage 8 — Harder, policy-focused eval (both models)
+The Stage-6 set was easy: many queries are ones where base and our policy *agree*. This set (21 queries, [`hard_queries.json`](examples/gemma4-12b-qlora/hard_queries.json)) stresses the *divergent* cases (comparisons, listings, full-doc summaries).
+
+| Model | Base acc | Fine-tuned acc | "compare 2 docs" (5 cases) | query_type | output |
+|---|---|---|---|---|---|
+| E2B | 62 % | 81 % | **0/5 → 5/5** | 48 % → 81 % | −18 % |
+| 12B | 76 % | 81 % | 0/5 → 1/5 | 57 % → **100 %** | −41 % |
+
+- **Every base model misroutes all 5 document-comparisons** (→ detail). Generic reasoning ≠ our "comparison = summaries" convention. Clearest domain-policy gap.
+- **Smaller model steers more easily:** E2B learned the comparison rule fully (5/5); the 12B fixed 1/5 from the same 158 samples (stronger prior) — though its `query_type` is 100 % (it *recognises* comparisons, won't override depth). → the router wants a small model + enough policy examples.
+- **The eval exposed a data gap:** the E2B fine-tune regressed on whole-document summaries (under-represented in 158 samples) → tells us what to add. Evidence: [`PILOT_RESULTS_HARD_E2B.md`](examples/gemma4-12b-qlora/PILOT_RESULTS_HARD_E2B.md) · [`PILOT_RESULTS_HARD_12B.md`](examples/gemma4-12b-qlora/PILOT_RESULTS_HARD_12B.md).
+
+> Note on model size: the **Q4_K_M serving size** is 6.9 GB (12B) — matches Ollama's 7.4 GB. The "24 GB" elsewhere is **bf16 full precision** (used for merge + the bf16 A/B for max fidelity); QLoRA *training* loads in 4-bit (~7–10 GB).
+
 ---
 
 ## Artifacts (where everything lives)
