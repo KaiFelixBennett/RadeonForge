@@ -3,7 +3,9 @@
 **Fine-tune LLMs on AMD Radeon (RDNA4 / RDNA3) under Windows & WSL2 — reproducibly.**
 QLoRA via ROCm (WSL2) · LoRA via Vulkan (native Windows) · worked Gemma-4-12B example · a smoke test that proves the loss actually falls.
 
-> Status: **working draft, community-maintained.** Verified on an **AMD Radeon AI PRO R9700 (RDNA4, gfx1201, 32 GB)** as of **June 2026**. Versions in this repo are *pinned and dated* — see [VERSIONS.md](VERSIONS.md) and re-verify before relying on them.
+> Status: **working draft, community-maintained.** Verified on an **AMD Radeon AI PRO R9700 (RDNA4, gfx1201, 32 GB)** as of **June 2026** (a real QLoRA fine-tune of gemma-4 → **8/8** held-out test). Versions are *pinned and dated* — see [VERSIONS.md](VERSIONS.md) and re-verify.
+
+> 📖 **New here / want to reproduce or learn?** Step-by-step: **[RUNBOOK.md](RUNBOOK.md)** · How fine-tuning works (from scratch): **[docs/how-finetuning-works.md](docs/how-finetuning-works.md)**.
 
 ---
 
