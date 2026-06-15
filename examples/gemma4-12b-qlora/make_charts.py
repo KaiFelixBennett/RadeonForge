@@ -201,4 +201,54 @@ ax.set_ylabel("Accuracy gain from fine-tuning (pp)"); ax.set_ylim(0, max(gains) 
 ax.set_title("How much each model GAINS from fine-tuning (60-query eval)\nThe biggest model (12B) gains the least (+7 pp); the small Qwens gain most")
 save(fig, "09_bakeoff_size_vs_acc.png")
 
+# 10) THE INVERSION (hero) — fine-tuned accuracy falls as model size rises
+order = sorted(ALL, key=lambda m: m[2])          # by Q4 size ascending
+sizes = [m[2] for m in order]
+accs = [acc(ev[m[1]], "finetuned") for m in order]
+fig, ax = plt.subplots(figsize=(10, 6.5))
+# descending trend arrow: smallest (top-left) -> biggest (bottom-right)
+ax.annotate("", xy=(sizes[-1], accs[-1]), xytext=(sizes[0], accs[0]),
+            arrowprops=dict(arrowstyle="-|>", color="#555", lw=2.5, ls=(0, (6, 4)), alpha=0.7))
+for m, s, a in zip(order, sizes, accs):
+    ax.scatter(s, a, s=900, color=m[3], edgecolors="white", linewidths=2, zorder=5)
+    ax.annotate(f"{m[0]}\n{a:.0f}%  ·  {m[2]} GB", (s, a),
+                textcoords="offset points", xytext=(0, 26), ha="center",
+                color=m[3], fontsize=11, fontweight="bold")
+# ring the winner (smallest = best)
+ax.scatter(sizes[0], accs[0], s=2600, facecolors="none", edgecolors="#f5b50a", linewidths=3, zorder=6)
+ax.annotate("BEST & SMALLEST", (sizes[0], accs[0]), textcoords="offset points",
+            xytext=(0, -34), ha="center", color="#b8860b", fontsize=11, fontweight="bold")
+factor = sizes[-1] / sizes[0]
+ax.text(0.5, 0.12, f"≈ {factor:.0f}× the size  →  {accs[0]-accs[-1]:.0f} points LOWER accuracy",
+        transform=ax.transAxes, ha="center", fontsize=14, fontweight="bold", color="#222",
+        bbox=dict(boxstyle="round,pad=0.5", fc="#fff3cd", ec="#f5b50a", lw=1.5))
+ax.set_xscale("log")
+import matplotlib.ticker as mticker
+ax.xaxis.set_major_locator(mticker.FixedLocator(sizes))
+ax.xaxis.set_major_formatter(mticker.FixedFormatter([f"{s}" for s in sizes]))
+ax.xaxis.set_minor_locator(mticker.NullLocator())
+ax.xaxis.set_minor_formatter(mticker.NullFormatter())
+ax.set_xlabel("Model size — Q4_K_M, GB  (log scale; → bigger)")
+ax.set_ylabel("Fine-tuned routing accuracy (%)")
+ax.set_ylim(84, 99); ax.set_xlim(0.35, 9)
+ax.set_title("After fine-tuning, BIGGER = WORSE\nFor a narrow task, the smallest model is the most accurate router")
+save(fig, "10_the_inversion.png")
+
+# 11) Base -> fine-tuned dumbbell — small models leap, the big one crawls
+order2 = sorted(ALL, key=lambda m: m[2], reverse=True)   # biggest on top
+fig, ax = plt.subplots(figsize=(9.5, 6))
+for i, m in enumerate(order2):
+    b, f = acc(ev[m[1]], "base"), acc(ev[m[1]], "finetuned")
+    ax.plot([b, f], [i, i], color=m[3], lw=4, zorder=2, solid_capstyle="round")
+    ax.scatter(b, i, color="#c4c9d0", s=150, zorder=3, edgecolors="white", linewidths=1.5)
+    ax.scatter(f, i, color=m[3], s=300, zorder=4, edgecolors="white", linewidths=1.5)
+    ax.annotate(f"{b:.0f}%", (b, i), textcoords="offset points", xytext=(-9, 0), ha="right", va="center", color="#777", fontsize=10)
+    ax.annotate(f"{f:.0f}%", (f, i), textcoords="offset points", xytext=(10, 0), va="center", color=m[3], fontsize=11, fontweight="bold")
+    ax.annotate(f"+{f-b:.0f} pp", ((b + f) / 2, i), textcoords="offset points", xytext=(0, 11), ha="center", color=m[3], fontsize=10, fontweight="bold")
+ax.set_yticks(range(len(order2))); ax.set_yticklabels([f"{m[0]}\n{m[2]} GB" for m in order2])
+ax.set_xlabel("Routing accuracy (%)  —  ● base   ●⟶ fine-tuned")
+ax.set_xlim(28, 104); ax.set_ylim(-0.6, len(order2) - 0.4)
+ax.set_title("Base → fine-tuned: the small models LEAP, the big one crawls\nThe 12B starts highest (80%) yet ends lowest (87%); Qwen-0.8B leaps 50→95%")
+save(fig, "11_dumbbell_base_to_ft.png")
+
 print("done ->", OUT)
