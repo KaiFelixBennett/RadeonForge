@@ -45,9 +45,21 @@ def comp_ok(d, k):
     return sum(1 for q in d["queries"]
                if q[k]["expected_type"] == "comparison" and q[k]["level_correct"])
 
+WM = "github.com/KaiFelixBennett/RadeonForge"
+
 def save(fig, name):
-    fig.text(0.995, 0.006, "https://github.com/KaiFelixBennett/RadeonForge",
-             ha="right", va="bottom", fontsize=8, color="#8a8a8a", alpha=0.85)
+    # Anti-crop watermark: a faint diagonal TILE repeated across the whole figure.
+    # Because it overlaps the data (lines/bars), you can't crop it off and it's
+    # awkward for AI inpainting to scrub without disturbing the plot — yet at very
+    # low alpha it stays unobtrusive. A single legible mark sits bottom-right.
+    rows = [0.04, 0.26, 0.48, 0.70, 0.92]
+    for i, yy in enumerate(rows):
+        xoff = -0.18 + (i % 2) * 0.18
+        for j in range(4):
+            fig.text(xoff + j * 0.36, yy, WM, fontsize=12, color="#5b6472",
+                     alpha=0.07, rotation=20, ha="left", va="center", zorder=5)
+    fig.text(0.995, 0.004, WM, fontsize=8, color="#8a8a8a", alpha=0.7,
+             ha="right", va="bottom", zorder=6)
     p = os.path.join(OUT, name)
     fig.savefig(p); plt.close(fig); print("wrote", p)
 
