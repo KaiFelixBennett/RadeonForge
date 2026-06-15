@@ -9,7 +9,7 @@ The gotcha → fix table. Most of these are **silent** failures (no error, just 
 | `flash-attn` build fails ("20 errors generated") | No CK FlashAttention for Wave32 RDNA4 | Don't build flash-attn; use math SDPA. (Triton flag `FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE` is inference-only-ish, unstable for training) |
 | `import bitsandbytes` ok but NF4 train corrupts / no ROCm backend | PyPI bnb lacks working ROCm backend | Install CI preview wheel `1.33.7.preview` or compile `-DBNB_ROCM_ARCH="gfx1201"`; set `BNB_BACKEND=rocm`, `AMDGPU_TARGETS="gfx1201"` |
 | `torch.cuda.is_available()` is False | CUDA wheel installed, or GPU not seen in WSL | Install the ROCm torch wheels; `export HSA_ENABLE_DXG_DETECTION=1`; check `rocminfo \| grep gfx1201` |
-| `rocminfo` doesn't list gfx1201 in WSL | Wrong driver / missing DXG env | AMD Adrenalin **26.2.2 for WSL2** on host; `HSA_ENABLE_DXG_DETECTION=1` |
+| `rocminfo` → `librocdxg.so: cannot open` / no gfx1201 in WSL | `librocdxg` package missing (it is **not** from the driver) | install `rocdxg-roct` .deb (→ `/opt/rocm/lib`); `export HSA_ENABLE_DXG_DETECTION=1`; ensure an Adrenalin WSL2 driver provides `/dev/dxg` |
 | `modprobe amdgpu` fails in WSL | You tried to install the kernel module in WSL | Don't — host owns the GPU. Install with `--no-dkms` |
 | `amdgpu-install: unknown usecase wsl` | `wsl` usecase removed in amdgpu-install 30.x | Use `--usecase=rocm,hip --no-dkms` |
 | HF `Trainer`/`SFTTrainer` HIP launch failure (raw loop works) | Trainer internals trip a HIP edge case | Reduce batch, set `PYTORCH_ALLOC_CONF=expandable_segments:True`; as last resort a minimal raw PyTorch loop |

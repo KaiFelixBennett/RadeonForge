@@ -6,7 +6,12 @@ Full, pinned setup for **4-bit QLoRA / LoRA** fine-tuning on **AMD Radeon AI PRO
 
 ## 0) Windows host (once, outside WSL)
 
-1. Install the **AMD Adrenalin 26.2.2 for WSL2** driver (R9700 driver page). **Mandatory & version-specific:** 26.2.2 introduced the WSL ROCm bridge (`librocdxg` / ROCDXG); a *newer* Adrenalin (e.g. 26.5.x) may **not** ship it — symptom: `rocminfo` → `librocdxg.so: cannot open` + `undefined symbol: hsaKmtOpenKFD`. Install clean (Factory Reset), then `wsl --shutdown`. (See [paths-and-stability.md](paths-and-stability.md).)
+1. Install **any recent AMD Adrenalin WSL2 driver** (R9700 driver page) — it provides `libdxcore.so` + `/dev/dxg`. **Driver version is NOT the blocker** (26.5.x is fine; no downgrade). The WSL↔GPU bridge `librocdxg` is a **separate package** (`amdgpu-install --usecase=wsl` does NOT include it) — install it inside WSL:
+   ```bash
+   wget https://github.com/ROCm/librocdxg/releases/download/v1.2.0/rocdxg-roct_1.2.0_amd64.deb
+   sudo apt install ./rocdxg-roct_1.2.0_amd64.deb     # -> /opt/rocm/lib/librocdxg.so
+   ```
+   Symptom if missing: `rocminfo` → `librocdxg.so: cannot open`. Details: [paths-and-stability.md](paths-and-stability.md).
 2. In PowerShell:
    ```powershell
    wsl --install -d Ubuntu-24.04

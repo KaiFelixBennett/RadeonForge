@@ -14,7 +14,7 @@ echo "== RadeonForge doctor =="
 echo "[1] GPU visible to ROCm"
 if command -v rocminfo >/dev/null 2>&1; then
   if rocminfo 2>/dev/null | grep -qi gfx1201; then pass "rocminfo lists gfx1201 (RDNA4)"
-  else fail "rocminfo found but gfx1201 NOT listed — check Adrenalin 26.2.2 driver + HSA_ENABLE_DXG_DETECTION=1"; fi
+  else fail "rocminfo found but gfx1201 NOT listed — install rocdxg-roct (librocdxg) + 'export HSA_ENABLE_DXG_DETECTION=1'; ensure an Adrenalin WSL2 driver provides /dev/dxg"; fi
 else fail "rocminfo not found — ROCm not installed (see docs/track-a-wsl2-rocm.md)"; fi
 
 echo "[2] Required env"
