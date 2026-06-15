@@ -1,0 +1,1584 @@
+{
+  "task": "HiRAG query-complexity routing (Task A)",
+  "base_model": "google/gemma-4-12B-it",
+  "finetuned": "/root/aria-pilot/12b-merged",
+  "gpu": "AMD Radeon AI PRO R9700",
+  "metrics": {
+    "base": {
+      "n": 60,
+      "json_valid_rate": 1.0,
+      "level_accuracy": 0.8,
+      "type_accuracy": 0.6,
+      "avg_out_tokens": 126.3
+    },
+    "finetuned": {
+      "n": 60,
+      "json_valid_rate": 1.0,
+      "level_accuracy": 0.867,
+      "type_accuracy": 0.967,
+      "avg_out_tokens": 73.1
+    }
+  },
+  "queries": [
+    {
+      "base": {
+        "query": "Welche Dokumente kennst du?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a list of available documents, which corresponds to a high-level overview of the knowledge base.\",\n  \"keywords\": [\n    \"Dokumente\",\n    \"Liste\",\n    \"Verfügbarkeit\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 109,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welche Dokumente kennst du?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"User is asking for a list of available documents (overview/browse)\", \"keywords\": [\"welche\", \"dokumente\", \"kennst\"], \"requires_cross_doc\": false}",
+        "out_tokens": 69,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Liste alle verfuegbaren Dokumente auf",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for a list of all available documents, which corresponds to a high-level overview of the collection rather than specific content.\",\n  \"keywords\": [\n    \"liste\",\n    \"dokumente\",\n    \"verfuegbar\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 112,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Liste alle verfuegbaren Dokumente auf",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Document listing/overview query\", \"keywords\": [\"liste\", \"alle\", \"verfuegbaren\", \"dokumente\", \"auf\"], \"requires_cross_doc\": false}",
+        "out_tokens": 72,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What documents do you have access to?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a high-level listing of available documents rather than specific information from within them.\",\n  \"keywords\": [\n    \"documents\",\n    \"access\",\n    \"inventory\",\n    \"list\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 106,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "What documents do you have access to?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 query — listing which documents exist\", \"keywords\": [\"what\", \"documents\", \"have\", \"access\"], \"requires_cross_doc\": false}",
+        "out_tokens": 65,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Gib mir einen Ueberblick ueber alle vorhandenen Unterlagen",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for an overview of all available documents ('Ueberblick ueber alle vorhandenen Unterlagen'), which maps directly to target_level 0.\",\n  \"keywords\": [\n    \"Ueberblick\",\n    \"Unterlagen\",\n    \"alle\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 117,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Gib mir einen Ueberblick ueber alle vorhandenen Unterlagen",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Wants a high-level overview of all available documents (level 0 summaries)\", \"keywords\": [\"gib\", \"mir\", \"einen\", \"ueberblick\", \"ueber\", \"alle\", \"vorhandenen\", \"unterlagen\"], \"requires_cross_doc\": false}",
+        "out_tokens": 91,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welche Berichte liegen dir vor?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a list of available documents/reports, which corresponds to a high-level overview of the available content.\",\n  \"keywords\": [\n    \"Berichte\",\n    \"Verfügbarkeit\",\n    \"Dokumente\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 112,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welche Berichte liegen dir vor?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Content/overview query — Level 0 (listing which documents exist)\", \"keywords\": [\"welche\", \"berichte\", \"liegen\", \"vor\"], \"requires_cross_doc\": false}",
+        "out_tokens": 71,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Show me everything in the knowledge base",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a comprehensive list or summary of all available content in the knowledge base, which corresponds to a high-level overview of document existence.\",\n  \"keywords\": [\n    \"everything\",\n    \"knowledge base\",\n    \"list\",\n    \"summary\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 117,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Show me everything in the knowledge base",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Document summaries (listing which documents exist)\", \"keywords\": [\"show\", \"everything\", \"knowledge\", \"base\"], \"requires_cross_doc\": false}",
+        "out_tokens": 67,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was fuer Dokumente sind hochgeladen?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a general list or inventory of uploaded documents, which corresponds to a high-level overview of the available content.\",\n  \"keywords\": [\n    \"Dokumente\",\n    \"hochgeladen\",\n    \"Liste\",\n    \"Inhalt\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 118,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Was fuer Dokumente sind hochgeladen?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Listing which documents exist (overview/browse)\", \"keywords\": [\"was\", \"fuer\", \"dokumente\", \"sind\", \"hochgeladen\"], \"requires_cross_doc\": false}",
+        "out_tokens": 76,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "List all available files",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"search\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a listing of all available files, which corresponds to a high-level overview of the document collection rather than specific content analysis.\",\n  \"keywords\": [\n    \"list\",\n    \"files\",\n    \"available\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 110,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "List all available files",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Document summaries/listing which documents exist\", \"keywords\": [\"list\", \"all\", \"available\", \"files\"], \"requires_cross_doc\": false}",
+        "out_tokens": 67,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welche Handbuecher gibt es?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a list of available handbooks ('Welche Handbuecher gibt es?'), which implies a request for a high-level overview or a listing of documents rather than a specific detail from one.\",\n  \"keywords\": [\n    \"Handbuecher\",\n    \"Liste\",\n    \"Übersicht\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 131,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welche Handbuecher gibt es?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Listing which documents exist (overview/browse)\", \"keywords\": [\"welche\", \"handbuecher\", \"gibt\"], \"requires_cross_doc\": false}",
+        "out_tokens": 70,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Zeig mir alle Vertraege, die du hast",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"search\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a listing of all documents of a specific type ('Vertraege' / contracts). This requires identifying which documents exist in the database rather than summarizing or analyzing specific content.\",\n  \"keywords\": [\n    \"Vertraege\",\n    \"contracts\",\n    \"list\",\n    \"all\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 126,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Zeig mir alle Vertraege, die du hast",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Listing which documents exist (overview/browse)\", \"keywords\": [\"zeig\", \"mir\", \"alle\", \"vertraege\", \"die\", \"du\", \"hast\"], \"requires_cross_doc\": false}",
+        "out_tokens": 81,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Which reports are available to you?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a high-level listing of available documents/reports rather than specific information from within them.\",\n  \"keywords\": [\n    \"available reports\",\n    \"document list\",\n    \"inventory\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 105,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Which reports are available to you?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Document summaries/listing which documents exist\", \"keywords\": [\"which\", \"reports\", \"available\"], \"requires_cross_doc\": false}",
+        "out_tokens": 64,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Nenne mir alle Dokumente im System",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "```json\n{\n  \"query_type\": \"search\",\n  \"target_level\": 0,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for a list of all documents in the system, which corresponds to a high-level overview/listing of available documents.\",\n  \"keywords\": [\n    \"alle Dokumente\",\n    \"Liste\",\n    \"Systeminhalt\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 113,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Nenne mir alle Dokumente im System",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Level 0 — Listing which documents exist\", \"keywords\": [\"nenne\", \"mir\", \"alle\", \"dokumente\", \"system\"], \"requires_cross_doc\": false}",
+        "out_tokens": 69,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Vergleiche die beiden Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user explicitly asks to 'compare' (Vergleiche) two contracts. This requires identifying two specific documents and performing a side-by-side analysis of their clauses, terms, and conditions.\",\n  \"keywords\": [\n    \"Verträge\",\n    \"Vergleich\",\n    \"Analyse\",\n    \"Unterschiede\",\n    \"Gemeinsamkeiten\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 140,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Vergleiche die beiden Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9, \"reasoning\": \"Cross-document comparison — Level 0 summaries\", \"keywords\": [\"vergleiche\", \"beiden\", \"vertraege\"], \"requires_cross_doc\": true}",
+        "out_tokens": 66,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Worin unterscheiden sich Bericht A und Bericht B?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for a comparison between two specific entities (Bericht A and Bericht B), requiring a side-by-side analysis of their contents.\",\n  \"keywords\": [\n    \"Bericht A\",\n    \"Bericht B\",\n    \"Unterschiede\",\n    \"Vergleich\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 125,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Worin unterscheiden sich Bericht A und Bericht B?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Cross-document comparison query — Level 0 summaries\", \"keywords\": [\"worin\", \"unterscheiden\", \"sich\", \"bericht\", \"a\", \"und\", \"bericht\", \"b\"], \"requires_cross_doc\": true}",
+        "out_tokens": 81,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Stelle die Angebote von Anbieter X und Y gegenueber",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user explicitly asks to 'gegenueber' (compare) the offers of two specific entities (X and Y), requiring a side-by-side analysis of specific details.\",\n  \"keywords\": [\n    \"Anbieter X\",\n    \"Anbieter Y\",\n    \"Angebote\",\n    \"Vergleich\",\n    \"comparison\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 133,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Stelle die Angebote von Anbieter X und Y gegenueber",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Cross-document comparison query — Level 2 detail chunks\", \"keywords\": [\"stelle\", \"angebote\", \"anbieter\", \"x\", \"y\", \"gegenueber\"], \"requires_cross_doc\": true}",
+        "out_tokens": 77,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Compare the two contracts",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user explicitly asks to 'Compare', which triggers the comparison type. Since 'the two contracts' implies specific documents are already in context or being referenced, a deep analysis of specific clauses (level 2) is required to provide a meaningful comparison.\",\n  \"keywords\": [\n    \"contract\",\n    \"comparison\",\n    \"differences\",\n    \"terms\",\n    \"clauses\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 143,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Compare the two contracts",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Cross-document comparison query — Level 2 detail chunks\", \"keywords\": [\"compare\", \"two\", \"contracts\"], \"requires_cross_doc\": true}",
+        "out_tokens": 63,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was sind die Gemeinsamkeiten der drei Studien?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a comparative analysis (commonalities) across three specific entities (studies). This requires identifying and synthesizing information from multiple documents/sections.\",\n  \"keywords\": [\n    \"Gemeinsamkeiten\",\n    \"Studien\",\n    \"Vergleich\",\n    \"Analyse\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 123,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Was sind die Gemeinsamkeiten der drei Studien?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9, \"reasoning\": \"Cross-document comparison query — Level 0 (overview/summaries)\", \"keywords\": [\"was\", \"sind\", \"gemeinsamkeiten\", \"drei\", \"studien\"], \"requires_cross_doc\": true}",
+        "out_tokens": 78,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welcher der beiden Tarife ist guenstiger?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a direct comparison between two specific entities (tariffs) to determine a cost difference, requiring a detailed analysis of pricing data.\",\n  \"keywords\": [\n    \"Tarif\",\n    \"Preisvergleich\",\n    \"günstiger\",\n    \"Kosten\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 122,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welcher der beiden Tarife ist guenstiger?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Cross-document/cross-section comparison query — Level 2 detail lookup\", \"keywords\": [\"welcher\", \"beiden\", \"tarife\", \"günstiger\"], \"requires_cross_doc\": true}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Gegenueberstellung der Kuendigungsfristen beider Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is explicitly asking for a 'Gegenüberstellung' (comparison/juxtaposition) of termination periods ('Kündigungsfristen') between two specific contracts. This requires extracting specific data points from two different documents and presenting them side-by-side.\",\n  \"keywords\": [\n    \"Kündigungsfristen\",\n    \"Verträge\",\n    \"Gegenüberstellung\",\n    \"termination periods\",\n    \"contracts\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 155,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Gegenueberstellung der Kuendigungsfristen beider Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Cross-document comparison/overview of specific data points (notice periods) within documents\", \"keywords\": [\"gegenueberstellung\", \"kuendigungsfristen\", \"beider\", \"vertraege\"], \"requires_cross_doc\": true}",
+        "out_tokens": 81,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "How do the two proposals differ?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is explicitly asking for a comparison between two specific entities ('proposals'). This requires identifying the two proposals in the context and extracting their respective features to highlight differences.\",\n  \"keywords\": [\n    \"proposals\",\n    \"differences\",\n    \"comparison\",\n    \"analysis\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 122,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "How do the two proposals differ?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Cross-document/cross-section comparison query — Level 2 detail comparison\", \"keywords\": [\"how\", \"two\", \"proposals\", \"differ\"], \"requires_cross_doc\": true}",
+        "out_tokens": 71,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Vergleiche die Datenschutzregelungen in den Dokumenten",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user explicitly asks to 'compare' (Vergleiche) data protection regulations across multiple documents. This requires extracting specific details from different sources and synthesizing them into a comparative format.\",\n  \"keywords\": [\n    \"Datenschutz\",\n    \"Regelungen\",\n    \"Vergleich\",\n    \"privacy policy\",\n    \"data protection\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 133,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Vergleiche die Datenschutzregelungen in den Dokumenten",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.95, \"reasoning\": \"Cross-document comparison query — Level 0 (document summaries)\", \"keywords\": [\"vergleiche\", \"datenschutzregelungen\", \"dokumenten\"], \"requires_cross_doc\": true}",
+        "out_tokens": 71,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was ist der Unterschied zwischen Version 1 und Version 2 des Handbuchs?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for a comparison between two specific versions of a document (Version 1 and Version 2). This requires identifying differences in content, features, or instructions across both versions.\",\n  \"keywords\": [\n    \"Version 1\",\n    \"Version 2\",\n    \"Unterschied\",\n    \"Handbuch\",\n    \"Vergleich\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 137,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Was ist der Unterschied zwischen Version 1 und Version 2 des Handbuchs?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9, \"reasoning\": \"Cross-document comparison between two summaries/documents\", \"keywords\": [\"was\", \"ist\", \"unterschied\", \"zwischen\", \"version\", \"handbuch\"], \"requires_cross_doc\": true}",
+        "out_tokens": 72,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Which supplier offers better terms according to the documents?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a comparative analysis of 'terms' between multiple entities (suppliers). This requires extracting specific data points from different documents and weighing them against each other.\",\n  \"keywords\": [\n    \"supplier\",\n    \"terms\",\n    \"comparison\",\n    \"pricing\",\n    \"contract\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 125,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Which supplier offers better terms according to the documents?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Cross-document comparison query — Level 2 detail lookup\", \"keywords\": [\"which\", \"supplier\", \"offers\", \"better\", \"terms\", \"according\"], \"requires_cross_doc\": true}",
+        "out_tokens": 72,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Vergleiche die Kernaussagen beider Quartalsberichte",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "```json\n{\n  \"query_type\": \"comparison\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user explicitly asks to 'compare' (Vergleiche) the 'core statements' (Kernaussagen) of 'both quarterly reports' (beider Quartalsberichte), requiring a cross-document analysis of specific content.\",\n  \"keywords\": [\n    \"Quartalsbericht\",\n    \"Kernaussagen\",\n    \"Vergleich\",\n    \"Analyse\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 141,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Vergleiche die Kernaussagen beider Quartalsberichte",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Cross-document comparison of summaries/chapters — Level 1\", \"keywords\": [\"vergleiche\", \"kernaussagen\", \"beider\", \"quartalsberichte\"], \"requires_cross_doc\": true}",
+        "out_tokens": 77,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Fasse Kapitel 3 zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a summary of a specific chapter (Kapitel 3), which corresponds to a section/chapter level summary.\",\n  \"keywords\": [\n    \"Kapitel 3\",\n    \"Zusammenfassung\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 107,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Fasse Kapitel 3 zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Level 1 — Chapter/section or a document summary\", \"keywords\": [\"fasse\", \"kapitel\", \"3\", \"zusammen\"], \"requires_cross_doc\": false}",
+        "out_tokens": 70,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Worum geht es im Jahresbericht?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a general summary of the content of the annual report ('Jahresbericht'). This requires a high-level overview of the document's main themes and sections rather than specific data points.\",\n  \"keywords\": [\n    \"Jahresbericht\",\n    \"Zusammenfassung\",\n    \"Inhalt\",\n    \"Überblick\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 136,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Worum geht es im Jahresbericht?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9, \"reasoning\": \"Level 0 — Document summaries (listing which documents exist/overview of a document)\", \"keywords\": [\"worum\", \"geht\", \"im\", \"jahresbericht\"], \"requires_cross_doc\": false}",
+        "out_tokens": 74,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": false,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Gib mir eine Zusammenfassung des gesamten Vertrags",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for a summary ('Zusammenfassung') of the entire document ('gesamten Vertrags'), which maps directly to a high-level overview/summary task.\",\n  \"keywords\": [\n    \"Zusammenfassung\",\n    \"Vertrag\",\n    \"Gesamt\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 120,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Gib mir eine Zusammenfassung des gesamten Vertrags",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Level 1 — Chapter/section or a document summary\", \"keywords\": [\"gib\", \"mir\", \"eine\", \"zusammenfassung\", \"des\", \"gesamten\", \"vertrags\"], \"requires_cross_doc\": false}",
+        "out_tokens": 82,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Summarize section 2 of the manual",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a summary of a specific section (Section 2) of a document, which corresponds to a chapter/section summary level.\",\n  \"keywords\": [\n    \"section 2\",\n    \"summary\",\n    \"manual\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 112,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Summarize section 2 of the manual",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Level 1 — Chapter/section or a document summary\", \"keywords\": [\"summarize\", \"section\", \"2\", \"manual\"], \"requires_cross_doc\": false}",
+        "out_tokens": 68,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was steht in Abschnitt 4.2?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for the content of a specific section (4.2), which requires retrieving a chapter/section summary or content.\",\n  \"keywords\": [\n    \"Abschnitt 4.2\",\n    \"content\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 107,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Was steht in Abschnitt 4.2?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Specific chapter/section/document summary request\", \"keywords\": [\"was\", \"steht\", \"abschnitt\", \"42\"], \"requires_cross_doc\": false}",
+        "out_tokens": 67,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Fasse das Datenschutzkonzept zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a summary ('Fasse zusammen') of a specific document ('Datenschutzkonzept'). This requires a high-level overview of the content rather than specific details or a deep dive into individual clauses.\",\n  \"keywords\": [\n    \"Datenschutzkonzept\",\n    \"Zusammenfassung\",\n    \"Summary\",\n    \"Data Protection Concept\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 137,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Fasse das Datenschutzkonzept zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Wants a summary of a specific document/chapter — Level 1\", \"keywords\": [\"fasse\", \"datenschutzkonzept\", \"zusammen\"], \"requires_cross_doc\": false}",
+        "out_tokens": 72,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Give me the key points of the whitepaper",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for 'key points', which implies a high-level summary of the entire document rather than specific details or a deep dive into a single section.\",\n  \"keywords\": [\n    \"key points\",\n    \"summary\",\n    \"whitepaper\",\n    \"highlights\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 121,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Give me the key points of the whitepaper",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Level 1 — Chapter/section or a document summary\", \"keywords\": [\"give\", \"key\", \"points\", \"whitepaper\"], \"requires_cross_doc\": false}",
+        "out_tokens": 68,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Worum geht es in Dokument 5?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a summary of a specific document (Document 5), which corresponds to a document-level summary.\",\n  \"keywords\": [\n    \"Dokument 5\",\n    \"Inhalt\",\n    \"Zusammenfassung\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 111,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Worum geht es in Dokument 5?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Level 1 query — Level 1 is a chapter/section or a document summary\", \"keywords\": [\"worum\", \"geht\", \"dokument\", \"5\"], \"requires_cross_doc\": false}",
+        "out_tokens": 74,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Zusammenfassung des Onboarding-Handbuchs bitte",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is explicitly asking for a 'Zusammenfassung' (summary) of a specific document ('Onboarding-Handbuch'). This maps to a high-level overview of the document's content rather than specific details or a deep dive.\",\n  \"keywords\": [\n    \"Onboarding-Handbuch\",\n    \"Zusammenfassung\",\n    \"summary\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 135,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Zusammenfassung des Onboarding-Handbuchs bitte",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Level 1 — Chapter/section or a document summary\", \"keywords\": [\"zusammenfassung\", \"onboardinghandbuch\"], \"requires_cross_doc\": false}",
+        "out_tokens": 66,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What is the annual report about?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a high-level summary of a document (the annual report) rather than specific data points or a deep technical analysis.\",\n  \"keywords\": [\n    \"annual report\",\n    \"summary\",\n    \"overview\",\n    \"highlights\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 116,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "What is the annual report about?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9, \"reasoning\": \"Level 1 query — Level 1 is a chapter/section or a document summary\", \"keywords\": [\"what\", \"annual\", \"report\", \"about\"], \"requires_cross_doc\": false}",
+        "out_tokens": 72,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Fasse das Kapitel Sicherheit zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 1,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a summary of a specific chapter ('Sicherheit'). This requires a summary of a section/chapter rather than a full document overview or granular detail chunks.\",\n  \"keywords\": [\n    \"Sicherheit\",\n    \"Zusammenfassung\",\n    \"Kapitel\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 119,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Fasse das Kapitel Sicherheit zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95, \"reasoning\": \"Content/chapter summary request — Level 1\", \"keywords\": [\"fasse\", \"kapitel\", \"sicherheit\", \"zusammen\"], \"requires_cross_doc\": false}",
+        "out_tokens": 69,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Gib mir die Kernaussagen des Berichts",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "```json\n{\n  \"query_type\": \"overview\",\n  \"target_level\": 1,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for 'Kernaussagen' (key statements/main points), which implies a summary of the entire document or a specific report rather than a deep dive into specific details.\",\n  \"keywords\": [\n    \"Kernaussagen\",\n    \"Bericht\",\n    \"Zusammenfassung\",\n    \"Summary\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 131,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Gib mir die Kernaussagen des Berichts",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9, \"reasoning\": \"Wants a summary of a specific document/chapter — Level 1\", \"keywords\": [\"gib\", \"mir\", \"kernaussagen\", \"des\", \"berichts\"], \"requires_cross_doc\": false}",
+        "out_tokens": 76,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erklaere das Saga-Pattern im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a detailed explanation ('im Detail') of a specific technical architectural pattern (Saga Pattern). This requires a comprehensive breakdown of concepts, types (Choreography vs. Orchestration), and implementation details rather than a simple summary.\",\n  \"keywords\": [\n    \"Saga Pattern\",\n    \"Distributed Transactions\",\n    \"Choreography\",\n    \"Orchestration\",\n    \"Compensating Transactions\",\n    \"Microservices\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 158,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Erklaere das Saga-Pattern im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/detail lookup within documents — Level 2 detail chunks\", \"keywords\": [\"erkläre\", \"saga\", \"pattern\", \"detail\"], \"requires_cross_doc\": false}",
+        "out_tokens": 72,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie funktioniert die Zwei-Faktor-Authentifizierung genau?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a detailed explanation of a technical process ('how exactly does it work'). This requires a deep dive into the underlying mechanisms (tokens, SMS, biometrics, protocols) rather than just a high-level summary.\",\n  \"keywords\": [\n    \"Zwei-Faktor-Authentifizierung\",\n    \"2FA\",\n    \"Multi-Faktor-Authentifizierung\",\n    \"Authentifizierungsprozess\",\n    \"TOTP\",\n    \"SMS-Code\",\n    \"Biometrie\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 172,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Wie funktioniert die Zwei-Faktor-Authentifizierung genau?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"wie\", \"funktioniert\", \"zwei\", \"faktor\", \"authentifizierung\", \"genau\"], \"requires_cross_doc\": false}",
+        "out_tokens": 78,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Explain the authentication flow step by step",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a sequential, technical explanation of a process ('step by step'). This requires extracting specific procedural details from the documentation rather than a high-level summary.\",\n  \"keywords\": [\n    \"authentication\",\n    \"flow\",\n    \"step by step\",\n    \"sequence\",\n    \"protocol\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 130,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Explain the authentication flow step by step",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"explain\", \"authentication\", \"flow\", \"step\"], \"requires_cross_doc\": false}",
+        "out_tokens": 69,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Beschreibe den genauen Ablauf des Onboardings",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a precise sequence of events ('genauen Ablauf') regarding a specific process ('Onboarding'). This requires detailed information from a specific section or procedure document rather than a general overview.\",\n  \"keywords\": [\n    \"Onboarding\",\n    \"Ablauf\",\n    \"Prozess\",\n    \"Schritte\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 131,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Beschreibe den genauen Ablauf des Onboardings",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"beschreibe\", \"genauen\", \"ablauf\", \"onboardings\"], \"requires_cross_doc\": false}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie wird die Rueckstellung im Detail berechnet?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a detailed calculation ('im Detail berechnet') of a specific accounting concept (provisions/Rueckstellungen). This requires granular data, formulas, and specific rules rather than a general overview.\",\n  \"keywords\": [\n    \"Rückstellung\",\n    \"Berechnung\",\n    \"Buchhaltung\",\n    \"Accounting\",\n    \"Provisions\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 141,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Wie wird die Rueckstellung im Detail berechnet?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"wie\", \"wird\", \"rueckstellung\", \"detail\", \"berechnet\"], \"requires_cross_doc\": false}",
+        "out_tokens": 77,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erlaeutere die Architektur des Systems im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a detailed explanation ('im Detail') of a system architecture. This requires granular information from specific technical sections rather than a high-level summary.\",\n  \"keywords\": [\n    \"Architektur\",\n    \"System\",\n    \"Detail\",\n    \"Komponenten\",\n    \"Struktur\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 129,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Erlaeutere die Architektur des Systems im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/detail lookup within documents — Level 2 detail chunks\", \"keywords\": [\"erlaeutere\", \"architektur\", \"systems\", \"detail\"], \"requires_cross_doc\": false}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "How exactly does the retry mechanism work?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a technical explanation of a specific mechanism ('how exactly'), which requires detailed technical chunks rather than a high-level summary.\",\n  \"keywords\": [\n    \"retry mechanism\",\n    \"error handling\",\n    \"exponential backoff\",\n    \"retry logic\",\n    \"timeout\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 127,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "How exactly does the retry mechanism work?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Specific technical detail/deep dive into a mechanism within a document\", \"keywords\": [\"how\", \"exactly\", \"does\", \"retry\", \"mechanism\", \"work\"], \"requires_cross_doc\": false}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erklaere Schritt fuer Schritt, wie die Kuendigung ablaeuft",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a step-by-step explanation of a specific process (cancellation). This requires extracting detailed procedural instructions from the relevant document sections.\",\n  \"keywords\": [\n    \"Kündigung\",\n    \"Ablauf\",\n    \"Schritt für Schritt\",\n    \"Prozess\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 126,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Erklaere Schritt fuer Schritt, wie die Kuendigung ablaeuft",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"erkläre\", \"schritt\", \"für\", \"schritt\", \"wie\", \"kündigung\", \"abläuft\"], \"requires_cross_doc\": false}",
+        "out_tokens": 85,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Detailliere den Datenfluss zwischen Frontend und Backend",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a detailed analysis ('Detailliere') of a specific technical process (data flow between frontend and backend). This requires granular information about protocols, request/response cycles, state management, and API interactions, which corresponds to detail chunks.\",\n  \"keywords\": [\n    \"Datenfluss\",\n    \"Frontend\",\n    \"Backend\",\n    \"API\",\n    \"Request\",\n    \"Response\",\n    \"Architecture\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 156,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Detailliere den Datenfluss zwischen Frontend und Backend",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"detailliere\", \"datenfluss\", \"zwischen\", \"frontend\"], \"requires_cross_doc\": false}",
+        "out_tokens": 74,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Walk me through the deployment process in detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a 'detailed' walkthrough of a process, which implies a need for granular, step-by-step instructions rather than a high-level summary. This requires extracting specific procedural chunks.\",\n  \"keywords\": [\n    \"deployment process\",\n    \"steps\",\n    \"walkthrough\",\n    \"deployment guide\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 133,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Walk me through the deployment process in detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"walk\", \"me\", \"through\", \"deployment\", \"process\", \"detail\"], \"requires_cross_doc\": false}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie genau wird die Verschluesselung umgesetzt?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a technical explanation of a specific mechanism ('how exactly'). This requires detailed technical chunks rather than a high-level summary.\",\n  \"keywords\": [\n    \"Verschlüsselung\",\n    \"Umsetzung\",\n    \"Technik\",\n    \"Algorithmus\",\n    \"Implementierung\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 130,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Wie genau wird die Verschluesselung umgesetzt?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/detail lookup within documents — Level 2 detail chunks\", \"keywords\": [\"wie\", \"genau\", \"wird\", \"verschluesselung\", \"umgesetzt\"], \"requires_cross_doc\": false}",
+        "out_tokens": 79,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erklaere die Funktionsweise des Caching-Layers im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "```json\n{\n  \"query_type\": \"deep_dive\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a detailed explanation ('im Detail') of a specific technical mechanism (Caching-Layer). This requires granular technical details rather than a high-level summary.\",\n  \"keywords\": [\n    \"Caching-Layer\",\n    \"Funktionsweise\",\n    \"Mechanism\",\n    \"Cache\",\n    \"Data Storage\"\n  ],\n  \"requires_cross_doc\": true\n}\n```",
+        "out_tokens": 133,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Erklaere die Funktionsweise des Caching-Layers im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.95, \"reasoning\": \"Content/data lookup within documents — Level 2 detail chunks\", \"keywords\": [\"erkläre\", \"funktionsweise\", \"caching\", \"layer\", \"detail\"], \"requires_cross_doc\": false}",
+        "out_tokens": 78,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was kostet die Premium-Lizenz?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a specific data point (price) regarding a specific product (Premium License). This requires locating a specific detail chunk within the documentation.\",\n  \"keywords\": [\n    \"Premium-Lizenz\",\n    \"Preis\",\n    \"Kosten\",\n    \"Lizenzgebühr\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 123,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was kostet die Premium-Lizenz?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"was\", \"kostet\", \"premiumlizenz\"], \"requires_cross_doc\": false}",
+        "out_tokens": 67,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie hoch ist die Vertragsstrafe bei Verzug?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific numerical or legal value (contractual penalty) related to a specific condition (delay). This requires extracting detailed information from a specific clause rather than a general overview.\",\n  \"keywords\": [\n    \"Vertragsstrafe\",\n    \"Verzug\",\n    \"Höhe\",\n    \"Strafzahlung\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 132,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie hoch ist die Vertragsstrafe bei Verzug?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"wie\", \"hoch\", \"vertragsstrafe\", \"bei\", \"verzug\"], \"requires_cross_doc\": false}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welche E-Mail-Adresse ist fuer Support angegeben?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"search\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is looking for a specific piece of information (an email address) which is a factual detail typically found in a specific section of a document.\",\n  \"keywords\": [\n    \"E-Mail-Adresse\",\n    \"Support\",\n    \"Kontakt\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 114,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welche E-Mail-Adresse ist fuer Support angegeben?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"welche\", \"emailadresse\", \"für\", \"support\", \"angegeben\"], \"requires_cross_doc\": false}",
+        "out_tokens": 73,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What is the cancellation notice period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific factual detail (cancellation notice period) which is typically found in a specific clause of a contract or policy document.\",\n  \"keywords\": [\n    \"cancellation\",\n    \"notice period\",\n    \"termination\",\n    \"policy\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 118,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "What is the cancellation notice period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"what\", \"is\", \"cancellation\", \"notice\", \"period\"], \"requires_cross_doc\": false}",
+        "out_tokens": 71,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welches Datum hat die letzte Vertragsaenderung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific piece of data (a date) regarding a specific event (last contract change). This requires locating a specific detail chunk within a contract document.\",\n  \"keywords\": [\n    \"Vertragsaenderung\",\n    \"Datum\",\n    \"letzte\",\n    \"Änderung\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 127,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Welches Datum hat die letzte Vertragsaenderung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"welches\", \"datum\", \"hat\", \"letzte\", \"vertragsaenderung\"], \"requires_cross_doc\": false}",
+        "out_tokens": 76,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie viele Urlaubstage stehen mir laut Vertrag zu?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific piece of information (number of vacation days) contained within a specific document (the contract). This requires locating the exact clause regarding 'Urlaub' or 'Ferien'.\",\n  \"keywords\": [\n    \"Urlaubstage\",\n    \"Urlaub\",\n    \"Vertrag\",\n    \"Anspruch\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 133,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie viele Urlaubstage stehen mir laut Vertrag zu?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"wie\", \"viele\", \"urlaubstage\", \"stehen\", \"mir\", \"laut\", \"vertrag\", \"zu\"], \"requires_cross_doc\": false}",
+        "out_tokens": 82,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was ist die maximale Antwortzeit laut SLA?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific numerical value (maximum response time) defined within a specific document (SLA). This requires locating a precise detail chunk rather than a general overview.\",\n  \"keywords\": [\n    \"maximale Antwortzeit\",\n    \"SLA\",\n    \"Service Level Agreement\",\n    \"Response Time\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 129,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was ist die maximale Antwortzeit laut SLA?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"was\", \"ist\", \"maximale\", \"antwortzeit\", \"laut\", \"sla\"], \"requires_cross_doc\": false}",
+        "out_tokens": 75,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Which version of the API is required?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific technical requirement (API version) which typically resides in a specific section of documentation or a configuration guide.\",\n  \"keywords\": [\n    \"API version\",\n    \"required version\",\n    \"compatibility\",\n    \"endpoint version\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 116,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Which version of the API is required?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"which\", \"version\", \"api\", \"required\"], \"requires_cross_doc\": false}",
+        "out_tokens": 67,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie lautet die Bestellnummer im Dokument?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 1.0,\n  \"reasoning\": \"The user is asking for a specific piece of data (order number) located within a document. This requires extracting a specific detail chunk rather than a summary or overview.\",\n  \"keywords\": [\n    \"Bestellnummer\",\n    \"order number\",\n    \"Dokument\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 117,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie lautet die Bestellnummer im Dokument?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"wie\", \"laute\", \"bestellnummer\", \"dokument\"], \"requires_cross_doc\": false}",
+        "out_tokens": 70,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Ab wann gilt die neue Regelung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.9,\n  \"reasoning\": \"The user is asking for a specific date/timeframe regarding a 'new regulation'. This requires locating a specific fact within a document rather than a general overview or a comparison.\",\n  \"keywords\": [\n    \"Regelung\",\n    \"Datum\",\n    \"Beginn\",\n    \"Gültigkeit\",\n    \"neue Regelung\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 132,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Ab wann gilt die neue Regelung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"ab\", \"wann\", \"gilt\", \"neue\", \"regelung\"], \"requires_cross_doc\": false}",
+        "out_tokens": 73,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What is the warranty period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific piece of factual information (warranty duration) which is typically found in a specific section of a manual or contract.\",\n  \"keywords\": [\n    \"warranty\",\n    \"period\",\n    \"duration\",\n    \"coverage\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 115,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "What is the warranty period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"what\", \"is\", \"warranty\", \"period\"], \"requires_cross_doc\": false}",
+        "out_tokens": 67,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie hoch ist der Rabatt bei Jahreszahlung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "```json\n{\n  \"query_type\": \"specific\",\n  \"target_level\": 2,\n  \"confidence\": 0.95,\n  \"reasoning\": \"The user is asking for a specific numerical value (discount rate) related to a specific payment method (annual payment). This requires locating a specific detail within a pricing or subscription section.\",\n  \"keywords\": [\n    \"Rabatt\",\n    \"Jahreszahlung\",\n    \"Preis\",\n    \"Abonnement\"\n  ],\n  \"requires_cross_doc\": false\n}\n```",
+        "out_tokens": 128,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie hoch ist der Rabatt bei Jahreszahlung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.9, \"reasoning\": \"Content/data lookup within documents — Level 2 detail search\", \"keywords\": [\"wie\", \"hoch\", \"rabatt\", \"bei\", \"jahreszahlung\"], \"requires_cross_doc\": false}",
+        "out_tokens": 73,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    }
+  ]
+}
