@@ -32,8 +32,8 @@ ev = {t: load(f"eval_{t}.json") for t in ["e2b", "12b", "qwen08", "qwen2b"]}
 C_QWEN08, C_QWEN2B = "#16a34a", "#9333ea"
 # (name, eval-key, Q4_K_M size GB, color, marker)
 ALL = [
-    ("gemma-E2B",    "e2b",    3.2, C_E2B,    "o"),
-    ("gemma-12B",    "12b",    6.9, C_12B,    "s"),
+    ("gemma-4-E2B",    "e2b",    3.2, C_E2B,    "o"),
+    ("gemma-4-12B",    "12b",    6.9, C_12B,    "s"),
     ("Qwen3.5-0.8B", "qwen08", 0.5, C_QWEN08, "^"),
     ("Qwen3.5-2B",   "qwen2b", 1.2, C_QWEN2B, "D"),
 ]
@@ -262,5 +262,24 @@ ax.set_xlabel("Routing accuracy (%)  —  ● base   ●⟶ fine-tuned")
 ax.set_xlim(28, 104); ax.set_ylim(-0.6, len(order2) - 0.4)
 ax.set_title("Base → fine-tuned: the small models LEAP, the big one crawls\nThe 12B starts highest (80%) yet ends lowest (87%); Qwen-0.8B leaps 50→95%")
 save(fig, "11_dumbbell_base_to_ft.png")
+
+# 12) Decode speed — same engine (transformers) = fair model comparison
+_tps = os.path.join(HERE, "tps.json")
+if os.path.exists(_tps):
+    tps = json.load(open(_tps))
+    order = sorted(ALL, key=lambda m: m[2])
+    vals = [tps.get(m[0], 0) for m in order]
+    fig, ax = plt.subplots(figsize=(9.5, 6))
+    bars = ax.bar(range(len(order)), vals, color=[m[3] for m in order], width=0.6)
+    for b, v in zip(bars, vals):
+        ax.annotate(f"{v:.0f} tok/s", (b.get_x() + b.get_width() / 2, v), textcoords="offset points",
+                    xytext=(0, 4), ha="center", fontweight="bold")
+    ax.set_xticks(range(len(order))); ax.set_xticklabels([f"{m[0]}\n{m[2]} GB" for m in order])
+    ax.set_ylabel("Decode speed (tokens/sec)"); ax.set_ylim(0, max(vals) + 12)
+    ax.set_title("Decode speed — same engine (transformers, R9700)\nSmaller = faster: Qwen-0.8B leads; the 12B is slowest")
+    fig.text(0.5, -0.02, "Note: gemma-4 also runs on llama.cpp at ~2-3x these numbers (E2B ~117, 12B ~53 tok/s); "
+                         "Qwen3.5 has no llama.cpp runtime yet, so it serves via the transformers mini-service.",
+             ha="center", fontsize=9, color="#555")
+    save(fig, "12_tokens_per_sec.png")
 
 print("done ->", OUT)
