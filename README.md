@@ -22,30 +22,25 @@ It is deliberately *not* "yet another ROCm wrapper". The general case (Linux/Ins
 | Platform | Inference | **Training (fine-tune)** |
 |---|---|---|
 | **Native Windows + ROCm** | ✅ preview | ❌ **No ML training** (AMD: *"No ML training support"*) |
-| **Native Windows + Vulkan** | ✅ | ✅ **LoRA only** (Track B — QVAC fork) |
-| **WSL2 + ROCm** | ✅ | ✅ **QLoRA/LoRA** (Track A) — R9700 officially listed |
-| **Native Linux + ROCm** | ✅ | ✅ best stability (fallback if WSL2 blocks) |
+| **Native Windows + Vulkan** | ✅ (often fastest on RDNA4) | ❌ **not a real path** — upstream Vulkan has no backward-pass kernel; QVAC fork immature (see below) |
+| **WSL2 + ROCm** | ✅ | ✅ **QLoRA/LoRA** — needs Adrenalin **26.2.2** (`librocdxg` bridge) |
+| **Native Linux + ROCm** | ✅ | ✅ **most stable — recommended long-term home** |
 
-**Takeaway:** to *train* on Windows you either go **WSL2 + ROCm** (Track A) or **native Windows + Vulkan** (Track B). Native-Windows **ROCm** training does not exist yet.
+**Takeaway:** **train on ROCm, not Vulkan.** On Windows today → **WSL2 + ROCm** (install Adrenalin **26.2.2** for the `librocdxg` bridge). For a serious long-term rig → **native Linux + ROCm**. Vulkan is the *inference* path (great on RDNA4) — it **cannot train** (no backward-pass kernels upstream). Full reasoning + evidence: **[docs/paths-and-stability.md](docs/paths-and-stability.md)**.
 
-## Two tracks — which to pick
+## Which path — training is ROCm, not Vulkan
 
-```
-                        ┌─ Need 4-bit QLoRA / HF ecosystem / arbitrary HF model? ──► TRACK A (WSL2 + ROCm)
- Want to fine-tune ─────┤
-                        └─ Want native Windows, no ROCm, already GGUF/llama.cpp? ──► TRACK B (Vulkan, LoRA-only)
-```
+> **Updated 2026-06-15 after researching real-world evidence** ([docs/paths-and-stability.md](docs/paths-and-stability.md)). The earlier "Vulkan as a 2nd training track" idea does **not** hold: upstream llama.cpp/ggml has **no Vulkan backward-pass (`OUT_PROD`) kernel**, and the QVAC Vulkan-LoRA fork has ~zero independent adoption + a stale fine-tune branch. **Vulkan = inference only.** The real choice is *where* you run ROCm:
 
-| | **Track A — WSL2 + ROCm + QLoRA** | **Track B — Vulkan LoRA (QVAC fork)** |
+| | **WSL2 + ROCm** (start here on Windows) | **Native Linux + ROCm** (long-term home) |
 |---|---|---|
-| OS | WSL2 (Ubuntu) or native Linux | **native Windows** (or any OS) |
-| Quantized training | ✅ 4-bit QLoRA (NF4) | ❌ LoRA only (f16 base) |
-| Ecosystem | full HF: transformers/peft/trl | llama.cpp / GGUF |
-| Setup pain | high (ROCm + bitsandbytes + workarounds) | low (one cmake, Vulkan driver) |
-| Gemma-4-12B | ✅ verified path | ⚠️ **unverified** (QVAC tested Gemma-3/Qwen-3; Gemma-4 is a new arch) |
-| Guide | [docs/track-a-wsl2-rocm.md](docs/track-a-wsl2-rocm.md) | [docs/track-b-vulkan-qvac.md](docs/track-b-vulkan-qvac.md) |
+| OS | Windows + WSL2 (Ubuntu 24.04) | native Ubuntu 24.04 |
+| Training | ✅ QLoRA / LoRA / SFT / DPO | ✅ same, most reliable |
+| Stability | ⚠️ works; WSL/driver updates can break it | ✅ best (most real RDNA4 success evidence) |
+| Prerequisite | **Adrenalin 26.2.2** → `librocdxg` bridge (a *newer* driver may lack it!) | none |
+| Guide | [docs/track-a-wsl2-rocm.md](docs/track-a-wsl2-rocm.md) | same guide, native steps |
 
-**Recommendation for Gemma-4-12B:** Track A. Use Track B for Gemma-3 / Qwen-3 / smaller models, or as a no-ROCm Windows fallback.
+**Recommendation:** start on **WSL2 + ROCm** (you're likely 90 % there), move to **native Linux + ROCm** for serious/long-term runs. Use **Vulkan for inference only** ([docs/track-b-vulkan-qvac.md](docs/track-b-vulkan-qvac.md) is an experimental note, not a training recommendation).
 
 ## Quickstart (Track A, WSL2)
 
