@@ -1,0 +1,27 @@
+# RadeonForge — Gemma-4-12B QLoRA example config (Track A: WSL2 + ROCm, gfx1201)
+# All values verified 2026-06-15. See ../../VERSIONS.md.
+
+model_id: google/gemma-4-12B-it          # NOTE capital B; real HF repo, Apache 2.0, gemma4_unified arch
+dataset: examples/gemma4-12b-qlora/sample_data.jsonl   # JSONL, conversational {"messages":[...]}
+output_dir: gemma4-12b-sft               # LoRA adapter is saved here
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: all-linear             # do NOT add modules_to_save (tied lm_head+embed)
+
+train:
+  epochs: 1
+  learning_rate: 2.0e-4
+  per_device_batch_size: 1
+  grad_accum: 8
+  max_length: 2048
+  seed: 42
+
+  # --- gfx1201 workarounds (do not change without re-running scripts/smoke_test.py) ---
+  optim: adamw_torch                      # NEVER paged_adamw_* / adamw_bnb_8bit (silent corruption)
+  attn_implementation: sdpa               # + flash/mem-efficient SDPA disabled in code (math SDPA)
+  bf16: true
+  gradient_checkpointing: true
+  load_in_4bit: true                      # NF4 weight quant is safe on gfx1201

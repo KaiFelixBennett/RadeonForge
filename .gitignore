@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Models / weights / data (never commit large binaries)
+*.gguf
+*.safetensors
+*.bin
+*.pt
+checkpoints/
+outputs/
+*-merged/
+*-sft/
+*-gguf/
+hf_cache/
+data/*.jsonl
+!examples/**/sample_data.jsonl
+
+# Logs / scratch
+*.log
+wandb/
+runs/
+.DS_Store
