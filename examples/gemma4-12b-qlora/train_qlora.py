@@ -66,7 +66,7 @@ def main() -> None:
     args = SFTConfig(
         output_dir=cfg["output_dir"],
         optim=tr["optim"],                                  # (1) adamw_torch
-        assistant_only_loss=True,                           # mask everything but assistant spans
+        assistant_only_loss=tr.get("assistant_only_loss", False),  # True needs a {% generation %} chat template; gemma-4's lacks it
         max_length=tr.get("max_length", 2048),
         per_device_train_batch_size=tr.get("per_device_batch_size", 1),
         gradient_accumulation_steps=tr.get("grad_accum", 8),
@@ -80,7 +80,9 @@ def main() -> None:
         report_to="none",
     )
 
-    trainer = SFTTrainer(model=model, args=args, peft_config=peft_cfg, train_dataset=ds)
+    # Pass the tokenizer explicitly so text-only SFT works on multimodal archs
+    # (e.g. gemma-4 "unified") without pulling in the image Processor.
+    trainer = SFTTrainer(model=model, args=args, peft_config=peft_cfg, train_dataset=ds, processing_class=tok)
     trainer.train()
     trainer.save_model(cfg["output_dir"])
     print(f"\n✅ LoRA adapter saved to: {cfg['output_dir']}")
