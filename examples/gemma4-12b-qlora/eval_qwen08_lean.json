@@ -1,0 +1,1584 @@
+{
+  "task": "HiRAG query-complexity routing (Task A)",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "finetuned": "/root/aria-pilot/qwen08-lean-merged",
+  "gpu": "AMD Radeon AI PRO R9700",
+  "metrics": {
+    "base": {
+      "n": 60,
+      "json_valid_rate": 1.0,
+      "level_accuracy": 0.617,
+      "type_accuracy": 0.3,
+      "avg_out_tokens": 26.0
+    },
+    "finetuned": {
+      "n": 60,
+      "json_valid_rate": 1.0,
+      "level_accuracy": 0.95,
+      "type_accuracy": 0.9,
+      "avg_out_tokens": 25.6
+    }
+  },
+  "queries": [
+    {
+      "base": {
+        "query": "Welche Dokumente kennst du?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welche Dokumente kennst du?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Liste alle verfuegbaren Dokumente auf",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Liste alle verfuegbaren Dokumente auf",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What documents do you have access to?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "What documents do you have access to?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Gib mir einen Ueberblick ueber alle vorhandenen Unterlagen",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Gib mir einen Ueberblick ueber alle vorhandenen Unterlagen",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welche Berichte liegen dir vor?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Welche Berichte liegen dir vor?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Show me everything in the knowledge base",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Show me everything in the knowledge base",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was fuer Dokumente sind hochgeladen?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was fuer Dokumente sind hochgeladen?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "List all available files",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "List all available files",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welche Handbuecher gibt es?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Welche Handbuecher gibt es?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Zeig mir alle Vertraege, die du hast",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Zeig mir alle Vertraege, die du hast",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Which reports are available to you?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Which reports are available to you?",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Nenne mir alle Dokumente im System",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Nenne mir alle Dokumente im System",
+        "expected_level": 0,
+        "expected_type": "overview",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Vergleiche die beiden Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Vergleiche die beiden Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Worin unterscheiden sich Bericht A und Bericht B?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Worin unterscheiden sich Bericht A und Bericht B?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Stelle die Angebote von Anbieter X und Y gegenueber",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Stelle die Angebote von Anbieter X und Y gegenueber",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Compare the two contracts",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Compare the two contracts",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was sind die Gemeinsamkeiten der drei Studien?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was sind die Gemeinsamkeiten der drei Studien?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welcher der beiden Tarife ist guenstiger?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Welcher der beiden Tarife ist guenstiger?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Gegenueberstellung der Kuendigungsfristen beider Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Gegenueberstellung der Kuendigungsfristen beider Vertraege",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": false,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "How do the two proposals differ?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "How do the two proposals differ?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Vergleiche die Datenschutzregelungen in den Dokumenten",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Vergleiche die Datenschutzregelungen in den Dokumenten",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was ist der Unterschied zwischen Version 1 und Version 2 des Handbuchs?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was ist der Unterschied zwischen Version 1 und Version 2 des Handbuchs?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": false,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Which supplier offers better terms according to the documents?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Which supplier offers better terms according to the documents?",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Vergleiche die Kernaussagen beider Quartalsberichte",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "comparison",
+        "level_correct": false,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Vergleiche die Kernaussagen beider Quartalsberichte",
+        "expected_level": 0,
+        "expected_type": "comparison",
+        "raw": "{\"query_type\": \"comparison\", \"target_level\": 0, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "comparison",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Fasse Kapitel 3 zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Fasse Kapitel 3 zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Worum geht es im Jahresbericht?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 0, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 0,
+        "pred_type": "overview",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Worum geht es im Jahresbericht?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": false,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Gib mir eine Zusammenfassung des gesamten Vertrags",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Gib mir eine Zusammenfassung des gesamten Vertrags",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Summarize section 2 of the manual",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Summarize section 2 of the manual",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was steht in Abschnitt 4.2?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Was steht in Abschnitt 4.2?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Fasse das Datenschutzkonzept zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Fasse das Datenschutzkonzept zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Give me the key points of the whitepaper",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Give me the key points of the whitepaper",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Worum geht es in Dokument 5?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Worum geht es in Dokument 5?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Zusammenfassung des Onboarding-Handbuchs bitte",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Zusammenfassung des Onboarding-Handbuchs bitte",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What is the annual report about?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "What is the annual report about?",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Fasse das Kapitel Sicherheit zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Fasse das Kapitel Sicherheit zusammen",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Gib mir die Kernaussagen des Berichts",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      },
+      "finetuned": {
+        "query": "Gib mir die Kernaussagen des Berichts",
+        "expected_level": 1,
+        "expected_type": "specific",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.9}",
+        "out_tokens": 25,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erklaere das Saga-Pattern im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Erklaere das Saga-Pattern im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie funktioniert die Zwei-Faktor-Authentifizierung genau?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie funktioniert die Zwei-Faktor-Authentifizierung genau?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Explain the authentication flow step by step",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Explain the authentication flow step by step",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Beschreibe den genauen Ablauf des Onboardings",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Beschreibe den genauen Ablauf des Onboardings",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Wie wird die Rueckstellung im Detail berechnet?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie wird die Rueckstellung im Detail berechnet?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erlaeutere die Architektur des Systems im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Erlaeutere die Architektur des Systems im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "How exactly does the retry mechanism work?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "How exactly does the retry mechanism work?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Erklaere Schritt fuer Schritt, wie die Kuendigung ablaeuft",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Erklaere Schritt fuer Schritt, wie die Kuendigung ablaeuft",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Detailliere den Datenfluss zwischen Frontend und Backend",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Detailliere den Datenfluss zwischen Frontend und Backend",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Walk me through the deployment process in detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Walk me through the deployment process in detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie genau wird die Verschluesselung umgesetzt?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie genau wird die Verschluesselung umgesetzt?",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": false
+      }
+    },
+    {
+      "base": {
+        "query": "Erklaere die Funktionsweise des Caching-Layers im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Erklaere die Funktionsweise des Caching-Layers im Detail",
+        "expected_level": 2,
+        "expected_type": "deep_dive",
+        "raw": "{\"query_type\": \"deep_dive\", \"target_level\": 2, \"confidence\": 0.9}",
+        "out_tokens": 27,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "deep_dive",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was kostet die Premium-Lizenz?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was kostet die Premium-Lizenz?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie hoch ist die Vertragsstrafe bei Verzug?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie hoch ist die Vertragsstrafe bei Verzug?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welche E-Mail-Adresse ist fuer Support angegeben?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Welche E-Mail-Adresse ist fuer Support angegeben?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What is the cancellation notice period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "What is the cancellation notice period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Welches Datum hat die letzte Vertragsaenderung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Welches Datum hat die letzte Vertragsaenderung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie viele Urlaubstage stehen mir laut Vertrag zu?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie viele Urlaubstage stehen mir laut Vertrag zu?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Was ist die maximale Antwortzeit laut SLA?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Was ist die maximale Antwortzeit laut SLA?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Which version of the API is required?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.85}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Which version of the API is required?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie lautet die Bestellnummer im Dokument?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 2, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "specific",
+        "level_correct": true,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie lautet die Bestellnummer im Dokument?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Ab wann gilt die neue Regelung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"specific\", \"target_level\": 1, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "specific",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Ab wann gilt die neue Regelung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "What is the warranty period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.95}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "What is the warranty period?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    },
+    {
+      "base": {
+        "query": "Wie hoch ist der Rabatt bei Jahreszahlung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"overview\", \"target_level\": 1, \"confidence\": 0.92}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 1,
+        "pred_type": "overview",
+        "level_correct": false,
+        "type_correct": false
+      },
+      "finetuned": {
+        "query": "Wie hoch ist der Rabatt bei Jahreszahlung?",
+        "expected_level": 2,
+        "expected_type": "search",
+        "raw": "{\"query_type\": \"search\", \"target_level\": 2, \"confidence\": 0.75}",
+        "out_tokens": 26,
+        "json_valid": true,
+        "pred_level": 2,
+        "pred_type": "search",
+        "level_correct": true,
+        "type_correct": true
+      }
+    }
+  ]
+}
