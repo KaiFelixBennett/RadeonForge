@@ -14,6 +14,19 @@ This isn't "AMD is now as easy as NVIDIA." It's "AMD RDNA4 training is *possible
 
 ---
 
+## The results in five charts
+*Generated from the raw A/B JSONs by [`make_charts.py`](../examples/gemma4-12b-qlora/make_charts.py) — reproducible, no hand numbers.*
+
+![QLoRA training loss — both models converge cleanly on one AMD Radeon](../charts/01_training_loss.png)
+
+![Routing accuracy, base vs fine-tuned, hard policy-focused set](../charts/02_accuracy_before_after.png)
+
+![Comparison policy: the smaller model learns the contradictory rule 5/5; the 12B only 1/5 from the same data](../charts/03_policy_comparison.png)
+
+![Same accuracy, ~2x the speed, half the size — the small fine-tune is the more usable model](../charts/04_speed_vs_accuracy.png)
+
+![Fine-tuning also makes outputs concise — shorter = faster and cheaper per call](../charts/05_output_length.png)
+
 ## Why this exists
 Every "fine-tune your own LLM" guide assumes CUDA. If you own a Radeon, you hit a wall of cryptic errors that each cost hours, most of which **fail silently** (no crash — just garbage results). I wanted the guide I couldn't find. So I kept a brutally honest log of everything that broke.
 
