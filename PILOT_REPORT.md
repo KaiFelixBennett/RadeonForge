@@ -25,6 +25,9 @@ The full pipeline — **dataset → QLoRA → merge → GGUF → GPU serving** �
 RDNA4. The base model's misses were all *domain-policy* cases; the tune injects our
 routing convention. Detail: [`examples/gemma4-12b-qlora/PILOT_RESULTS.md`](examples/gemma4-12b-qlora/PILOT_RESULTS.md).
 
+**It also scales to the 12B** on the same card (Stage 7): trained in ~11 min, served as a
+6.9 GB Q4_K_M at ~53 tok/s; A/B **86 % → 93 %** accuracy, output **−42 %**.
+
 ---
 
 ## Stage 1 — GPU stack works
@@ -90,6 +93,22 @@ The 3 base misses, all *domain-policy* (base uses generic reasoning; tune learne
 
 Full per-query outputs from both models: [`PILOT_RESULTS.md`](examples/gemma4-12b-qlora/PILOT_RESULTS.md)
 · raw data: [`pilot_ab_results.json`](examples/gemma4-12b-qlora/pilot_ab_results.json).
+
+## Stage 7 — Scaling to the 12B (same pipeline, same card)
+Re-ran the *whole* pipeline on `gemma-4-12B-it` on the same R9700, config-only change.
+
+| Step | Result |
+|---|---|
+| Training (QLoRA, GPU) | loss 3.32 → 0.34, ~11 min (30 steps @ ~23 s) |
+| Merge → GGUF f16 → Q4_K_M | 23.8 GB → **6.9 GB** |
+| Serving (R9700, `-ngl 99`, +template fix) | clean JSON, `finish_reason:stop`, **~53 tok/s**, ready in 12 s |
+| A/B `target_level` accuracy | 86 % → **93 %** |
+| A/B `query_type` accuracy | 71 % → **93 %** |
+| A/B output length | 124 → **72 tok (−42 %)** |
+
+Two findings worth keeping:
+- **Arch gotcha:** the 12B is `model_type: gemma4_unified` (vs the E2B's `gemma4_audio`) — needed `transformers` 5.12 (`KeyError: 'gemma4_unified'` on 5.8). Same family ≠ same setup.
+- **Bigger base, stronger prior:** the 12B base already hit 86 % and resisted one *policy-override* case (routing "compare two contracts" to detail). 158 samples flipped one of two comparison cases; the smaller E2B flipped both. More data would close it — but the **efficiency** gain is larger on the 12B (−42 % tokens). Detail: [`PILOT_RESULTS_12B.md`](examples/gemma4-12b-qlora/PILOT_RESULTS_12B.md).
 
 ---
 
