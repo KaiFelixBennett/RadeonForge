@@ -1,0 +1,23 @@
+[
+  {"q": "Vergleiche die Kuendigungsfristen in beiden Vertraegen", "level": 0, "type": "comparison"},
+  {"q": "Worin unterscheiden sich die zwei Angebote?", "level": 0, "type": "comparison"},
+  {"q": "Stelle die Vor- und Nachteile aus den beiden Berichten gegenueber", "level": 0, "type": "comparison"},
+  {"q": "Was sind die Gemeinsamkeiten der drei Studien?", "level": 0, "type": "comparison"},
+  {"q": "Welcher der beiden Anbieter ist laut den Dokumenten guenstiger?", "level": 0, "type": "comparison"},
+  {"q": "Welche Dokumente liegen dir vor?", "level": 0, "type": "overview"},
+  {"q": "Gib mir eine Liste aller Handbuecher", "level": 0, "type": "overview"},
+  {"q": "Was fuer Unterlagen hast du zur Verfuegung?", "level": 0, "type": "overview"},
+  {"q": "Zeig mir alle Vertraege, die du kennst", "level": 0, "type": "overview"},
+  {"q": "Fasse den gesamten Jahresbericht zusammen", "level": 1, "type": "specific"},
+  {"q": "Worum geht es im Datenschutzkonzept?", "level": 1, "type": "specific"},
+  {"q": "Gib mir die Kernaussagen des Whitepapers", "level": 1, "type": "specific"},
+  {"q": "Fasse Abschnitt 4.2 zusammen", "level": 1, "type": "specific"},
+  {"q": "Was steht in Kapitel 7?", "level": 1, "type": "specific"},
+  {"q": "Erklaere den genauen Ablauf der Zwei-Faktor-Authentifizierung", "level": 2, "type": "deep_dive"},
+  {"q": "Wie wird die Rueckstellung im Detail berechnet?", "level": 2, "type": "deep_dive"},
+  {"q": "Beschreibe Schritt fuer Schritt das Onboarding", "level": 2, "type": "deep_dive"},
+  {"q": "Wie hoch ist die Vertragsstrafe bei Verzug?", "level": 2, "type": "search"},
+  {"q": "Welches Datum hat die letzte Aenderung?", "level": 2, "type": "search"},
+  {"q": "Was kostet die Premium-Lizenz?", "level": 2, "type": "search"},
+  {"q": "Welche E-Mail-Adresse ist fuer Support angegeben?", "level": 2, "type": "search"}
+]

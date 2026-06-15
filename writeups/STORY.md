@@ -43,6 +43,21 @@ A falling loss proves nothing about the *task*. So I ran the **same held-out que
 
 The interesting part isn't the number — it's **why** the base missed. All three errors were *domain-policy* cases: the base routed "compare two contracts" to detail-level retrieval (generic, reasonable), but **our** RAG convention is to start from document summaries. The base model wasn't dumb; it didn't know our policy. **That's what fine-tuning injects — and now I can measure it.**
 
+## A harder eval — where it gets honest (and interesting)
+My first eval was too easy: many queries (detail look-ups) are ones where the base model and our routing policy already *agree*. So I built a deliberately hard set (21 queries) stressing the cases where they *diverge* — document comparisons, listings, whole-document summaries.
+
+| | Base accuracy | Fine-tuned | "compare two docs" cases | output length |
+|---|---|---|---|---|
+| **E2B** | 62 % | 81 % | **0/5 → 5/5** | −18 % |
+| **12B** | 76 % | 81 % | 0/5 → 1/5 | −41 % |
+
+Three findings I didn't expect, all useful:
+1. **Every base model gets all 5 document-comparisons wrong** — both E2B and 12B route "compare these two contracts" to detail retrieval, because generically it *sounds* like deep work. Our convention is to start from summaries. The single clearest "domain policy the base can't guess."
+2. **The smaller model is *easier* to steer.** E2B (weaker priors) learned the comparison rule completely (5/5). The 12B (stronger priors) fixed only 1/5 from the same 158 examples — yet its `query_type` accuracy hit 100 %, i.e. it *correctly labels* them "comparison" but won't override its depth instinct. Counterintuitive but real: to teach a policy that contradicts a model's instinct, the bigger model needs more data.
+3. **The eval earns its keep.** The E2B fine-tune fixed comparisons but *regressed* on whole-document summaries — a query type my 158-sample set barely covered. Not a failure; the eval telling me exactly what data to add next.
+
+Takeaway for anyone fine-tuning: build your eval around where the base and your target behaviour *disagree*, not where they happen to agree — otherwise you're measuring luck. And don't assume bigger = easier to steer. Evidence: [`PILOT_RESULTS_HARD_E2B.md`](../examples/gemma4-12b-qlora/PILOT_RESULTS_HARD_E2B.md) · [`PILOT_RESULTS_HARD_12B.md`](../examples/gemma4-12b-qlora/PILOT_RESULTS_HARD_12B.md).
+
 ## The serving trap that ate an afternoon
 Training worked; serving the GGUF looked broken. Through llama.cpp's OpenAI endpoint the model either drifted into a "Thinking Process:" monologue (empty output) or, with reasoning disabled, echoed `<|turn>model<|turn>…` forever.
 
