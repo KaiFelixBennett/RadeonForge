@@ -24,9 +24,59 @@ torch.backends.cuda.enable_flash_sdp(False)
 torch.backends.cuda.enable_mem_efficient_sdp(False)
 
 from datasets import load_dataset
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig, TrainerCallback
 from peft import LoraConfig
 from trl import SFTTrainer, SFTConfig
+
+
+class ProgressCallback(TrainerCallback):
+    """Opt-in: schreibt Live-Status (Step/Epoche/Loss) als JSON für progress_dashboard.py.
+    Aktiv nur, wenn cfg['progress_file'] gesetzt ist. Reine Stdlib, funktioniert auch über
+    /mnt/e aus WSL heraus."""
+    def __init__(self, path: str):
+        import os
+        self.path = path
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        self.total = None
+        self._ptok = None; self._ptime = None; self._tps = []   # Tokens/s-Verlauf
+        self._loss = []                                          # Loss-Verlauf (fuer Live-Loss-Chart)
+
+    def _write(self, state, status):
+        import json, os, time
+        loss = next((h["loss"] for h in reversed(state.log_history) if "loss" in h), None)
+        ntok = next((h["num_tokens"] for h in reversed(state.log_history) if "num_tokens" in h), None)
+        now = time.time()
+        tps = None
+        if ntok is not None and self._ptok is not None and self._ptime and now > self._ptime:
+            d = ntok - self._ptok
+            if d > 0:
+                tps = round(d / (now - self._ptime))
+                self._tps.append(tps); self._tps = self._tps[-80:]
+        if ntok is not None:
+            self._ptok = ntok; self._ptime = now
+        if loss is not None and (not self._loss or self._loss[-1] != loss):
+            self._loss.append(round(float(loss), 4)); self._loss = self._loss[-200:]
+        tmp = self.path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump({"name": os.path.splitext(os.path.basename(self.path))[0],
+                       "status": status, "step": state.global_step,
+                       "total_steps": self.total or state.max_steps,
+                       "epoch": state.epoch, "epochs": round(state.num_train_epochs)
+                       if getattr(state, "num_train_epochs", None) else None,
+                       "loss": loss, "tps": tps, "tps_series": self._tps,
+                       "loss_series": self._loss,
+                       "updated": time.time()}, f, ensure_ascii=False)
+        os.replace(tmp, self.path)
+
+    def on_train_begin(self, args, state, control, **kw):
+        self.total = state.max_steps
+        self._write(state, "running")
+
+    def on_log(self, args, state, control, **kw):
+        self._write(state, "running")
+
+    def on_train_end(self, args, state, control, **kw):
+        self._write(state, "done")
 
 
 def main() -> None:
@@ -37,14 +87,22 @@ def main() -> None:
 
     assert "paged" not in tr["optim"], "Refusing to run: paged optimizers silently corrupt training on gfx1201."
 
-    tok = AutoTokenizer.from_pretrained(cfg["model_id"])
+    tok = AutoTokenizer.from_pretrained(cfg["model_id"], **cfg.get("tokenizer_kwargs", {}))
 
     quant = BitsAndBytesConfig(
         load_in_4bit=True, bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True,
     ) if tr.get("load_in_4bit", True) else None
 
-    model = AutoModelForCausalLM.from_pretrained(
+    # Multimodal archs expose the LM via a different AutoModel: gemma-4 "unified" works
+    # under AutoModelForCausalLM, but Mistral3/Ministral-3 (vision_encoder) needs
+    # AutoModelForImageTextToText. We still do TEXT-ONLY SFT (processing_class=tokenizer).
+    # Set `model_class: image_text_to_text` in the config for such models.
+    if cfg.get("model_class") == "image_text_to_text":
+        from transformers import AutoModelForImageTextToText as _ModelCls
+    else:
+        _ModelCls = AutoModelForCausalLM
+    model = _ModelCls.from_pretrained(
         cfg["model_id"],
         quantization_config=quant,
         dtype=torch.bfloat16,
@@ -63,6 +121,32 @@ def main() -> None:
     # SFTTrainer applies the model's chat template + assistant-only loss for us.
     ds = load_dataset("json", data_files=cfg["dataset"], split="train")
 
+    # "Alles festhalten": Snapshot von Config + Datenmenge neben den Lauf schreiben (Windows-lesbar,
+    # falls progress_file auf /mnt/... liegt). Macht jeden künftigen Lauf selbst-dokumentierend.
+    try:
+        import json as _json, time as _time
+        _md = os.path.dirname(cfg.get("progress_file") or "") or cfg["output_dir"]
+        os.makedirs(_md, exist_ok=True)
+        _name = os.path.splitext(os.path.basename(cfg.get("progress_file") or cfg["output_dir"]))[0]
+        with open(os.path.join(_md, _name + ".meta.json"), "w", encoding="utf-8") as _f:
+            _json.dump({"config": cfg, "dataset_rows": len(ds), "started": _time.time()},
+                       _f, ensure_ascii=False, default=str, indent=2)
+    except Exception as _e:
+        print("run_meta konnte nicht geschrieben werden:", _e)
+
+    # completion_only_loss (Loss NUR auf der Antwort) nur setzen, wenn die TRL-Version es kennt
+    # UND die Daten prompt/completion-Format haben. Bei prompt-completion ist es ohnehin der Default.
+    import inspect
+    _extra = {}
+    if "completion_only_loss" in inspect.signature(SFTConfig.__init__).parameters \
+            and tr.get("completion_only_loss") is not None:
+        _extra["completion_only_loss"] = tr["completion_only_loss"]
+    # pad_to_multiple_of: erzwingt eine KONSTANTE Sequenzform pro Batch (z.B. 4096), damit der
+    # Triton-AMD-Flash-Kernel auf gfx1201 nur EINMAL kompiliert (sonst Recompile-Stall pro Laenge).
+    if "pad_to_multiple_of" in inspect.signature(SFTConfig.__init__).parameters \
+            and tr.get("pad_to_multiple_of") is not None:
+        _extra["pad_to_multiple_of"] = tr["pad_to_multiple_of"]
+
     args = SFTConfig(
         output_dir=cfg["output_dir"],
         optim=tr["optim"],                                  # (1) adamw_torch
@@ -75,14 +159,20 @@ def main() -> None:
         bf16=tr.get("bf16", True),
         gradient_checkpointing=tr.get("gradient_checkpointing", True),
         gradient_checkpointing_kwargs={"use_reentrant": False},
-        logging_steps=5,
+        logging_steps=tr.get("logging_steps", 5),   # =1 -> Dashboard-Kachel tickt ~jeden Step
+        save_strategy=tr.get("save_strategy", "no"),   # "steps" -> reboot-sichere Checkpoints
+        save_steps=tr.get("save_steps", 500),
+        save_total_limit=tr.get("save_total_limit", 3),
         seed=tr.get("seed", 42),
         report_to="none",
+        **_extra,
     )
 
     # Pass the tokenizer explicitly so text-only SFT works on multimodal archs
     # (e.g. gemma-4 "unified") without pulling in the image Processor.
-    trainer = SFTTrainer(model=model, args=args, peft_config=peft_cfg, train_dataset=ds, processing_class=tok)
+    callbacks = [ProgressCallback(cfg["progress_file"])] if cfg.get("progress_file") else []
+    trainer = SFTTrainer(model=model, args=args, peft_config=peft_cfg, train_dataset=ds,
+                         processing_class=tok, callbacks=callbacks)
     trainer.train()
     trainer.save_model(cfg["output_dir"])
     print(f"\n✅ LoRA adapter saved to: {cfg['output_dir']}")
