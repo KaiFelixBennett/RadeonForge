@@ -1,0 +1,458 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Progress · WebGL</title>
+<style>
+:root{--card:rgba(15,27,48,.56);--line:rgba(95,135,190,.30);--cyan:#22d3ee;--green:#10b981;
+--purple:#8b5cf6;--blue:#3b9cff;--amber:#f59e0b;--txt:#eaf2ff;--mut:#8ea6c8}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:#02040a;color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:20px;font-weight:700;margin:0 0 2px}.sub{color:var(--mut);font-size:12px;margin-bottom:14px}
+.sec{margin:24px 0 10px;color:var(--cyan);font-size:11px;letter-spacing:.13em;text-transform:uppercase;text-shadow:0 0 14px rgba(34,211,238,.45);display:flex;justify-content:space-between;align-items:center}
+.btn{cursor:pointer;font:inherit;font-size:11px;color:var(--cyan);background:rgba(34,211,238,.08);border:1px solid var(--line);border-radius:8px;padding:3px 10px;letter-spacing:0;text-transform:none}
+.btn:hover{background:rgba(34,211,238,.18)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:8px 0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.name{font-weight:600;font-size:14px}.meta{color:var(--mut);font-size:12px;white-space:nowrap}
+.big{font-variant-numeric:tabular-nums}.big b{font-size:20px}.tgt{color:var(--mut);font-size:13px}
+.bar{height:8px;background:rgba(4,12,24,.7);border-radius:6px;margin-top:10px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--cyan));border-radius:6px;width:0;transition:width .5s;box-shadow:0 0 14px rgba(59,156,255,.6)}
+.badge{font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.badge.live{color:#04140c;background:var(--green);border-color:var(--green);font-weight:700;box-shadow:0 0 16px rgba(16,185,129,.7)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.empty{color:var(--mut);font-size:13px;font-style:italic;padding:6px 2px}
+.todoitem{display:flex;gap:9px;align-items:flex-start;padding:5px 2px;font-size:13px}
+.todoitem .b{color:var(--amber)}
+.term{background:rgba(2,6,14,.82);color:#b9d0ea;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:250px;overflow:auto;margin:0;padding:9px 11px;border-radius:9px;border:1px solid var(--line)}
+.warn{position:fixed;inset:0;display:none;place-items:center;color:var(--mut);z-index:0;text-align:center;padding:20px}
+a{color:var(--cyan)}
+/* Scrim: dämpft die 3D-Knoten unter dem Inhalt -> garantierter Textkontrast, Glow bleibt sichtbar */
+.scrim{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(130% 100% at 50% -10%,rgba(2,4,10,.48),rgba(2,4,10,.74) 60%,rgba(2,4,10,.82))}
+/* ---- HUD-Kacheln (Live-Werte) ---- */
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0 4px}
+.tile{position:relative;background:linear-gradient(160deg,rgba(34,211,238,.10),rgba(139,92,246,.05));border:1px solid var(--line);border-radius:16px;padding:13px 15px 15px;overflow:hidden;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.45)}
+.tile::after{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple));opacity:.85}
+.tile.accent::after{box-shadow:0 0 18px var(--cyan)}
+.tile .k{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:6px}
+.tile .k svg{width:13px;height:13px;opacity:.85}
+.tile .v{font-size:25px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:7px;line-height:1.05;text-shadow:0 0 18px rgba(34,211,238,.30)}
+.tile.accent .v{color:#bdf3ff;text-shadow:0 0 22px rgba(34,211,238,.55)}
+.tile .v .u{font-size:13px;font-weight:600;color:var(--mut);margin-left:3px;text-shadow:none}
+.tile .sub2{font-size:11px;color:var(--mut);margin-top:8px;min-height:6px}
+.tbar{height:6px;background:rgba(4,12,24,.7);border-radius:5px;overflow:hidden;margin-top:7px}
+.tfill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--cyan));box-shadow:0 0 12px rgba(59,156,255,.7);transition:width .6s;border-radius:5px}
+.spark{position:absolute;right:12px;bottom:11px}
+/* ---- Chips (Log-Kopf) ---- */
+.chips{display:inline-flex;gap:8px;flex-wrap:wrap;align-items:center;text-transform:none;letter-spacing:0;vertical-align:middle}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--txt);background:rgba(34,211,238,.08);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.chip b{font-weight:700;color:var(--cyan)}
+.chip.eta{background:rgba(34,211,238,.16);box-shadow:0 0 14px rgba(34,211,238,.25)}.chip.eta b{color:#dffaff}
+.chip svg{width:12px;height:12px;opacity:.85}
+</style></head><body>
+<canvas id="gl"></canvas>
+<div class="scrim"></div>
+<div class="warn" id="warn">WebGL nicht verfügbar — Canvas-Variante: <a href="/">/</a></div>
+<div class="wrap">
+  <h1 id="title">Progress</h1><div class="sub" id="sub">lädt …</div>
+  <div id="hudsec"></div>
+  <div id="gpusec"></div>
+  <div id="tpssec"></div>
+  <div id="losssec"></div>
+  <div id="flowsec"></div>
+  <div id="chartsec"></div>
+  <div id="logsec"></div>
+  <div id="root"></div>
+  <div class="foot" style="color:var(--mut);font-size:11px;margin-top:26px;border-top:1px solid var(--line);padding-top:10px">
+   RadeonForge · WebGL-3D · Auto-Refresh 3 s · Canvas-Variante: <a href="/">/</a></div>
+</div>
+<script>
+/* ===================== WebGL — glühende Knotenwolke + Energie-Pulse (kein CDN) ===================== */
+let trainingActive=false;
+(function(){
+const cv=document.getElementById('gl');let gl;
+try{gl=cv.getContext('webgl',{antialias:true,alpha:false,premultipliedAlpha:false})||cv.getContext('experimental-webgl');}catch(e){}
+if(!gl){document.getElementById('warn').style.display='grid';return;}
+let W,H,DPR;function resize(){DPR=Math.min(window.devicePixelRatio||1,2);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;gl.viewport(0,0,W,H);}
+addEventListener('resize',resize);resize();
+const N=320,pos=[],col=[],P=[];
+for(let i=0;i<N;i++){const t=i/N,phi=Math.acos(1-2*t),th=Math.PI*(1+Math.sqrt(5))*i,r=(i%2?1.0:0.6)+(i%7)*0.02;
+ const x=Math.cos(th)*Math.sin(phi)*r,y=Math.sin(th)*Math.sin(phi)*r,z=Math.cos(phi)*r;pos.push(x,y,z);P.push([x,y,z]);
+ const f=(x+1.1)/2.2;col.push(0.62-0.40*f,0.32+0.46*f,0.98);}        /* violett -> cyan */
+const E=[];
+for(let i=0;i<N;i++){const d=[];for(let j=0;j<N;j++)if(i!==j){const dx=P[i][0]-P[j][0],dy=P[i][1]-P[j][1],dz=P[i][2]-P[j][2];d.push([dx*dx+dy*dy+dz*dz,j]);}
+ d.sort((a,b)=>a[0]-b[0]);for(let k=0;k<2;k++){const j=d[k][1];if(i<j)E.push([i,j]);}}
+const lpos=[],lcol=[];E.forEach(([i,j])=>{lpos.push(P[i][0],P[i][1],P[i][2],P[j][0],P[j][1],P[j][2]);
+ lcol.push(col[i*3],col[i*3+1],col[i*3+2],col[j*3],col[j*3+1],col[j*3+2]);});
+function buf(a,dyn){const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(a),dyn?gl.DYNAMIC_DRAW:gl.STATIC_DRAW);return b;}
+const bPos=buf(pos),bCol=buf(col),bL=buf(lpos),bLc=buf(lcol),bCore=buf([0,0,0]);
+const NP=22,pul=[];for(let i=0;i<NP;i++)pul.push({e:(Math.random()*E.length)|0,t:Math.random()});
+const bPul=buf(new Array(NP*3).fill(0),true),bPulC=buf(new Array(NP*3).fill(1),true);
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o;}
+function prog(v,f){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,v));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,f));gl.linkProgram(p);return p;}
+const vP=`attribute vec3 p;attribute vec3 c;uniform mat4 m;uniform float ps;varying vec3 vc;varying float vd;
+void main(){vec4 q=m*vec4(p,1.0);gl_Position=q;vd=clamp((4.3-q.w)/2.3,0.18,1.0);gl_PointSize=ps*vd;vc=c;}`;
+const fP=`precision mediump float;varying vec3 vc;varying float vd;
+void main(){vec2 d=gl_PointCoord-vec2(0.5);float r=length(d);float a=smoothstep(0.5,0.0,r);a*=a;
+gl_FragColor=vec4(vc*(0.75+1.5*vd),a*(0.55+0.45*vd));}`;
+const vL=`attribute vec3 p;attribute vec3 c;uniform mat4 m;varying vec3 vc;varying float vd;
+void main(){vec4 q=m*vec4(p,1.0);gl_Position=q;vd=clamp((4.3-q.w)/2.3,0.15,1.0);vc=c;}`;
+const fL=`precision mediump float;varying vec3 vc;varying float vd;void main(){gl_FragColor=vec4(vc*1.1,0.10+0.22*vd);}`;
+const pPts=prog(vP,fP),pLin=prog(vL,fL);
+function mul(a,b){const o=new Float32Array(16);for(let i=0;i<4;i++)for(let j=0;j<4;j++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+j]*b[i*4+k];o[i*4+j]=s;}return o;}
+function persp(f,as,n,fa){const t=1/Math.tan(f/2);return new Float32Array([t/as,0,0,0,0,t,0,0,0,0,(fa+n)/(n-fa),-1,0,0,2*fa*n/(n-fa),0]);}
+function rY(a){const c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,s,0,0,1,0,0,-s,0,c,0,0,0,0,1]);}
+function rX(a){const c=Math.cos(a),s=Math.sin(a);return new Float32Array([1,0,0,0,0,c,-s,0,0,s,c,0,0,0,0,1]);}
+function tr(x,y,z){return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,x,y,z,1]);}
+function draw(m,bp,bc,pr,mode,cnt,ps){gl.useProgram(pr);
+ const lp=gl.getAttribLocation(pr,'p');gl.bindBuffer(gl.ARRAY_BUFFER,bp);gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,3,gl.FLOAT,false,0,0);
+ const lc=gl.getAttribLocation(pr,'c');gl.bindBuffer(gl.ARRAY_BUFFER,bc);gl.enableVertexAttribArray(lc);gl.vertexAttribPointer(lc,3,gl.FLOAT,false,0,0);
+ gl.uniformMatrix4fv(gl.getUniformLocation(pr,'m'),false,m);const u=gl.getUniformLocation(pr,'ps');if(u)gl.uniform1f(u,ps);gl.drawArrays(mode,0,cnt);}
+function frame(now){
+ gl.clearColor(0.01,0.016,0.038,1);gl.clear(gl.COLOR_BUFFER_BIT);
+ gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.disable(gl.DEPTH_TEST);
+ const m=mul(persp(1.15,W/H,0.1,100),mul(tr(0,0,-3.05),mul(rY(now*0.00005),rX(Math.sin(now*0.000032)*0.32))));
+ draw(m,bL,bLc,pLin,gl.LINES,lpos.length/3,0);
+ const k=(trainingActive?1.25:1);
+ draw(m,bPos,bCol,pPts,gl.POINTS,N,86*DPR*k);   /* großer weicher Glow (Bloom-Look) */
+ draw(m,bPos,bCol,pPts,gl.POINTS,N,30*DPR);      /* heller Kern je Knoten */
+ const pp=new Float32Array(NP*3),pc=new Float32Array(NP*3);
+ for(let i=0;i<NP;i++){const e=E[pul[i].e],a=P[e[0]],b=P[e[1]];pul[i].t+=0.004*k;if(pul[i].t>1){pul[i].t=0;pul[i].e=(Math.random()*E.length)|0;}
+  const t=pul[i].t;pp[i*3]=a[0]+(b[0]-a[0])*t;pp[i*3+1]=a[1]+(b[1]-a[1])*t;pp[i*3+2]=a[2]+(b[2]-a[2])*t;pc[i*3]=1;pc[i*3+1]=1;pc[i*3+2]=1;}
+ gl.bindBuffer(gl.ARRAY_BUFFER,bPul);gl.bufferData(gl.ARRAY_BUFFER,pp,gl.DYNAMIC_DRAW);
+ gl.bindBuffer(gl.ARRAY_BUFFER,bPulC);gl.bufferData(gl.ARRAY_BUFFER,pc,gl.DYNAMIC_DRAW);
+ draw(m,bPul,bPulC,pPts,gl.POINTS,NP,18*DPR*k);
+ const cpz=0.6+0.4*Math.sin(now*0.0015*k);
+ draw(m,bCore,buf([0.8,0.7,1.0]),pPts,gl.POINTS,1,(150+90*cpz)*DPR);   /* brillanter Kern-Flare */
+ draw(m,bCore,buf([1,1,1]),pPts,gl.POINTS,1,(46+24*cpz)*DPR);
+ requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+})();
+
+/* ===================== Daten / Overlay ===================== */
+const PAL=['#8b5cf6','#3b9cff','#22d3ee','#10b981','#f59e0b','#ef4444'];
+function esc(s){return (''+s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function bar(p){return '<div class="bar"><div class="fill" style="width:'+(p||0)+'%"></div></div>';}
+function age(s){if(s==null)return '—';if(s<90)return '<span class="dot"></span>vor '+s+' s';if(s<5400)return 'vor '+Math.round(s/60)+' min';return 'vor '+(s/3600).toFixed(1)+' h';}
+
+/* ---- nicht-lineares Fluss-Diagramm (SVG, datengetrieben aus manifest.flow) ---- */
+function renderFlow(flow){
+ const el=document.getElementById('flowsec');
+ if(!flow||!flow.nodes||!flow.nodes.length){el.innerHTML='';return;}
+ const w=flow.w||1000,h=flow.h||430,byId={};flow.nodes.forEach(n=>byId[n.id]=n);
+ const col={done:'#10b981',current:'#22d3ee',todo:'#3b6797',goal:'#8b5cf6'};
+ let svg='<svg id="flowsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" width="100%" style="display:block;border-radius:12px">';
+ svg+='<defs>';
+ ['done','current','goal','todo'].forEach(k=>{const c=col[k];
+  svg+='<linearGradient id="fg_'+k+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+c+'" stop-opacity="'+(k==='todo'?'0.16':'0.34')+'"/><stop offset="1" stop-color="'+c+'" stop-opacity="0.06"/></linearGradient>';
+  svg+='<marker id="ar_'+k+'" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0L7,3L0,6Z" fill="'+c+'"/></marker>';});
+ svg+='<filter id="fglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+ svg+='<rect width="'+w+'" height="'+h+'" rx="12" fill="#06101f"/></defs>';
+ svg+='<rect width="'+w+'" height="'+h+'" rx="12" fill="#06101f"/>';
+ // ---- Kanten ----
+ (flow.edges||[]).forEach(e=>{const a=byId[e[0]],b=byId[e[1]];if(!a||!b)return;
+  if(e[2]==='loop'){svg+='<path d="M'+(a.x+a.w/2-18)+','+(a.y-a.h/2)+' C'+(a.x+10)+','+(a.y-a.h/2-46)+' '+(a.x-10)+','+(a.y-a.h/2-46)+' '+(a.x-a.w/2+18)+','+(a.y-a.h/2)+'" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#ar_current)" opacity="0.7"/>';
+   svg+='<text x="'+a.x+'" y="'+(a.y-a.h/2-50)+'" fill="#8ea6c8" font-size="11" text-anchor="middle">iteriert (v1→v4)</text>';return;}
+  const mx=(a.x+b.x)/2,d='M'+(a.x+a.w/2)+','+a.y+' C'+mx+','+a.y+' '+mx+','+b.y+' '+(b.x-b.w/2)+','+b.y;
+  // Status der Kante: fertig wenn beide done; aktiv wenn Ziel current
+  const flowing=(a.status==='done'&&b.status==='done'),toCur=(b.status==='current');
+  const ec=flowing?col.done:(toCur?col.current:'#3b6797');
+  svg+='<path d="'+d+'" fill="none" stroke="'+ec+'" stroke-width="2"'+((e[2]==='dash'||(!flowing&&!toCur))?' stroke-dasharray="5 5"':'')+' marker-end="url(#ar_'+(flowing?'done':(toCur?'current':'todo'))+')" opacity="'+(flowing||toCur?'0.9':'0.5')+'"/>';
+  if(flowing||toCur)svg+='<path d="'+d+'" fill="none" stroke="'+(flowing?'#bfffe4':'#d8fbff')+'" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="16 360" filter="url(#fglow)" opacity="0.95"><animate attributeName="stroke-dashoffset" from="376" to="0" dur="2.4s" repeatCount="indefinite"/></path>';});
+ // ---- Knoten ----
+ flow.nodes.forEach(n=>{const c=col[n.status]||'#3b6797',cur=n.status==='current',x0=n.x-n.w/2,y0=n.y-n.h/2;
+  svg+='<g'+(cur?' filter="url(#fglow)"':'')+'>';
+  svg+='<rect x="'+x0+'" y="'+y0+'" rx="13" width="'+n.w+'" height="'+n.h+'" fill="url(#fg_'+(n.status||'todo')+')" stroke="'+c+'" stroke-width="'+(cur?2.6:1.6)+'"/>';
+  if(cur)svg+='<rect x="'+x0+'" y="'+y0+'" rx="13" width="'+n.w+'" height="'+n.h+'" fill="none" stroke="'+c+'" stroke-width="2.6"><animate attributeName="opacity" values="1;.25;1" dur="1.5s" repeatCount="indefinite"/></rect>';
+  // Status-Badge (Kreis + Icon) oben links
+  const ic=n.status==='done'?'✓':(n.status==='goal'?'★':(cur?'●':'·'));
+  svg+='<circle cx="'+(x0+16)+'" cy="'+(y0+16)+'" r="9" fill="'+c+'" opacity="'+(n.status==='todo'?'0.5':'0.95')+'"/>';
+  svg+='<text x="'+(x0+16)+'" y="'+(y0+20)+'" fill="#06101f" font-size="11" font-weight="800" text-anchor="middle">'+ic+'</text>';
+  // Label + Detail (rechts vom Badge zentriert)
+  svg+='<text x="'+(n.x+8)+'" y="'+(n.y-3)+'" fill="'+(n.status==='todo'?'#cfe0f5':'#fff')+'" font-size="12.5" font-weight="700" text-anchor="middle">'+esc(n.label)+'</text>';
+  if(n.detail)svg+='<text x="'+(n.x+8)+'" y="'+(n.y+14)+'" fill="#9fb4d4" font-size="10" text-anchor="middle">'+esc(n.detail)+'</text>';
+  svg+='</g>';
+  // "Du bist hier"-Plakette über dem aktuellen Knoten
+  if(cur){const by=y0-30;svg+='<g><rect x="'+(n.x-58)+'" y="'+by+'" rx="9" width="116" height="22" fill="#0a1f33" stroke="'+col.current+'" stroke-width="1.4"><animate attributeName="opacity" values="1;.55;1" dur="1.5s" repeatCount="indefinite"/></rect>'
+   +'<path d="M'+(n.x-6)+','+(by+22)+' L'+(n.x+6)+','+(by+22)+' L'+n.x+','+(by+30)+' Z" fill="#0a1f33"/>'
+   +'<text x="'+n.x+'" y="'+(by+15)+'" fill="'+col.current+'" font-size="11" font-weight="700" text-anchor="middle">▶ Du bist hier</text></g>';}});
+ svg+='</svg>';
+ el.innerHTML='<div class="sec">Ablauf <span style="color:var(--mut);text-transform:none;letter-spacing:0">· Status live aus Daten</span> <button class="btn" id="flow-dl">SVG ↓</button></div><div class="card" style="padding:10px">'+svg+'</div>';
+ var fb=document.getElementById('flow-dl');if(fb)fb.onclick=function(){dl('flowsvg','ablauf.svg');};
+}
+
+/* ---- Vorher/Nachher-Charts (SVG, toggle, download) ---- */
+let chartsOpen=true;
+function renderCharts(res){
+ const el=document.getElementById('chartsec');
+ if(!res||!res.models||!res.models.length){el.innerHTML='';return;}
+ const models=res.models,metrics=res.metrics||[];
+ let head='<div class="sec">'+esc(res.title||'Ergebnisse')
+   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· vorher → nachher</span>'
+   +' <span><button class="btn" id="ch-tg">'+(chartsOpen?'ausblenden':'einblenden')+'</button> '
+   +'<button class="btn" id="ch-dl">SVG ↓</button></span></div>';
+ function wire(){var t=document.getElementById('ch-tg');if(t)t.onclick=window.__tg;var c=document.getElementById('ch-dl');if(c)c.onclick=function(){dl('chartsvg','ergebnisse.svg');};}
+ if(!chartsOpen){el.innerHTML=head;wire();return;}
+ const n=models.length;
+ const SHORT={grounded_ok:'Gate',coverage:'Coverage',refusal_ok:'Refusal',over_refusal:'Over-Ref.'};
+ const W=980,H=380,padL=50,padR=170,padT=40,padB=52,iw=W-padL-padR,ih=H-padT-padB;
+ const allMax=Math.max(100,...models.map(m=>Math.max(0,...metrics.map(mt=>m.values[mt.key]||0))));
+ const yMax=allMax<=100?100:Math.ceil(allMax/10)*10;
+ const X=i=>padL+(n<2?iw/2:(i/(n-1)*iw));
+ const Y=v=>padT+ih-(v/yMax)*ih;
+ let s='<svg id="chartsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;border-radius:12px">';
+ s+='<defs><filter id="chGlow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+ s+='<rect width="'+W+'" height="'+H+'" rx="12" fill="#06101f"/>';
+ // Trennlinie zur Label-Spalte
+ s+='<line x1="'+(W-padR+1)+'" y1="'+padT+'" x2="'+(W-padR+1)+'" y2="'+(padT+ih)+'" stroke="rgba(255,255,255,.08)"/>';
+ // Gitter + Y-Achse
+ for(let k=0;k<=4;k++){const v=yMax*k/4,y=Y(v);
+  s+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';
+  s+='<text x="'+(padL-8)+'" y="'+(y+4).toFixed(1)+'" fill="#6f86a8" font-size="11" text-anchor="end">'+Math.round(v)+'</text>';}
+ // X-Achse: Lauf-Namen + vorher/nachher
+ models.forEach((m,i)=>{const x=X(i);
+  s+='<line x1="'+x.toFixed(1)+'" y1="'+padT+'" x2="'+x.toFixed(1)+'" y2="'+(padT+ih)+'" stroke="rgba(255,255,255,.04)"/>';
+  s+='<text x="'+x.toFixed(1)+'" y="'+(padT+ih+19)+'" fill="#9fb4d4" font-size="12" font-weight="600" text-anchor="middle">'+esc(m.name)+'</text>';});
+ if(n>1){s+='<text x="'+X(0).toFixed(1)+'" y="'+(padT+ih+35)+'" fill="#6f86a8" font-size="10" text-anchor="middle">vorher</text>';
+  s+='<text x="'+X(n-1).toFixed(1)+'" y="'+(padT+ih+35)+'" fill="#22d3ee" font-size="10" font-weight="700" text-anchor="middle">nachher</text>';}
+ // eine Glow-Linie je Metrik + Marker
+ metrics.forEach((mt,mi)=>{const c=PAL[mi%PAL.length];
+  const pts=models.map((m,i)=>[X(i),Y(m.values[mt.key]||0)]);
+  const poly=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  s+='<polyline points="'+poly+'" fill="none" stroke="'+c+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#chGlow)" opacity="0.95"/>';
+  pts.forEach((p,i)=>{s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(i===0||i===n-1?4.5:3)+'" fill="'+c+'"'+((i===n-1)?' filter="url(#chGlow)"':'')+'/>';});});
+ // rechte Label-Spalte: Punkt + Kurzname (Linienfarbe) + Endwert (weiß), kollisionsfrei -> ersetzt die alte Legende
+ const ends=metrics.map((mt,mi)=>({c:PAL[mi%PAL.length],lab:(SHORT[mt.key]||String(mt.label||mt.key)).slice(0,13),v:(models[n-1].values[mt.key]||0),unit:mt.unit||'',y:Y(models[n-1].values[mt.key]||0)}));
+ ends.sort((a,b)=>a.y-b.y);
+ for(let i=1;i<ends.length;i++){if(ends[i].y-ends[i-1].y<18)ends[i].y=ends[i-1].y+18;}
+ ends.forEach(e=>{const ly=(e.y+4).toFixed(1);
+  s+='<circle cx="'+(W-padR+11)+'" cy="'+e.y.toFixed(1)+'" r="3.6" fill="'+e.c+'"/>';
+  s+='<text x="'+(W-padR+20)+'" y="'+ly+'" fill="'+e.c+'" font-size="12" font-weight="600">'+esc(e.lab)+'</text>';
+  s+='<text x="'+(W-14)+'" y="'+ly+'" fill="#eaf2ff" font-size="13" font-weight="800" text-anchor="end">'+e.v+e.unit+'</text>';});
+ s+='</svg>';
+ el.innerHTML=head+'<div class="card" style="padding:10px">'+s+'</div>';wire();
+}
+window.__tg=function(){chartsOpen=!chartsOpen;renderCharts(window.__res);};
+
+/* ---- Live Tokens/s-Chart — „beeindruckend": Glow-Gradient, Energie-Puls, pulsierender Live-Punkt ---- */
+let tpsOpen=true;
+// Catmull-Rom -> kubische Bezier: weiche, fließende Kurve statt Zickzack
+function smoothPath(P){if(P.length<2)return '';let d='M'+P[0][0].toFixed(1)+','+P[0][1].toFixed(1);
+ for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||P[i+1];
+  const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+  d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);}
+ return d;}
+function renderTps(trainings){const el=document.getElementById('tpssec');if(!el)return;
+ const list=(trainings||[]).filter(t=>t.tps_series&&t.tps_series.length);
+ const t=list.find(x=>x.active)||list.sort((a,b)=>(a.age_secs||0)-(b.age_secs||0))[0];
+ if(!t){el.innerHTML='';return;}
+ const ser=t.tps_series,cur=ser[ser.length-1];
+ const mx=Math.max.apply(null,ser),mn=Math.min.apply(null,ser),avg=ser.reduce((a,b)=>a+b,0)/ser.length;
+ const liveDot=t.active?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-right:6px;vertical-align:middle"></span>':'';
+ const head='<div class="sec">'+liveDot+'Tokens/s — live'
+   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(t.name)+' · '+ser.length+' Punkte'+(t.sec_per_it?(' · '+t.sec_per_it+' s/Step'):'')+'</span>'
+   +' <span><button class="btn" id="tps-tg">'+(tpsOpen?'ausblenden':'einblenden')+'</button> '
+   +'<button class="btn" id="tps-dl">SVG ↓</button></span></div>';
+ function wire(){var g=document.getElementById('tps-tg');if(g)g.onclick=function(){tpsOpen=!tpsOpen;renderTps(trainings);};
+   var d=document.getElementById('tps-dl');if(d)d.onclick=function(){dl('tpssvg','tokens-pro-sekunde.svg');};}
+ if(!tpsOpen){el.innerHTML=head;wire();return;}
+ const W=960,H=300,padL=64,padR=24,padT=46,padB=30,iw=W-padL-padR,ih=H-padT-padB;
+ const span0=(mx-mn)||Math.max(1,mx*0.3);const lo=Math.max(0,mn-span0*0.35),hi=mx+span0*0.30,span=(hi-lo)||1;
+ const X=i=>padL+(ser.length<2?iw:(i/(ser.length-1)*iw));
+ const Y=v=>padT+ih-((v-lo)/span)*ih;
+ const P=ser.map((v,i)=>[X(i),Y(v)]);
+ const line=ser.length>1?smoothPath(P):('M'+padL+','+Y(cur).toFixed(1)+' L'+(W-padR)+','+Y(cur).toFixed(1));
+ const area=line+' L'+(W-padR).toFixed(1)+','+(padT+ih)+' L'+padL+','+(padT+ih)+' Z';
+ const lx=X(ser.length-1).toFixed(1),ly=Y(cur).toFixed(1);
+ let s='<svg id="tpssvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;border-radius:12px">';
+ s+='<defs>'
+  +'<linearGradient id="tpsArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity="0.40"/><stop offset="0.55" stop-color="#3b9cff" stop-opacity="0.14"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0.02"/></linearGradient>'
+  +'<linearGradient id="tpsLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="0.5" stop-color="#3b9cff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>'
+  +'<filter id="tpsGlow" x="-30%" y="-60%" width="160%" height="260%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+  +'<radialGradient id="tpsDot"><stop offset="0" stop-color="#eaffff"/><stop offset="0.4" stop-color="#22d3ee"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>'
+  +'</defs>';
+ s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" rx="12" fill="#071425"/>';
+ // Gitter + Y-Achse
+ for(let k=0;k<=4;k++){const v=lo+span*k/4,y=Y(v);
+  s+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';
+  s+='<text x="'+(padL-10)+'" y="'+(y+4).toFixed(1)+'" fill="#6f86a8" font-size="12" text-anchor="end">'+Math.round(v)+'</text>';}
+ // Fläche + Glow-Linie
+ s+='<path d="'+area+'" fill="url(#tpsArea)"/>';
+ s+='<path d="'+line+'" fill="none" stroke="url(#tpsLine)" stroke-width="3" stroke-linecap="round" filter="url(#tpsGlow)"/>';
+ // Energie-Puls, der die Kurve entlangläuft (nur wenn live + genug Punkte)
+ if(t.active&&ser.length>2){s+='<path d="'+line+'" fill="none" stroke="#d8fbff" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="22 1400" filter="url(#tpsGlow)" opacity="0.95"><animate attributeName="stroke-dashoffset" from="1422" to="0" dur="2.6s" repeatCount="indefinite"/></path>';}
+ // jeden Messpunkt sichtbar markieren (ausser dem letzten -> der wird zum Live-Punkt)
+ if(ser.length>1)ser.forEach((v,i)=>{if(i===ser.length-1)return;
+   s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="3.4" fill="#08182c" stroke="#5fe0f2" stroke-width="2"/>';});
+ // Live-Punkt: pulsierender Ring + Kern
+ s+='<circle cx="'+lx+'" cy="'+ly+'" r="6" fill="url(#tpsDot)">'+(t.active?'<animate attributeName="r" values="6;15;6" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.9;0.2;0.9" dur="1.8s" repeatCount="indefinite"/>':'')+'</circle>';
+ s+='<circle cx="'+lx+'" cy="'+ly+'" r="4" fill="#eaffff" filter="url(#tpsGlow)"/>';
+ // Große Live-Zahl (oben)
+ s+='<text x="'+padL+'" y="32" fill="#eaf2ff" font-size="30" font-weight="800" filter="url(#tpsGlow)">'+Math.round(cur)+'</text>';
+ s+='<text x="'+(padL+Math.max(58,String(Math.round(cur)).length*19))+'" y="32" fill="#7fd9ec" font-size="14" font-weight="600">tok/s</text>';
+ s+='<text x="'+(W-padR)+'" y="32" fill="#6f86a8" font-size="13" text-anchor="end">Ø '+Math.round(avg)+'  ·  min '+Math.round(mn)+'  ·  max '+Math.round(mx)+'</text>';
+ s+='</svg>';
+ el.innerHTML=head+'<div class="card" style="padding:10px">'+s+'</div>';
+ wire();}
+/* ---- Live Loss-Chart (Glow-Linie, runter = besser; gleiche Optik wie t/s) ---- */
+let lossOpen=true;
+function renderLoss(trainings){const el=document.getElementById('losssec');if(!el)return;
+ const list=(trainings||[]).filter(t=>t.loss_series&&t.loss_series.length>1);
+ const t=list.find(x=>x.active)||list.sort((a,b)=>(a.age_secs||0)-(b.age_secs||0))[0];
+ if(!t){el.innerHTML='';return;}
+ const ser=t.loss_series,cur=ser[ser.length-1],first=ser[0];
+ const mx=Math.max.apply(null,ser),mn=Math.min.apply(null,ser);
+ const drop=first>0?Math.round((1-cur/first)*100):0;
+ const liveDot=t.active?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 8px var(--purple);margin-right:6px;vertical-align:middle"></span>':'';
+ const head='<div class="sec">'+liveDot+'Loss — Training'
+   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(t.name)+' · '+ser.length+' Steps · ↓ besser</span>'
+   +' <span><button class="btn" id="loss-tg">'+(lossOpen?'ausblenden':'einblenden')+'</button> '
+   +'<button class="btn" id="loss-dl">SVG ↓</button></span></div>';
+ function wire(){var g=document.getElementById('loss-tg');if(g)g.onclick=function(){lossOpen=!lossOpen;renderLoss(trainings);};
+   var d=document.getElementById('loss-dl');if(d)d.onclick=function(){dl('losssvg','loss.svg');};}
+ if(!lossOpen){el.innerHTML=head;wire();return;}
+ const W=960,H=300,padL=64,padR=24,padT=46,padB=30,iw=W-padL-padR,ih=H-padT-padB;
+ const lo=Math.max(0,mn-(mx-mn)*0.12),hi=mx+(mx-mn)*0.08,span=(hi-lo)||1;
+ const X=i=>padL+(ser.length<2?iw:(i/(ser.length-1)*iw));
+ const Y=v=>padT+ih-((v-lo)/span)*ih;
+ const P=ser.map((v,i)=>[X(i),Y(v)]);
+ const line=smoothPath(P),lx=X(ser.length-1).toFixed(1),ly=Y(cur).toFixed(1);
+ const area=line+' L'+(W-padR).toFixed(1)+','+(padT+ih)+' L'+padL+','+(padT+ih)+' Z';
+ let s='<svg id="losssvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;border-radius:12px">';
+ s+='<defs>'
+  +'<linearGradient id="lossArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b5cf6" stop-opacity="0.38"/><stop offset="0.6" stop-color="#3b9cff" stop-opacity="0.12"/><stop offset="1" stop-color="#10b981" stop-opacity="0.02"/></linearGradient>'
+  +'<linearGradient id="lossLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8b5cf6"/><stop offset="0.6" stop-color="#3b9cff"/><stop offset="1" stop-color="#10b981"/></linearGradient>'
+  +'<filter id="lossGlow" x="-30%" y="-60%" width="160%" height="260%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+  +'<radialGradient id="lossDot"><stop offset="0" stop-color="#eafff4"/><stop offset="0.4" stop-color="#10b981"/><stop offset="1" stop-color="#10b981" stop-opacity="0"/></radialGradient>'
+  +'</defs>';
+ s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" rx="12" fill="#0a0a1e"/>';
+ for(let k=0;k<=4;k++){const v=lo+span*k/4,y=Y(v);
+  s+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';
+  s+='<text x="'+(padL-10)+'" y="'+(y+4).toFixed(1)+'" fill="#7e6fa8" font-size="12" text-anchor="end">'+v.toFixed(2)+'</text>';}
+ s+='<path d="'+area+'" fill="url(#lossArea)"/>';
+ s+='<path d="'+line+'" fill="none" stroke="url(#lossLine)" stroke-width="3" stroke-linecap="round" filter="url(#lossGlow)"/>';
+ if(t.active&&ser.length>2){s+='<path d="'+line+'" fill="none" stroke="#eafff4" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="22 1400" filter="url(#lossGlow)" opacity="0.9"><animate attributeName="stroke-dashoffset" from="1422" to="0" dur="2.6s" repeatCount="indefinite"/></path>';}
+ ser.forEach((v,i)=>{if(i===ser.length-1)return;s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="2.8" fill="#0a0a1e" stroke="#9b8cf2" stroke-width="1.6"/>';});
+ s+='<circle cx="'+lx+'" cy="'+ly+'" r="6" fill="url(#lossDot)">'+(t.active?'<animate attributeName="r" values="6;15;6" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.9;0.2;0.9" dur="1.8s" repeatCount="indefinite"/>':'')+'</circle>';
+ s+='<circle cx="'+lx+'" cy="'+ly+'" r="4" fill="#eafff4" filter="url(#lossGlow)"/>';
+ s+='<text x="'+padL+'" y="32" fill="#eaf2ff" font-size="30" font-weight="800" filter="url(#lossGlow)">'+cur.toFixed(3)+'</text>';
+ s+='<text x="'+(padL+96)+'" y="32" fill="#9fe6c0" font-size="13" font-weight="600">Loss</text>';
+ s+='<text x="'+(W-padR)+'" y="32" fill="#7e6fa8" font-size="13" text-anchor="end">Start '+first.toFixed(2)+'  ·  jetzt '+cur.toFixed(2)+'  ·  −'+drop+'%</text>';
+ s+='</svg>';
+ el.innerHTML=head+'<div class="card" style="padding:10px">'+s+'</div>';wire();}
+
+function dl(id,name){const s=document.getElementById(id);if(!s)return;const blob=new Blob(['<?xml version="1.0"?>\n'+s.outerHTML],{type:'image/svg+xml'});
+ const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+
+/* ---- Live-HUD: glühende Kacheln für die Trainings-Kennzahlen ---- */
+const ICON={
+ clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ steps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h4v-4h4v-4h4V7h4"/></svg>',
+ speed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18a9 9 0 1 1 18 0"/><path d="M12 14l4-3.5"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>',
+ loss:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l5 7 4-3 9 10"/></svg>',
+ epoch:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>',
+ file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/></svg>',
+ refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v5h-5"/></svg>'};
+function tileSpark(arr){const a=arr.slice(-26),w=72,h=22,mx=Math.max.apply(null,a),mn=Math.min.apply(null,a),sp=(mx-mn)||1;
+ const pts=a.map((v,i)=>(a.length<2?w:(i/(a.length-1)*w)).toFixed(1)+','+(h-2-(v-mn)/sp*(h-4)).toFixed(1)).join(' ');
+ return '<svg class="spark" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'"><polyline points="'+pts+'" fill="none" stroke="#22d3ee" stroke-width="1.7" opacity="0.65" stroke-linecap="round"/></svg>';}
+function tile(k,v,u,sub,o){o=o||{};
+ return '<div class="tile'+(o.accent?' accent':'')+'"><div class="k">'+(o.icon||'')+k+'</div>'
+  +'<div class="v">'+v+(u?'<span class="u">'+u+'</span>':'')+'</div>'
+  +'<div class="sub2">'+(sub||'')+'</div>'+(o.spark||'')+'</div>';}
+function renderHud(){const el=document.getElementById('hudsec');if(!el)return;
+ const t=window.__hudTr,lg=window.__log;
+ if(!t||!t.active){el.innerHTML='';return;}   // HUD nur während ein Lauf live ist
+ const pct=(t.pct!=null)?t.pct:((t.step!=null&&t.total_steps)?Math.round(t.step/t.total_steps*100):null);
+ const T=[];
+ T.push(tile('Fortschritt',(t.step!=null?t.step:'–'),'/'+(t.total_steps||'?'),
+   (pct!=null?('<div class="tbar"><div class="tfill" style="width:'+pct+'%"></div></div>'):''),{accent:true,icon:ICON.steps}));
+ if(lg&&lg.eta) T.push(tile('verbleibend','<span style="font-size:21px">'+lg.eta+'</span>','','bis fertig',{accent:true,icon:ICON.clock}));
+ if(lg&&lg.sec_per_it) T.push(tile('Tempo',(+lg.sec_per_it).toFixed(1),'s/Step','pro Optimizer-Step',{icon:ICON.speed}));
+ if(t.tps!=null) T.push(tile('Durchsatz',t.tps,'tok/s','',{icon:ICON.bolt,spark:(t.tps_series&&t.tps_series.length>1?tileSpark(t.tps_series):'')}));
+ if(t.loss!=null){const ls=(lg&&lg.loss)||[];let tr='';
+   if(ls.length>=6){const n=Math.min(5,Math.floor(ls.length/2));
+     const rec=ls.slice(-n).reduce((a,b)=>a+b,0)/n,pre=ls.slice(-2*n,-n).reduce((a,b)=>a+b,0)/n,d=rec-pre;
+     tr=d<-0.005?'<span style="color:var(--green)">▼ fällt</span>':(d>0.005?'<span style="color:var(--amber)">▲ steigt</span>':'<span style="color:var(--mut)">≈ stabil</span>');}
+   T.push(tile('Loss',(+t.loss).toFixed(3),'',tr,{icon:ICON.loss,spark:(ls.length>1?tileSpark(ls):'')}));}
+ if(t.epoch!=null) T.push(tile('Epoche',(+t.epoch).toFixed(2),(t.epochs?'/'+t.epochs:''),'',{icon:ICON.epoch}));
+ el.innerHTML='<div class="hud">'+T.join('')+'</div>';}
+
+function roadmapTodo(items){if(!items||!items.length)return '';
+ const done=items.filter(x=>x.status==='done').length,tot=items.length,pct=tot?Math.round(done/tot*100):0;
+ let h='<div class="sec">Bis zum voll trainierten Modell <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+done+'/'+tot+' ✓ · '+pct+'%</span></div>';
+ h+='<div class="card"><div class="bar" style="margin:0 0 14px"><div class="fill" style="width:'+pct+'%"></div></div>';
+ items.forEach(x=>{const st=x.status||'todo';
+  const ico=st==='done'?'<span style="color:var(--green);font-weight:800">✓</span>'
+           :st==='current'?'<span class="dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan);margin:0"></span>'
+           :'<span style="color:var(--mut)">○</span>';
+  const nameCol=st==='done'?'#7e95b8':(st==='current'?'#eaf2ff':'#cfe0f5');
+  const box=st==='current'?'background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.35);box-shadow:0 0 18px rgba(34,211,238,.12)':'border:1px solid transparent';
+  h+='<div class="todoitem" style="border-radius:10px;padding:7px 10px;margin:2px 0;'+box+'">'
+   +'<span class="b" style="min-width:16px;text-align:center">'+ico+'</span>'
+   +'<div><b style="color:'+nameCol+';font-weight:'+(st==='done'?'500':'700')+'">'+esc(x.phase)+'</b>'
+   +(st==='current'?' <span style="color:var(--cyan);font-size:11px;font-weight:700">◂ aktuell</span>':'')
+   +(x.detail?('<div class="meta" style="margin-top:2px">'+esc(x.detail)+'</div>'):'')+'</div></div>';});
+ return h+'</div>';}
+function trCard(t){const live=t.active?'<span class="badge live">läuft · GPU</span>':(t.stale?'<span class="badge">abgebrochen</span>':'<span class="badge">'+esc(t.status||'—')+'</span>');
+ const prog=(t.step!=null&&t.total_steps!=null)?('Step '+t.step+'/'+t.total_steps):(t.status||'');
+ const ep=(t.epoch!=null)?(' · Epoche '+(+t.epoch).toFixed(2)+(t.epochs?('/'+t.epochs):'')):'';const loss=(t.loss!=null)?(' · loss '+(+t.loss).toFixed(4)):'';
+ const tps=(t.tps!=null)?(' · ≈'+t.tps+' tok/s'):'';
+ let h='<div class="card"><div class="row"><span class="name">'+esc(t.name)+'</span>'+live+'</div><div class="row" style="margin-top:6px"><span class="big">'+prog+ep+loss+tps+'</span><span class="meta">'+age(t.age_secs)+'</span></div>';
+ if(t.pct!=null)h+=bar(t.pct);
+ if(t.tps_series&&t.tps_series.length>1)h+='<div class="meta" style="margin-top:9px">Tokens/s (Verlauf):'+spark(t.tps_series)+'</div>';
+ return h+'</div>';}
+function dsCard(d){const live=d.active?'<span class="badge live">läuft</span>':'<span class="badge">idle</span>';
+ let h='<div class="card"><div class="row"><span class="name">'+esc(d.label)+'</span>'+live+'</div><div class="row" style="margin-top:6px"><span class="big"><b>'+d.count+'</b></span>'+(d.target?' <span class="tgt">/ '+d.target+'</span>':'')+(d.pct!=null?(' · '+d.pct+'%'):'')+'<span class="meta" style="float:right">'+age(d.age_secs)+'</span></div>';
+ if(d.target)h+=bar(d.pct);return h+'</div>';}
+function grp(t,items,r,e){const h='<div class="sec">'+t+'</div>';return items.length?h+items.map(r).join(''):h+'<div class="empty">'+e+'</div>';}
+async function tick(){try{const j=await(await fetch('/api/progress',{cache:'no-store'})).json();window.__res=j.results;
+ trainingActive=(j.trainings||[]).some(t=>t.active);
+ document.title=j.title+' · WebGL';document.getElementById('title').textContent=j.title;
+ document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'Stand '+j.generated_at+(trainingActive?'  ·  ● Training aktiv':'');
+ renderFlow(j.flow);renderCharts(j.results);renderTps(j.trainings);renderLoss(j.trainings);
+ window.__hudTr=(j.trainings||[]).find(t=>t.active)||null;renderHud();
+ let html=roadmapTodo(j.pipeline);
+ html+=grp('Modell-Training',j.trainings||[],trCard,'noch kein Lauf');
+ const G={};(j.datasets||[]).forEach(d=>{(G[d.group]=G[d.group]||[]).push(d);});Object.keys(G).forEach(g=>{html+=grp(g,G[g],dsCard,'—');});
+ document.getElementById('root').innerHTML=html;
+}catch(e){document.getElementById('sub').textContent='Fehler: '+e;}}
+tick();setInterval(tick,3000);
+
+/* ---- Live-Log (folgt der neuesten *.log) + Loss-Sparkline ---- */
+let logOpen=true;
+function spark(loss){if(!loss||loss.length<2)return '';const w=300,h=36,mx=Math.max.apply(null,loss),mn=Math.min.apply(null,loss);
+ const pts=loss.map((v,i)=>(i/(loss.length-1)*w).toFixed(1)+','+(h-3-(mx===mn?h/2:(v-mn)/(mx-mn)*(h-6))).toFixed(1)).join(' ');
+ return '<svg width="'+w+'" height="'+h+'" style="vertical-align:middle;margin-left:8px"><polyline points="'+pts+'" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg>';}
+async function tickLog(){try{const j=await(await fetch('/api/log',{cache:'no-store'})).json();const el=document.getElementById('logsec');
+ window.__log=(j&&j.file)?j:null;renderHud();
+ if(!j||!j.file){el.innerHTML='';return;}
+ const idle=(j.age_secs!=null&&j.age_secs>90);
+ const chips='<span class="chips">'
+   +(j.eta?'<span class="chip eta">'+ICON.clock+'noch <b>'+esc(j.eta)+'</b></span>':'')
+   +(j.sec_per_it?'<span class="chip">'+ICON.speed+'<b>'+(+j.sec_per_it).toFixed(1)+'</b> s/Step</span>':'')
+   +'<span class="chip">'+ICON.file+esc(j.file)+'</span>'
+   +'<span class="chip"'+(idle?' style="opacity:.7"':'')+'>'+ICON.refresh+esc(age(j.age_secs))+'</span>'
+   +(idle?'<span class="chip" style="color:var(--mut)">ruht · kein aktiver Lauf</span>':'')+'</span>';
+ const head='<div class="sec"><span>Live-Log '+chips+'</span> <button class="btn" id="log-tg">'+(logOpen?'ausblenden':'einblenden')+'</button></div>';
+ if(!logOpen){el.innerHTML=head;const t=document.getElementById('log-tg');if(t)t.onclick=function(){logOpen=!logOpen;tickLog();};return;}
+ const ls=(j.loss&&j.loss.length)?('loss '+j.loss[j.loss.length-1].toFixed(3)+spark(j.loss)):'';
+ el.innerHTML=head+'<div class="card"><div class="meta" style="margin-bottom:6px">Loss-Verlauf: '+ls+'</div><pre class="term" id="termpre">'+(j.lines||[]).map(esc).join('\n')+'</pre></div>';
+ const t=document.getElementById('log-tg');if(t)t.onclick=function(){logOpen=!logOpen;tickLog();};
+ const pre=document.getElementById('termpre');if(pre)pre.scrollTop=pre.scrollHeight;
+}catch(e){}}
+(function L(){tickLog().finally(function(){setTimeout(L,1000);});})();   /* 1×/s, sequenziell (wartet auf Antwort) */
+
+/* ---- GPU-Telemetrie (portabel; Panel nur falls verfügbar) ---- */
+function gbar(p,c){return '<div class="bar"><div class="fill" style="width:'+(p||0)+'%;background:'+(c||'linear-gradient(90deg,var(--purple),var(--cyan))')+'"></div></div>';}
+async function tickGpu(){try{const g=await(await fetch('/api/gpu',{cache:'no-store'})).json();const el=document.getElementById('gpusec');
+ if(!g||(g.util==null&&g.used==null)){el.innerHTML='';return;}
+ let h='<div class="sec">GPU</div><div class="card"><div class="row"><span class="name">'+esc(g.name||'GPU')+'</span>';
+ if(g.util!=null)h+='<span class="meta">Auslastung '+g.util+'%</span>';h+='</div>';
+ if(g.util!=null)h+=gbar(g.util);
+ if(g.used!=null){h+='<div class="row" style="margin-top:8px"><span class="meta">VRAM '+g.used+(g.total!=null?(' / '+g.total):'')+' GB</span></div>';if(g.total!=null)h+=gbar(Math.round(g.used/g.total*100),'linear-gradient(90deg,#3b9cff,#10b981)');}
+ el.innerHTML=h+'</div>';
+}catch(e){}}
+(function G(){tickGpu().finally(function(){setTimeout(G,3000);});})();
+</script></body></html>
