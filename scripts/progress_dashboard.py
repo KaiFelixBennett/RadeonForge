@@ -122,9 +122,15 @@ def collect() -> dict:
             results = {}
     flow = _resolve_flow(man.get("flow", {}), trainings, datasets, results)
     pipeline = _resolve_pipeline(man.get("pipeline", []), trainings, datasets, results)
+    scorecard = {}
+    if data_dir and (data_dir / "scorecard.json").exists():
+        try:
+            scorecard = json.loads((data_dir / "scorecard.json").read_text(encoding="utf-8"))
+        except Exception:
+            scorecard = {}
     return {"generated_at": _dt.datetime.now().strftime("%H:%M:%S"),
             "title": CFG.get("title", "Training-Progress"), "subtitle": man.get("subtitle", ""),
-            "pipeline": pipeline, "flow": flow,
+            "pipeline": pipeline, "flow": flow, "scorecard": scorecard,
             "results": results, "datasets": datasets, "trainings": trainings}
 
 
