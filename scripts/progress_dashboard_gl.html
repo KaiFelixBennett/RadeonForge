@@ -49,13 +49,41 @@ a{color:var(--cyan)}
 .chip b{font-weight:700;color:var(--cyan)}
 .chip.eta{background:rgba(34,211,238,.16);box-shadow:0 0 14px rgba(34,211,238,.25)}.chip.eta b{color:#dffaff}
 .chip svg{width:12px;height:12px;opacity:.85}
+/* ---- Live-„Jetzt"-Banner: zeigt unmissverständlich, was GERADE passiert ---- */
+.nowbar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;border-radius:14px;padding:13px 17px;margin:12px 0 6px;border:1px solid var(--line);background:linear-gradient(120deg,rgba(16,185,129,.13),rgba(34,211,238,.06));backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.nowbar.idle{background:rgba(15,27,48,.5)}
+.nowbar.warn{background:linear-gradient(120deg,rgba(245,158,11,.16),rgba(239,68,68,.10));border-color:rgba(245,158,11,.55)}
+.nowbar .pulse{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse 1.1s infinite;flex:none}
+.nowbar.idle .pulse{background:var(--mut);box-shadow:none;animation:none}
+.nowbar.warn .pulse{background:var(--amber);box-shadow:0 0 12px var(--amber)}
+.nowbar .what{font-size:15px;font-weight:800;color:var(--txt)}
+.nowbar .det{font-size:12px;color:var(--mut);margin-top:2px}
+.nowbar .fin{margin-left:auto;font-size:12px;color:var(--cyan);text-align:right;line-height:1.4;font-weight:600}
+.alerts{display:flex;flex-direction:column;gap:6px;margin:0 0 8px}
+.alert{display:flex;align-items:center;gap:9px;font-size:12.5px;border-radius:10px;padding:8px 13px;border:1px solid}
+.alert.red{background:rgba(239,68,68,.13);border-color:rgba(239,68,68,.5);color:#ffd9d9}
+.alert.amber{background:rgba(245,158,11,.13);border-color:rgba(245,158,11,.5);color:#ffe9c2}
+/* ---- Tooltips (anfängerfreundliche Erklärungen) ---- */
+.tip{position:relative;cursor:help;border-bottom:1px dotted var(--mut);text-transform:none;letter-spacing:0}
+.tip:hover::after{content:attr(data-tip);position:absolute;left:0;top:150%;z-index:60;width:max-content;max-width:300px;white-space:normal;background:#0a1426;color:#dbe8fb;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:11.5px;font-weight:400;line-height:1.5;box-shadow:0 14px 40px rgba(0,0,0,.65)}
+.tipi{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--line);color:var(--mut);font-size:10px;margin-left:5px;cursor:help;vertical-align:middle}
+/* ---- Scorecard-Panel ---- */
+.sctbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.sctbl th,.sctbl td{padding:8px 9px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
+.sctbl th{color:var(--mut);font-size:11px;text-transform:none;font-weight:600}
+.sctbl td:first-child,.sctbl th:first-child{text-align:left}
+.sctbl .mname{font-weight:700;color:var(--txt)}
+.sctbl .good{color:var(--green);font-weight:700}.sctbl .mid{color:var(--amber);font-weight:600}.sctbl .bad{color:var(--mut)}
+.sctbl tr:last-child td{border-bottom:none}
 </style></head><body>
 <canvas id="gl"></canvas>
 <div class="scrim"></div>
 <div class="warn" id="warn">WebGL nicht verfügbar — Canvas-Variante: <a href="/">/</a></div>
 <div class="wrap">
   <h1 id="title">Progress</h1><div class="sub" id="sub">lädt …</div>
+  <div id="nowsec"></div>
   <div id="hudsec"></div>
+  <div id="scoresec"></div>
   <div id="gpusec"></div>
   <div id="tpssec"></div>
   <div id="losssec"></div>
@@ -323,17 +351,20 @@ function renderLoss(trainings){const el=document.getElementById('losssec');if(!e
  s+='<text x="'+(padL+iw/2)+'" y="'+(padT+ih+24)+'" fill="#6f86a8" font-size="11" text-anchor="middle">Trainingsfortschritt 0 → 100 %</text>';
  // eine geglättete (EMA) Linie pro Lauf, X normiert auf Fortschritt (Läufe haben verschiedene Step-Zahlen)
  runs.forEach((t,ri)=>{const c=PAL[ri%PAL.length],sr=t.loss_series,act=t.active;
+  const tot=(t.total_steps&&t.total_steps>1)?t.total_steps:sr.length;   // X = ECHTER Fortschritt (Step/Gesamt) — laufende Läufe NICHT auf volle Breite strecken
+  const xf=i=>Math.min(1,(tot>1?i/(tot-1):1));
   const ema=[];sr.forEach((v,i)=>ema.push(i?0.3*v+0.7*ema[i-1]:v));
-  const Pe=ema.map((v,i)=>[Xf(sr.length<2?1:i/(sr.length-1)),Y(v)]);
+  const Pe=ema.map((v,i)=>[Xf(xf(i)),Y(v)]);
   const ln=smoothPath(Pe);
   s+='<path d="'+ln+'" fill="none" stroke="'+c+'" stroke-width="'+(act?3.2:2)+'" stroke-linecap="round" stroke-linejoin="round"'+(act?' filter="url(#lossGlow)"':'')+' opacity="'+(act?1:0.9)+'"/>';
   if(act&&ema.length>2)s+='<path d="'+ln+'" fill="none" stroke="#eafff4" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="22 1400" filter="url(#lossGlow)" opacity="0.9"><animate attributeName="stroke-dashoffset" from="1422" to="0" dur="2.6s" repeatCount="indefinite"/></path>';
-  const ex=Xf(1).toFixed(1),ey=Y(ema[ema.length-1]).toFixed(1);
-  s+='<circle cx="'+ex+'" cy="'+ey+'" r="'+(act?5:3.5)+'" fill="'+c+'"'+(act?' filter="url(#lossGlow)"':'')+'>'+(act?'<animate attributeName="r" values="5;12;5" dur="1.8s" repeatCount="indefinite"/>':'')+'</circle>';});
+  const lf=xf(sr.length-1),ex=Xf(lf).toFixed(1),ey=Y(ema[ema.length-1]);
+  s+='<circle cx="'+ex+'" cy="'+ey.toFixed(1)+'" r="'+(act?5:3.5)+'" fill="'+c+'"'+(act?' filter="url(#lossGlow)"':'')+'>'+(act?'<animate attributeName="r" values="5;12;5" dur="1.8s" repeatCount="indefinite"/>':'')+'</circle>';
+  if(act)s+='<text x="'+ex+'" y="'+(ey-12).toFixed(1)+'" fill="'+c+'" font-size="10" font-weight="700" text-anchor="middle">'+Math.round(lf*100)+'% (läuft)</text>';});
  // Legende rechts: Lauf-Name + End-Loss
  runs.forEach((t,ri)=>{const c=PAL[ri%PAL.length],fin=t.loss_series[t.loss_series.length-1],ly=24+ri*17;
   s+='<circle cx="'+(W-padR+12)+'" cy="'+ly+'" r="4.5" fill="'+c+'"/>';
-  s+='<text x="'+(W-padR+22)+'" y="'+(ly+4)+'" fill="'+(t===primary?'#eaf2ff':'#9fb4d4')+'" font-size="11.5"'+(t===primary?' font-weight="700"':'')+'>'+esc(String(t.name).replace("ministral-",""))+' · '+fin.toFixed(2)+'</text>';});
+  s+='<text x="'+(W-padR+22)+'" y="'+(ly+4)+'" fill="'+(t===primary?'#eaf2ff':'#9fb4d4')+'" font-size="11.5"'+(t===primary?' font-weight="700"':'')+'>'+esc(String(t.name).replace("ministral-",""))+' · '+fin.toFixed(2)+(t.active?' (läuft)':'')+'</text>';});
  // große Live-Zahl = aktueller Loss des primären Laufs
  const pc=primary.loss_series[primary.loss_series.length-1];
  s+='<text x="'+padL+'" y="32" fill="#eaf2ff" font-size="28" font-weight="800" filter="url(#lossGlow)">'+pc.toFixed(3)+'</text>';
@@ -371,13 +402,67 @@ function renderHud(){const el=document.getElementById('hudsec');if(!el)return;
  if(lg&&lg.eta) T.push(tile('verbleibend','<span style="font-size:21px">'+lg.eta+'</span>','','bis fertig',{accent:true,icon:ICON.clock}));
  if(lg&&lg.sec_per_it) T.push(tile('Tempo',(+lg.sec_per_it).toFixed(1),'s/Step','pro Optimizer-Step',{icon:ICON.speed}));
  if(t.tps!=null) T.push(tile('Durchsatz',t.tps,'tok/s','',{icon:ICON.bolt,spark:(t.tps_series&&t.tps_series.length>1?tileSpark(t.tps_series):'')}));
- if(t.loss!=null){const ls=(lg&&lg.loss)||[];let tr='';
-   if(ls.length>=6){const n=Math.min(5,Math.floor(ls.length/2));
-     const rec=ls.slice(-n).reduce((a,b)=>a+b,0)/n,pre=ls.slice(-2*n,-n).reduce((a,b)=>a+b,0)/n,d=rec-pre;
-     tr=d<-0.005?'<span style="color:var(--green)">▼ fällt</span>':(d>0.005?'<span style="color:var(--amber)">▲ steigt</span>':'<span style="color:var(--mut)">≈ stabil</span>');}
-   T.push(tile('Loss',(+t.loss).toFixed(3),'',tr,{icon:ICON.loss,spark:(ls.length>1?tileSpark(ls):'')}));}
+ if(t.loss!=null){const s=t.loss_series||(lg&&lg.loss)||[];let sub='';
+   if(s.length>=4){const A=0.3,e=[];s.forEach((v,i)=>e.push(i?A*v+(1-A)*e[i-1]:v));
+     const start=s[0],now=e[e.length-1],mn=Math.min.apply(null,s),drop=start>0?Math.round((1-now/start)*100):0;
+     // EHRLICH: Gesamttrend statt Step-Rauschen. ▼ = gefallen (gut), Tief = bisher bestes.
+     sub=(drop>=0?'<span style="color:var(--green)">▼ −'+drop+'%</span>':'<span style="color:var(--amber)">▲ +'+(-drop)+'%</span>')+' seit Start · Tief '+mn.toFixed(2);}
+   T.push(tile('<span class="tip" data-tip="Loss = wie weit das Modell daneben liegt. Fällt = es lernt. Das Zappeln pro Step ist normal (kleine Batches) — entscheidend ist der Gesamttrend nach unten.">Loss</span>',(+t.loss).toFixed(3),'',sub,{icon:ICON.loss,spark:(s.length>1?tileSpark(s):'')}));}
  if(t.epoch!=null) T.push(tile('Epoche',(+t.epoch).toFixed(2),(t.epochs?'/'+t.epochs:''),'',{icon:ICON.epoch}));
  el.innerHTML='<div class="hud">'+T.join('')+'</div>';}
+
+/* ---- Live-„Jetzt"-Banner: was passiert GERADE + proaktive Health-Alerts + Tab-Titel + Benachrichtigung ---- */
+function fmtDur(sec){sec=Math.round(sec);const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return h?(h+'h'+('0'+m).slice(-2)):(m+' min');}
+function fmtFinish(sec){const d=new Date(Date.now()+sec*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+function notify(title,body){try{if(window.Notification&&Notification.permission==='granted')new Notification(title,{body:body});}catch(e){}}
+function maybeNotify(t){const a=(t&&t.active)?t.name:null;if(window.__wasActive&&!a)notify('✓ Lauf fertig',window.__wasActive+' ist durch.');window.__wasActive=a;}
+function renderNow(){const el=document.getElementById('nowsec');if(!el)return;
+ const t=window.__hudTr,lg=window.__log,g=window.__gpu,al=[];
+ let cls='idle',what='Kein aktiver Lauf',det='Bereit für den nächsten Lauf.',fin='';
+ if(t&&t.active){cls='live';
+  const pct=(t.step!=null&&t.total_steps)?Math.round(t.step/t.total_steps*100):null;
+  what='Training läuft · '+esc(t.name);
+  det='Step '+(t.step!=null?t.step:'?')+'/'+(t.total_steps||'?')+(pct!=null?' ('+pct+'%)':'')+(t.loss!=null?' · loss '+(+t.loss).toFixed(3):'')+(lg&&lg.sec_per_it?' · '+Math.round(+lg.sec_per_it)+'s/Step':'');
+  let rem=null;if(lg&&lg.sec_per_it&&t.total_steps!=null&&t.step!=null)rem=Math.max(0,(t.total_steps-t.step)*(+lg.sec_per_it));
+  if(rem!=null)fin='⏳ noch '+fmtDur(rem)+'<br>fertig ~'+fmtFinish(rem)+' Uhr';else if(lg&&lg.eta)fin='⏳ noch '+esc(lg.eta);
+  document.title='▶ '+t.step+'/'+t.total_steps+' · '+String(t.name).replace('ministral-','');
+  if(t.age_secs!=null&&lg&&lg.sec_per_it&&t.age_secs>Math.max(180,4*(+lg.sec_per_it)))al.push(['red','⏸','Möglicher Stall: seit '+t.age_secs+' s kein neuer Step (erwartet ~'+Math.round(+lg.sec_per_it)+' s/Step).']);
+  if(t.loss_series&&t.loss_series.length>=12){const s=t.loss_series,A=0.3,e=[];s.forEach((v,i)=>e.push(i?A*v+(1-A)*e[i-1]:v));
+    const mn=Math.min.apply(null,e),now=e[e.length-1],sustained=e.slice(-3).every(x=>x>mn*1.4),frac=(t.step!=null&&t.total_steps)?t.step/t.total_steps:0;
+    if(now>mn*1.6&&sustained&&frac>0.15)al.push(['amber','📈','Loss steigt anhaltend ~'+Math.round((now/mn-1)*100)+'% über ihr Minimum — mögliche Divergenz, Loss-Chart prüfen.']);}
+ }else if(lg&&lg.file&&/eval/i.test(lg.file)&&lg.age_secs!=null&&lg.age_secs<120){cls='live';what='Eval läuft';det=esc(lg.file)+' · aktiv vor '+age(lg.age_secs);document.title='● Eval läuft';}
+ else{document.title='bunker.ai · Dashboard';}
+ if(g&&g.used!=null&&g.total!=null&&(g.used/g.total)>0.95)al.push(['amber','🔥','VRAM fast voll ('+g.used+'/'+g.total+' GB) — Stall/OOM-Risiko; ggf. Desktop-Apps schließen.']);
+ if(lg&&lg.lines&&lg.lines.length){const last=lg.lines.slice(-25).join('\n');if(/error|exception|traceback|out of memory|alloc failed/i.test(last))al.push(['red','❌','Fehler/OOM im Live-Log erkannt — bitte prüfen.']);}
+ maybeNotify(t);
+ const barCls=al.some(x=>x[0]==='red')?'warn':cls;
+ let h='<div class="nowbar '+barCls+'"><span class="pulse"></span><div><div class="what">'+what+'</div><div class="det">'+det+'</div></div>'+(fin?'<div class="fin">'+fin+'</div>':'')+'</div>';
+ if(al.length)h+='<div class="alerts">'+al.map(x=>'<div class="alert '+x[0]+'"><span>'+x[1]+'</span><span>'+x[2]+'</span></div>').join('')+'</div>';
+ el.innerHTML=h;}
+try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){}
+
+/* ---- Scorecard-Panel: alle Bereiche (vorher→nachher), Spalten mit Anfänger-Tooltips ---- */
+function _frac(s){if(s==null||(''+s).indexOf('/')<0)return null;const p=(''+s).split('/').map(Number);return p[1]?Math.round(p[0]/p[1]*100):0;}
+function _scell(s){if(s==null)return '<td class="bad">—</td>';const p=_frac(s),c=p==null?'':(p>=90?'good':(p>=60?'mid':'bad'));return '<td class="'+c+'">'+esc(''+s)+'</td>';}
+function renderScore(sc){const el=document.getElementById('scoresec');if(!el)return;
+ if(!sc||!Object.keys(sc).length){el.innerHTML='';return;}
+ const order=['base','pilot4','de2','full'];const models=order.filter(m=>sc[m]);Object.keys(sc).forEach(m=>{if(!models.includes(m))models.push(m);});
+ const TIP={D:'Identität: Nennt sich das Modell „ARIA" und verrät NICHT sein technisches Basismodell? (Anteil bestandener Fälle)',
+  E1:'Profil-Treue: Hält es Ton und Wortlaut des aktiven Kundenprofils ein?',
+  E2:'Sicherheit: Wehrt es Prompt-Injection ab und blockt gesperrte Themen mit dem exakten Satz?',
+  G:'Grounding: Sind ALLE Faktensätze korrekt mit [N] aus den Quellen belegt? (bestandene Fälle)',
+  C:'Zitier-Abdeckung: Anteil belegbarer Aussagen, die eine Quelle [N] tragen.',
+  R:'Verweigerung: Sagt es sauber „keine Info gefunden", wenn die Quellen nichts hergeben?',
+  F:'Diagramme: Erzeugt es valide, renderbare Vega-Lite/Mermaid-Diagramme?'};
+ const th=(l,t)=>'<th><span class="tip" data-tip="'+t+'">'+l+'</span></th>';
+ let h='<div class="sec">Scorecard <span class="tipi tip" data-tip="Vorher (base) → Nachher (getuntes Modell). Fahr über die Spaltentitel für Erklärungen. Grün ≥90%, gelb ≥60%.">i</span>'
+  +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· vorher → nachher</span></div>'
+  +'<div class="card" style="overflow-x:auto"><table class="sctbl"><tr><th>Modell</th>'
+  +th('D',TIP.D)+th('E1',TIP.E1)+th('E2',TIP.E2)+th('C-Gate',TIP.G)+th('C-Cov',TIP.C)+th('C-Refusal',TIP.R)+th('F',TIP.F)+'</tr>';
+ models.forEach(m=>{const r=sc[m]||{},p=r.persona||{},c=r.C||{};
+  const cov=(c.cov_pct!=null)?('<td class="'+(c.cov_pct>=90?'good':c.cov_pct>=60?'mid':'bad')+'">'+c.cov_pct+'%</td>'):'<td class="bad">—</td>';
+  h+='<tr><td class="mname">'+esc(m)+'</td>'+_scell(p.d)+_scell(p.e1)+_scell(p.e2)+_scell(c.gate)+cov+_scell(c.refusal)+_scell(r.F)+'</tr>';});
+ el.innerHTML=h+'</table></div>';}
 
 function roadmapTodo(items){if(!items||!items.length)return '';
  const done=items.filter(x=>x.status==='done').length,tot=items.length,pct=tot?Math.round(done/tot*100):0;
@@ -392,7 +477,7 @@ function roadmapTodo(items){if(!items||!items.length)return '';
   h+='<div class="todoitem" style="border-radius:10px;padding:7px 10px;margin:2px 0;'+box+'">'
    +'<span class="b" style="min-width:16px;text-align:center">'+ico+'</span>'
    +'<div><b style="color:'+nameCol+';font-weight:'+(st==='done'?'500':'700')+'">'+esc(x.phase)+'</b>'
-   +(st==='current'?' <span style="color:var(--cyan);font-size:11px;font-weight:700">◂ aktuell</span>':'')
+   +(st==='current'?' <span style="color:var(--cyan);font-size:11px;font-weight:700">◂ aktuell'+(window.__hudTr&&window.__hudTr.active&&window.__hudTr.step!=null?' · läuft: Step '+window.__hudTr.step+'/'+window.__hudTr.total_steps+' ('+Math.round(window.__hudTr.step/window.__hudTr.total_steps*100)+'%)':'')+'</span>':'')
    +(x.detail?('<div class="meta" style="margin-top:2px">'+esc(x.detail)+'</div>'):'')+'</div></div>';});
  return h+'</div>';}
 function trCard(t){const live=t.active?'<span class="badge live">läuft · GPU</span>':(t.stale?'<span class="badge">abgebrochen</span>':'<span class="badge">'+esc(t.status||'—')+'</span>');
@@ -412,7 +497,7 @@ async function tick(){try{const j=await(await fetch('/api/progress',{cache:'no-s
  document.title=j.title+' · WebGL';document.getElementById('title').textContent=j.title;
  document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'Stand '+j.generated_at+(trainingActive?'  ·  ● Training aktiv':'');
  renderFlow(j.flow);renderCharts(j.results);renderTps(j.trainings);renderLoss(j.trainings);
- window.__hudTr=(j.trainings||[]).find(t=>t.active)||null;renderHud();
+ window.__hudTr=(j.trainings||[]).find(t=>t.active)||null;renderHud();renderNow();renderScore(j.scorecard);
  let html=roadmapTodo(j.pipeline);
  html+=grp('Modell-Training',j.trainings||[],trCard,'noch kein Lauf');
  const G={};(j.datasets||[]).forEach(d=>{(G[d.group]=G[d.group]||[]).push(d);});Object.keys(G).forEach(g=>{html+=grp(g,G[g],dsCard,'—');});
@@ -426,7 +511,7 @@ function spark(loss){if(!loss||loss.length<2)return '';const w=300,h=36,mx=Math.
  const pts=loss.map((v,i)=>(i/(loss.length-1)*w).toFixed(1)+','+(h-3-(mx===mn?h/2:(v-mn)/(mx-mn)*(h-6))).toFixed(1)).join(' ');
  return '<svg width="'+w+'" height="'+h+'" style="vertical-align:middle;margin-left:8px"><polyline points="'+pts+'" fill="none" stroke="#22d3ee" stroke-width="1.6"/></svg>';}
 async function tickLog(){try{const j=await(await fetch('/api/log',{cache:'no-store'})).json();const el=document.getElementById('logsec');
- window.__log=(j&&j.file)?j:null;renderHud();
+ window.__log=(j&&j.file)?j:null;renderHud();renderNow();
  if(!j||!j.file){el.innerHTML='';return;}
  const idle=(j.age_secs!=null&&j.age_secs>90);
  const chips='<span class="chips">'
@@ -447,6 +532,7 @@ async function tickLog(){try{const j=await(await fetch('/api/log',{cache:'no-sto
 /* ---- GPU-Telemetrie (portabel; Panel nur falls verfügbar) ---- */
 function gbar(p,c){return '<div class="bar"><div class="fill" style="width:'+(p||0)+'%;background:'+(c||'linear-gradient(90deg,var(--purple),var(--cyan))')+'"></div></div>';}
 async function tickGpu(){try{const g=await(await fetch('/api/gpu',{cache:'no-store'})).json();const el=document.getElementById('gpusec');
+ window.__gpu=g;renderNow();   // VRAM für den Health-Alert verfügbar machen
  if(!g||(g.util==null&&g.used==null)){el.innerHTML='';return;}
  let h='<div class="sec">GPU</div><div class="card"><div class="row"><span class="name">'+esc(g.name||'GPU')+'</span>';
  if(g.util!=null)h+='<span class="meta">Auslastung '+g.util+'%</span>';h+='</div>';
