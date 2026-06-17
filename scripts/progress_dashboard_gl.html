@@ -75,6 +75,14 @@ a{color:var(--cyan)}
 .sctbl .mname{font-weight:700;color:var(--txt)}
 .sctbl .good{color:var(--green);font-weight:700}.sctbl .mid{color:var(--amber);font-weight:600}.sctbl .bad{color:var(--mut)}
 .sctbl tr:last-child td{border-bottom:none}
+/* ---- Live-Eval-Panel (Pass/Fail-Grid, füllt sich live) ---- */
+.edim{margin:9px 0}
+.edim .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:4px}
+.edim .lab b{color:var(--txt);font-weight:700}
+.egrid{display:flex;flex-wrap:wrap;gap:4px}
+.edot{width:13px;height:13px;border-radius:3px;background:rgba(255,255,255,.10);transition:background .3s}
+.edot.ok{background:var(--green);box-shadow:0 0 6px rgba(16,185,129,.55)}
+.edot.bad{background:var(--red);box-shadow:0 0 7px rgba(239,68,68,.6)}
 </style></head><body>
 <canvas id="gl"></canvas>
 <div class="scrim"></div>
@@ -82,7 +90,9 @@ a{color:var(--cyan)}
 <div class="wrap">
   <h1 id="title">Progress</h1><div class="sub" id="sub">lädt …</div>
   <div id="nowsec"></div>
+  <div id="evalsec"></div>
   <div id="hudsec"></div>
+  <div id="radarsec"></div>
   <div id="scoresec"></div>
   <div id="gpusec"></div>
   <div id="losssec"></div>
@@ -441,28 +451,52 @@ function renderNow(){const el=document.getElementById('nowsec');if(!el)return;
  el.innerHTML=h;}
 try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){}
 
-/* ---- Scorecard-Panel: alle Bereiche (vorher→nachher), Spalten mit Anfänger-Tooltips ---- */
-function _frac(s){if(s==null||(''+s).indexOf('/')<0)return null;const p=(''+s).split('/').map(Number);return p[1]?Math.round(p[0]/p[1]*100):0;}
-function _scell(s){if(s==null)return '<td class="bad">—</td>';const p=_frac(s),c=p==null?'':(p>=90?'good':(p>=60?'mid':'bad'));return '<td class="'+c+'">'+esc(''+s)+'</td>';}
+/* ---- Scorecard (GENERISCH: rendert axes/models aus scorecard.json — projekt-agnostisch) ---- */
+function _scoreColor(p){return p==null?'':(p>=90?'good':(p>=60?'mid':'bad'));}
 function renderScore(sc){const el=document.getElementById('scoresec');if(!el)return;
- if(!sc||!Object.keys(sc).length){el.innerHTML='';return;}
- const order=['base','pilot4','de2','full'];const models=order.filter(m=>sc[m]);Object.keys(sc).forEach(m=>{if(!models.includes(m))models.push(m);});
- const TIP={D:'Identität: Nennt sich das Modell „ARIA" und verrät NICHT sein technisches Basismodell? (Anteil bestandener Fälle)',
-  E1:'Profil-Treue: Hält es Ton und Wortlaut des aktiven Kundenprofils ein?',
-  E2:'Sicherheit: Wehrt es Prompt-Injection ab und blockt gesperrte Themen mit dem exakten Satz?',
-  G:'Grounding: Sind ALLE Faktensätze korrekt mit [N] aus den Quellen belegt? (bestandene Fälle)',
-  C:'Zitier-Abdeckung: Anteil belegbarer Aussagen, die eine Quelle [N] tragen.',
-  R:'Verweigerung: Sagt es sauber „keine Info gefunden", wenn die Quellen nichts hergeben?',
-  F:'Diagramme: Erzeugt es valide, renderbare Vega-Lite/Mermaid-Diagramme?'};
- const th=(l,t)=>'<th><span class="tip" data-tip="'+t+'">'+l+'</span></th>';
- let h='<div class="sec">Scorecard <span class="tipi tip" data-tip="Vorher (base) → Nachher (getuntes Modell). Fahr über die Spaltentitel für Erklärungen. Grün ≥90%, gelb ≥60%.">i</span>'
+ if(!sc||!sc.axes||!sc.models||!Object.keys(sc.models).length){el.innerHTML='';return;}
+ const axes=sc.axes,models=Object.keys(sc.models),detail=sc.detail||{};
+ const th=axes.map(a=>'<th><span class="tip" data-tip="'+esc(a.tip||'')+'">'+esc(a.label||a.key)+'</span></th>').join('');
+ let h='<div class="sec">Scorecard <span class="tipi tip" data-tip="Vorher → Nachher. Über die Spaltentitel fahren für Erklärungen. Grün ≥90%, gelb ≥60%. Werte = bestandene Fälle bzw. %.">i</span>'
   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· vorher → nachher</span></div>'
-  +'<div class="card" style="overflow-x:auto"><table class="sctbl"><tr><th>Modell</th>'
-  +th('D',TIP.D)+th('E1',TIP.E1)+th('E2',TIP.E2)+th('C-Gate',TIP.G)+th('C-Cov',TIP.C)+th('C-Refusal',TIP.R)+th('F',TIP.F)+'</tr>';
- models.forEach(m=>{const r=sc[m]||{},p=r.persona||{},c=r.C||{};
-  const cov=(c.cov_pct!=null)?('<td class="'+(c.cov_pct>=90?'good':c.cov_pct>=60?'mid':'bad')+'">'+c.cov_pct+'%</td>'):'<td class="bad">—</td>';
-  h+='<tr><td class="mname">'+esc(m)+'</td>'+_scell(p.d)+_scell(p.e1)+_scell(p.e2)+_scell(c.gate)+cov+_scell(c.refusal)+_scell(r.F)+'</tr>';});
+  +'<div class="card" style="overflow-x:auto"><table class="sctbl"><tr><th>Modell</th>'+th+'</tr>';
+ models.forEach(m=>{h+='<tr><td class="mname">'+esc(m)+'</td>';
+  axes.forEach(a=>{const pct=sc.models[m][a.key];const txt=(detail[m]&&detail[m][a.key]!=null)?detail[m][a.key]:(pct!=null?pct+'%':null);
+   h+=(txt==null)?'<td class="bad">—</td>':'<td class="'+_scoreColor(pct)+'">'+esc(''+txt)+'</td>';});
+  h+='</tr>';});
  el.innerHTML=h+'</table></div>';}
+
+/* ---- Radar/Spider: Behavioral-Fingerprint base vs … über alle Achsen (generisch) ---- */
+function renderRadar(sc){const el=document.getElementById('radarsec');if(!el)return;
+ if(!sc||!sc.axes||!sc.models){el.innerHTML='';return;}
+ const axes=sc.axes,full=Object.keys(sc.models).filter(m=>axes.every(a=>sc.models[m][a.key]!=null));
+ if(axes.length<3||full.length<1){el.innerHTML='';return;}   // Radar erst sinnvoll ab 3 Achsen + 1 voll bewertetem Modell
+ const W=520,H=360,cx=W/2,cy=H/2+6,R=Math.min(W,H)/2-60,n=axes.length;
+ const ang=i=>(-Math.PI/2+i/n*2*Math.PI),pt=(i,r)=>[cx+Math.cos(ang(i))*R*r,cy+Math.sin(ang(i))*R*r];
+ let s='<svg id="radarsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;max-width:560px;margin:0 auto">';
+ s+='<defs><filter id="rGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+ [0.25,0.5,0.75,1].forEach(r=>{const pp=axes.map((a,i)=>pt(i,r).map(v=>v.toFixed(1)).join(',')).join(' ');s+='<polygon points="'+pp+'" fill="none" stroke="rgba(255,255,255,.07)"/>';});
+ axes.forEach((a,i)=>{const e=pt(i,1),l=pt(i,1.17);s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+e[0].toFixed(1)+'" y2="'+e[1].toFixed(1)+'" stroke="rgba(255,255,255,.08)"/>';
+  s+='<text x="'+l[0].toFixed(1)+'" y="'+l[1].toFixed(1)+'" fill="#9fb4d4" font-size="11" font-weight="600" text-anchor="middle" dominant-baseline="middle">'+esc(a.label||a.key)+'</text>';});
+ full.forEach((m,mi)=>{const c=PAL[mi%PAL.length],pts=axes.map((a,i)=>pt(i,Math.max(0,Math.min(1,sc.models[m][a.key]/100))));
+  const poly=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  s+='<polygon points="'+poly+'" fill="'+c+'" fill-opacity="0.13" stroke="'+c+'" stroke-width="2.4" filter="url(#rGlow)"/>';
+  pts.forEach(p=>{s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="'+c+'"/>';});});
+ s+='</svg>';
+ const lg=full.map((m,mi)=>'<span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:12px"><span style="width:10px;height:10px;border-radius:2px;background:'+PAL[mi%PAL.length]+';display:inline-block"></span>'+esc(m)+'</span>').join('');
+ el.innerHTML='<div class="sec">Modell-Fingerprint <span class="tipi tip" data-tip="Radar über alle Bewertungs-Achsen: außen = besser (100%). Je größer die Fläche, desto stärker insgesamt. Vorher/Nachher überlagert.">i</span></div><div class="card"><div style="margin-bottom:6px">'+lg+'</div>'+s+'</div>';}
+
+/* ---- Live-Eval: Pass/Fail-Grid je Dimension, füllt sich während der Eval (generisch) ---- */
+function renderEvalLive(ev){const el=document.getElementById('evalsec');if(!el)return;
+ if(!ev||!ev.dims||ev.age_secs==null||ev.age_secs>180){el.innerHTML='';return;}
+ const dims=ev.dims,keys=Object.keys(dims);if(!keys.length){el.innerHTML='';return;}
+ const tDone=keys.reduce((a,k)=>a+dims[k].done,0),tPass=keys.reduce((a,k)=>a+dims[k].pass,0),live=ev.status==='running';
+ let h='<div class="sec">'+(live?'<span class="dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan);margin:0 6px 0 0"></span>':'')+'Eval — live <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(ev.tag||'')+' · '+tPass+'/'+tDone+' bestanden</span></div><div class="card">';
+ keys.forEach(k=>{const d=dims[k],pct=d.done?Math.round(d.pass/d.done*100):0,cells=ev.cases.filter(c=>c.dim===k);
+  h+='<div class="edim"><div class="lab"><b>'+esc(k)+'</b><span>'+d.pass+'/'+d.done+(d.total?(' von '+d.total):'')+' · '+pct+'%</span></div><div class="egrid">';
+  for(let i=0;i<(d.total||d.done);i++){const c=cells[i];h+='<span class="edot'+(c?(c.ok?' ok':' bad'):'')+'"></span>';}
+  h+='</div></div>';});
+ el.innerHTML=h+'</div>';}
 
 function roadmapTodo(items){if(!items||!items.length)return '';
  const done=items.filter(x=>x.status==='done').length,tot=items.length,pct=tot?Math.round(done/tot*100):0;
@@ -497,7 +531,7 @@ async function tick(){try{const j=await(await fetch('/api/progress',{cache:'no-s
  document.title=j.title+' · WebGL';document.getElementById('title').textContent=j.title;
  document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'Stand '+j.generated_at+(trainingActive?'  ·  ● Training aktiv':'');
  renderFlow(j.flow);renderCharts(j.results);renderTps(j.trainings);renderLoss(j.trainings);
- window.__hudTr=(j.trainings||[]).find(t=>t.active)||null;renderHud();renderNow();renderScore(j.scorecard);
+ window.__hudTr=(j.trainings||[]).find(t=>t.active)||null;renderHud();renderNow();renderScore(j.scorecard);renderRadar(j.scorecard);renderEvalLive(j.eval_live);
  let html=roadmapTodo(j.pipeline);
  html+=grp('Modell-Training',j.trainings||[],trCard,'noch kein Lauf');
  const G={};(j.datasets||[]).forEach(d=>{(G[d.group]=G[d.group]||[]).push(d);});Object.keys(G).forEach(g=>{html+=grp(g,G[g],dsCard,'—');});
