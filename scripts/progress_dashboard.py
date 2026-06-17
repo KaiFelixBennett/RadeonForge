@@ -128,9 +128,25 @@ def collect() -> dict:
             scorecard = json.loads((data_dir / "scorecard.json").read_text(encoding="utf-8"))
         except Exception:
             scorecard = {}
+    # Live-Eval: jüngste data/_eval/<tag>.json (von eval_progress.EvalProgress) -> Live-Panel
+    eval_live = {}
+    edir = (data_dir / "_eval") if data_dir else None
+    if edir and edir.exists():
+        newest, nt = None, -1.0
+        for p in edir.glob("*.json"):
+            try:
+                d = json.loads(p.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            u = d.get("updated", p.stat().st_mtime)
+            if u > nt:
+                nt, newest = u, d
+        if newest is not None:
+            newest["age_secs"] = round(time.time() - nt)
+            eval_live = newest
     return {"generated_at": _dt.datetime.now().strftime("%H:%M:%S"),
             "title": CFG.get("title", "Training-Progress"), "subtitle": man.get("subtitle", ""),
-            "pipeline": pipeline, "flow": flow, "scorecard": scorecard,
+            "pipeline": pipeline, "flow": flow, "scorecard": scorecard, "eval_live": eval_live,
             "results": results, "datasets": datasets, "trainings": trainings}
 
 
