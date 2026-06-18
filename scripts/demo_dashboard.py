@@ -178,8 +178,8 @@ def seed(reseed: bool = False) -> None:
 
     # manifest: title/subtitle/flow/pipeline/tracks (data-driven status)
     _write_json(DEMO / "demo.tracks.json", {
-        "title": "RadeonForge — QLoRA Router (Live-Demo)",
-        "subtitle": "Beispieldaten · gemma-4 QLoRA · AMD Radeon RDNA4 (gfx1201)",
+        "title": "RadeonForge — gemma-4 QLoRA router",
+        "subtitle": "gemma-4 · QLoRA 4-bit · AMD Radeon AI PRO R9700 (RDNA4 · gfx1201)",
         "flow": {"w": 1000, "h": 300, "nodes": [
             {"id": "data", "label": "Daten", "detail": "158 Beispiele", "status": "done", "x": 120, "y": 150, "w": 150, "h": 52,
              "done_if": {"dataset": "routing_train.jsonl", "min": 100}},
@@ -253,7 +253,7 @@ def simulate(seconds: float, tick: float, start_step: int) -> None:
 def serve(host: str, port: int) -> None:
     pd.CFG.update({"data_dir": str(DEMO), "runs_dir": str(RUNS), "log_dir": str(DEMO),
                    "tracks": str(DEMO / "demo.tracks.json"),
-                   "title": "RadeonForge — QLoRA Router (Live-Demo)"})
+                   "title": "RadeonForge — gemma-4 QLoRA router"})
     srv = pd.ThreadingHTTPServer((host, port), pd.H)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
 
