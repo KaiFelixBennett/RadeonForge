@@ -2,13 +2,13 @@
 """
 Minimal OpenAI-compatible serving for HF models that llama.cpp can't run yet
 (e.g. Qwen3.5's hybrid Gated-DeltaNet + MoE arch). Loads a merged model in bf16
-on the GPU and exposes /v1/chat/completions + /health — so an existing OpenAI
-client (custom-rag) talks to it unchanged. Good enough for a small, high-value
+on the GPU and exposes /v1/chat/completions + /health — so any existing OpenAI
+client talks to it unchanged. Good enough for a small, high-value
 router/specialist; for big models prefer llama.cpp/vLLM.
 
 Usage (WSL, training venv; needs: pip install fastapi uvicorn):
   HSA_ENABLE_DXG_DETECTION=1 python scripts/serve_transformers.py \
-      --model /root/aria-pilot/qwen08-merged --port 8099
+      --model /root/router-pilot/qwen08-merged --port 8099
 """
 import os, time, argparse, re, torch
 os.environ.setdefault("PYTORCH_ALLOC_CONF", "expandable_segments:True")

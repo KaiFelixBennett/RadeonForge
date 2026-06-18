@@ -1,0 +1,10 @@
+{
+  "name": "radeonforge-branding",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Render RadeonForge branding cards (hero, social preview, before/after) HTML -> PNG.",
+  "dependencies": {
+    "playwright": "^1.61.0"
+  }
+}

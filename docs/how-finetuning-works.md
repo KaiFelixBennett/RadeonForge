@@ -1,7 +1,7 @@
 # How fine-tuning works (and what we did) — a from-scratch explainer
 
 Written so you can **understand it, reproduce it, and explain it to others.** No prior ML
-background assumed. The concrete example throughout is our HiRAG "query router".
+background assumed. The concrete example throughout is our "query router".
 
 ---
 
@@ -85,10 +85,10 @@ into a small model that emits the answer as JSON from a tiny prompt.
 ## 9. Where the code lives
 | What | File |
 |---|---|
-| Build the dataset | `custom-rag/finetune/build_task_a_routing.py` |
-| Review the dataset | `custom-rag/finetune/review_task_a.py` |
+| Build the dataset | your own data-prep step (builder → JSONL) |
+| Review the dataset | your own data-prep step (renders the labels for a human check) |
 | Train (QLoRA) | `RadeonForge/examples/gemma4-12b-qlora/train_qlora.py` |
-| Config | `RadeonForge/examples/gemma4-12b-qlora/config.yaml` (+ `custom-rag/finetune/pilot_e2b_routing.yaml`) |
+| Config | `RadeonForge/examples/gemma4-12b-qlora/config.yaml` |
 | Test after training | `RadeonForge/examples/gemma4-12b-qlora/test_routing.py` |
 | Env health / smoke | `RadeonForge/scripts/doctor.sh`, `scripts/smoke_test.py` |
 | Full reproduce | `RadeonForge/RUNBOOK.md` |

@@ -1,9 +1,9 @@
-# Pilot report — ARIA HiRAG router on AMD RDNA4 (single source of truth)
+# Pilot report — a RAG query-router on AMD RDNA4 (single source of truth)
 
 **The evidence file.** Every measured result from the end-to-end pilot, in one place.
 Model: **`gemma-4-E2B-it`** (risk-de-risking run before the 12B). Hardware:
 **AMD Radeon AI PRO R9700** (RDNA4, gfx1201, 32 GB), **WSL2** + ROCm 7.2 +
-PyTorch 2.9.1+rocm7.2.0. Date: **2026-06-15**. Task: HiRAG query-complexity
+PyTorch 2.9.1+rocm7.2.0. Date: **2026-06-15**. Task: RAG query-complexity
 routing (free-text query → routing JSON with `target_level` 0/1/2).
 
 > How to read this: each stage has the command, the artifact it produced, and the
@@ -46,7 +46,7 @@ Task-A routing, **158 samples**, hand-reviewed + balanced:
 | deep_dive / L2 | 12 |
 
 > First pass was 88 % one class + mislabels + chatbot noise → cleaned to the above.
-> Generators live in `custom-rag/finetune/{build_task_a_routing.py,review_task_a.py}`.
+> The builder + reviewer scripts are a small data-prep step in your own data repo (not shipped here).
 
 ## Stage 3 — Training (QLoRA)
 `gemma-4-E2B-it`, LoRA r16/α32, 3 epochs, batch 4, lr 2e-4, ~92 s on the R9700.
@@ -55,7 +55,7 @@ Task-A routing, **158 samples**, hand-reviewed + balanced:
 epoch 0.5: loss 2.86  →  1.0: 0.90  →  2.0: 0.28  →  3.0: 0.21
 mean_token_accuracy: 0.62 → 0.96
 ```
-Adapter → `/root/aria-pilot/e2b-task-a`. Trainer: [`examples/gemma4-12b-qlora/train_qlora.py`](examples/gemma4-12b-qlora/train_qlora.py).
+Adapter → `/root/router-pilot/e2b-task-a`. Trainer: [`examples/gemma4-12b-qlora/train_qlora.py`](examples/gemma4-12b-qlora/train_qlora.py).
 
 ## Stage 4 — Held-out check (transformers, base + adapter)
 `test_routing.py`, 8 held-out queries: **8/8 target_level correct**, valid JSON, from the *short* prompt.
@@ -134,8 +134,8 @@ The Stage-6 set was easy: many queries are ones where base and our policy *agree
 | A/B generator | `examples/gemma4-12b-qlora/ab_test.py` |
 | Trainer / config | `examples/gemma4-12b-qlora/{train_qlora.py,config.yaml}` |
 | Serving (GPU) | `scripts/build_llamacpp_hip.sh` · `examples/gemma4-12b-qlora/{serve.sh,gemma4-chat-template.jinja}` |
-| Pilot model files (WSL) | `/root/aria-pilot/` (adapter, merged, `e2b-routing-Q4_K_M.gguf`) |
+| Pilot model files (WSL) | `/root/router-pilot/` (adapter, merged, `e2b-routing-Q4_K_M.gguf`) |
 
 ## Next (real 12B run)
-Same scripts, `BASE=google/gemma-4-12B-it`. Open: full dataset (Task A–F), D3 data
-basis, frozen eval set. Plan: `custom-rag/FINETUNING_PLAN_ARIA.md`.
+Same scripts, `BASE=google/gemma-4-12B-it`. Open: a fuller dataset, more policy
+examples for the divergent cases, and a frozen eval set.

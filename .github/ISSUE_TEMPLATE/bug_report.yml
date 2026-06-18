@@ -1,0 +1,30 @@
+name: "🐛 Bug / trap report"
+description: "A step failed, a script errored, or you hit a silent-corruption trap."
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Check [docs/troubleshooting.md](../blob/main/docs/troubleshooting.md) first — many gfx1201 traps are already mapped."
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      placeholder: "Command run, expected vs actual. Paste the error / traceback."
+    validations: { required: true }
+  - type: input
+    id: stage
+    attributes:
+      label: Which stage
+      placeholder: "setup / doctor / smoke / train / merge / GGUF / serve"
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "GPU, OS (Track A/B/native), ROCm, torch, transformers, bitsandbytes, date."
+    validations: { required: true }
+  - type: textarea
+    id: doctor
+    attributes:
+      label: "Output of `bash scripts/doctor.sh`"
+      render: text
