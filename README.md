@@ -14,11 +14,17 @@
 
 ### Fine-tune your own LLM on an AMD Radeon GPU — the easy, tested way.
 
-**No NVIDIA. No PhD. No guesswork.** A copy-paste path from a blank machine to a model *you trained yourself*, on the GPU you already own — plus a **reusable live training dashboard** you can drop into any project.
+**No NVIDIA. No PhD. No guesswork.** A copy-paste path from a blank machine to a model *you trained yourself*, on the GPU you already own.
 
 📖 [**Step-by-step (RUNBOOK)**](RUNBOOK.md) · 🔁 [**Use your own model**](docs/reuse-your-own-model.md) · 🧠 [**Never trained before? Start here**](docs/how-finetuning-works.md) · 🩺 [**If something breaks**](docs/troubleshooting.md)
 
 </div>
+
+> ### You get two real, reusable things — both yours to keep
+>
+> **① A tested path to train your own model on Radeon** — 5 plain commands, with a smoke test that proves your GPU can train *before* you spend real time on it.
+>
+> **② A production-quality live training dashboard** — *one* stdlib Python file you point at **your** run. Not a screenshot mocked up for this page; a tool you actually run, reusable in any project.
 
 ---
 
@@ -86,40 +92,42 @@ Every number is regenerated from raw A/B JSON by [`make charts`](examples/gemma4
 
 ---
 
-## 🎁 You also get a reusable live dashboard
+## 🖥️ A real, reusable dashboard — not a README mockup
 
-Training in a black box is stressful. RadeonForge ships a **high-quality live dashboard** — one
-Python file, **zero dependencies, works offline** — that you can drop into *any* training
-project. It shows your run as it happens: live loss & tokens/s, a base-vs-fine-tuned **radar
-fingerprint**, a pass/fail eval grid, GPU telemetry, and a data-driven roadmap.
+The charts above aren't vibe-coded for this page. The dashboard is **one stdlib Python file**
+(`scripts/progress_dashboard.py`) that simply reads the plain JSON your training writes — point
+it at *your* run and it lights up: live loss & tokens/s, a base-vs-fine-tuned radar fingerprint,
+a pass/fail eval grid, GPU telemetry, and a data-driven roadmap. **Zero dependencies. Works
+offline.**
 
 <div align="center">
 
-<img src="assets/dashboard/dashboard.gif" alt="Live training dashboard — loss + tokens/s, animated" width="90%">
+<img src="assets/dashboard/dashboard-hero.png" alt="The RadeonForge live training dashboard" width="88%">
 
 </div>
 
-**See it right now, with no GPU and no install** (it ships with a tiny simulator so you can
-explore the whole UI in ~10 seconds):
+Wiring it to **your own** training is two lines — copy nothing, just point it at your files:
 
+```yaml
+# 1) add one line to your training config
+progress_file: ./_runs/my-run.json
+```
 ```bash
-make demo                       # → opens http://127.0.0.1:8765/gl
-# no make? →  python scripts/demo_dashboard.py --open
-# on Windows, just double-click  start_dashboard.bat
+# 2) while it trains, watch it live
+python scripts/progress_dashboard.py --runs-dir ./_runs --open
 ```
 
-<div align="center">
-<img src="assets/dashboard/panel-radar.png" alt="Base vs fine-tuned radar fingerprint" width="49%">
-<img src="assets/dashboard/panel-results.png" alt="Before/after results chart" width="49%">
-</div>
-
-Point it at your own runs in one line — schemas + the "drop it into your project" recipe are in
-[scripts/DASHBOARD.md](scripts/DASHBOARD.md) and [docs/reuse-your-own-model.md](docs/reuse-your-own-model.md).
+Reuse it in any project by pointing `--runs-dir` / `--data-dir` / `--tracks` at your paths. Full
+schemas + the drop-in recipe: [scripts/DASHBOARD.md](scripts/DASHBOARD.md) ·
+[docs/reuse-your-own-model.md](docs/reuse-your-own-model.md).
 
 <details>
-<summary><b>The full <code>/gl</code> dashboard (one screenshot)</b></summary>
+<summary>▶ Watch it update live · or preview it without a GPU</summary>
 
-<div align="center"><img src="assets/dashboard/dashboard-gl.png" alt="Full RadeonForge dashboard" width="78%"></div>
+<div align="center"><img src="assets/dashboard/dashboard.gif" alt="The dashboard updating live" width="78%"></div>
+
+No Radeon set up yet? The dashboard can stand in a simulated run so you can explore the whole UI
+first — `python scripts/demo_dashboard.py --open` — then point it at your real training.
 </details>
 
 ---
