@@ -14,9 +14,10 @@ mkdirSync(ASSETS, { recursive: true });
 const SRC = pathToFileURL(join(HERE, 'branding.html')).href;
 
 const cards = [
-  ['#hero', 'hero.png', 1280, 440],
+  ['#hero', 'hero.png', 1280, 460],
+  ['#ba', 'before-after.png', 1200, 440],
+  ['#steps', 'steps.png', 1240, 430],
   ['#social', 'social-preview.png', 1280, 640],
-  ['#ba', 'before-after.png', 1200, 520],
 ];
 
 const browser = await chromium.launch({ headless: true, args: ['--force-color-profile=srgb'] });
