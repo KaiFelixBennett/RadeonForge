@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 RUNBOOK (reproduce the pilot end-to-end)
+    url: https://github.com/KaiFelixBennett/RadeonForge/blob/main/RUNBOOK.md
+    about: "Step-by-step from a blank Ubuntu to a trained + served model."
+  - name: 🩺 Troubleshooting (gfx1201 traps → fixes)
+    url: https://github.com/KaiFelixBennett/RadeonForge/blob/main/docs/troubleshooting.md
+    about: "The known silent-failure traps and their one-line fixes."

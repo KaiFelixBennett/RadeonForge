@@ -80,7 +80,7 @@ Der Callback füllt `step/epoch/loss/tps/loss_series/tps_series` → Loss- und t
 3. Optional ein Skript, das `dashboard_results.json` erzeugt (für das Vorher/Nachher-Chart).
 4. Starten: `python scripts/progress_dashboard.py --data-dir … --tracks …`.
 5. Optional einen **dünnen Wrapper** ins Projekt legen, der die Pfade vorbelegt (Beispiel:
-   `custom-rag/finetune/progress_dashboard.py` → `runpy` auf diese Engine mit projektspezifischen Defaults).
+   ein `progress_dashboard.py`-Wrapper im Projekt → `runpy` auf diese Engine mit projektspezifischen Defaults).
 
 ## Sicherheit / LAN
 `--host 0.0.0.0` macht das Dashboard für alle im selben Netz erreichbar (ohne Auth). Im Heimnetz

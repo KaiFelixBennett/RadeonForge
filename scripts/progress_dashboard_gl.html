@@ -441,7 +441,7 @@ function renderNow(){const el=document.getElementById('nowsec');if(!el)return;
     const mn=Math.min.apply(null,e),now=e[e.length-1],sustained=e.slice(-3).every(x=>x>mn*1.4),frac=(t.step!=null&&t.total_steps)?t.step/t.total_steps:0;
     if(now>mn*1.6&&sustained&&frac>0.15)al.push(['amber','📈','Loss steigt anhaltend ~'+Math.round((now/mn-1)*100)+'% über ihr Minimum — mögliche Divergenz, Loss-Chart prüfen.']);}
  }else if(lg&&lg.file&&/eval/i.test(lg.file)&&lg.age_secs!=null&&lg.age_secs<120){cls='live';what='Eval läuft';det=esc(lg.file)+' · aktiv vor '+age(lg.age_secs);document.title='● Eval läuft';}
- else{document.title='bunker.ai · Dashboard';}
+ else{document.title='RadeonForge · Dashboard';}
  if(g&&g.used!=null&&g.total!=null&&(g.used/g.total)>0.95)al.push(['amber','🔥','VRAM fast voll ('+g.used+'/'+g.total+' GB) — Stall/OOM-Risiko; ggf. Desktop-Apps schließen.']);
  if(lg&&lg.lines&&lg.lines.length){const last=lg.lines.slice(-25).join('\n');if(/error|exception|traceback|out of memory|alloc failed/i.test(last))al.push(['red','❌','Fehler/OOM im Live-Log erkannt — bitte prüfen.']);}
  maybeNotify(t);

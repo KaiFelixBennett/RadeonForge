@@ -4,7 +4,7 @@ A complete, **reproducible** walkthrough of what we actually ran to QLoRA-fine-t
 **gemma-4** on a **Radeon AI PRO R9700 (RDNA4, gfx1201, 32 GB)** under **WSL2** —
 from a blank Ubuntu to a model that produces correct task output.
 
-> Verified 2026-06-15. Worked example: a HiRAG "query router" (query → routing JSON).
+> Verified 2026-06-15. Worked example: a "query router" (query → routing JSON).
 > Result: **8/8** held-out queries correct in transformers, then **merged → GGUF (Q4_K_M) →
 > served on the GPU, 4/4 correct, ~117 tok/s**. New to fine-tuning? Read
 > [docs/how-finetuning-works.md](docs/how-finetuning-works.md) first — it explains *why* each step exists.
@@ -86,9 +86,9 @@ Each training row is a chat with the desired output as the assistant turn:
              {"role":"user","content":"Analyze this query:\nWelche Dokumente kennst du?"},
              {"role":"assistant","content":"{\"query_type\":\"overview\",\"target_level\":0, ...}"}]}
 ```
-Our ARIA routing dataset is generated + reviewed by scripts in the **custom-rag** repo:
-- `finetune/build_task_a_routing.py` — builds the JSONL (gold seeds + cleaned real queries; noise filter + balance).
-- `finetune/review_task_a.py` — renders a human-reviewable Markdown to eyeball the labels **before** training.
+The routing dataset for this example was generated + reviewed by a small data-prep step (kept in your own data repo — not shipped here). The pattern that mattered:
+- a **builder** script that emits the JSONL (gold seeds + cleaned real queries; noise filter + class balance).
+- a **reviewer** script that renders a human-readable Markdown so you can eyeball the labels **before** training.
 > Lesson: **review the labels first.** Our first pass was 88 % one class + had mislabels + chatbot noise; after cleaning it was balanced and correct.
 
 ## 5. Train (QLoRA)
@@ -106,14 +106,43 @@ Note: `assistant_only_loss` is **off** — gemma-4's chat template lacks `{% gen
 Our pilot run (gemma-4-E2B-it, 158 samples, 3 epochs, ~92 s):
 ```
 epoch 0.5: loss 2.86 → 1.0: 0.90 → 2.0: 0.28 → 3.0: 0.21   (mean_token_accuracy 0.62 → 0.96)
-✅ LoRA adapter saved → /root/aria-pilot/e2b-task-a
+✅ LoRA adapter saved → /root/router-pilot/e2b-task-a
 ```
+
+### 5a. Watch progress live — the reusable dashboard (optional)
+Tool: [`scripts/progress_dashboard.py`](scripts/progress_dashboard.py) — one file, stdlib only, offline
+(no CDN). Serves an HTML page + JSON API at `http://127.0.0.1:8765/`, auto-refreshing every 3 s.
+Two generic sources:
+- **Training runs** ← `<runs-dir>/*.json`, written by the `ProgressCallback` in `train_qlora.py`.
+  Enable it by setting **`progress_file: <runs-dir>/<name>.json`** in your training config — the
+  callback then writes live `step / total_steps / epoch / loss / status` (works across `/mnt/...` from WSL).
+- **Datasets** ← either a `--tracks` manifest (`{title, tracks:[{label,file,target,group}]}`) **or**
+  auto-discovery of all `*.jsonl` in `--data-dir` (line count = progress, for data-generation runs).
+```bash
+python scripts/progress_dashboard.py --runs-dir /root/router-pilot/_runs --open   # just training runs
+python scripts/progress_dashboard.py --data-dir ./data --tracks ./dashboard.tracks.json --open
+```
+Reuse in any project: copy nothing — point `--data-dir`/`--runs-dir`/`--tracks` at that project.
+(Pattern: drop a thin wrapper in your project that `runpy`s this engine with your data dir +
+tracks manifest pre-filled — see [docs/reuse-your-own-model.md](docs/reuse-your-own-model.md).)
+
+**One-command on any machine (no install — pure stdlib, Python 3.8+):**
+```bash
+cp scripts/dashboard.tracks.example.json my.tracks.json   # edit title/subtitle/pipeline/tracks
+python scripts/progress_dashboard.py --data-dir ./out --tracks my.tracks.json --open
+```
+**Models are configurable, not baked in:** the engine knows nothing about any specific model.
+- *Student* (what you fine-tune) = `model_id` in your training YAML.
+- *Teacher* (if you distill) = your data-gen script's choice (e.g. an Ollama tag) — the dashboard
+  doesn't run it.
+- *Display* = the manifest `subtitle`, e.g. `"Teacher: <x> · Student: <y>"` — shown under the title.
+So no project-specific names live in RadeonForge; they only live in *your* manifest.
 
 ## 6. Test that it WORKED (the important part)
 A falling loss is necessary but not sufficient — test on **held-out** queries:
 ```bash
 HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/test_routing.py \
-    --base google/gemma-4-E2B-it --adapter /root/aria-pilot/e2b-task-a
+    --base google/gemma-4-E2B-it --adapter /root/router-pilot/e2b-task-a
 ```
 Our result: **8/8 target_level correct**, valid JSON, from the *short* prompt — e.g.
 `"Welche Dokumente kennst du?" → {"query_type":"overview","target_level":0,...}`.
@@ -121,7 +150,7 @@ Our result: **8/8 target_level correct**, valid JSON, from the *short* prompt �
 **Prove it changed something — base vs fine-tuned A/B.** A score means little without a control: run the *same* held-out queries through the **untouched base** model and the fine-tuned one, side by side:
 ```bash
 HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/ab_test.py \
-    --base google/gemma-4-E2B-it --finetuned /root/aria-pilot/e2b-merged \
+    --base google/gemma-4-E2B-it --finetuned /root/router-pilot/e2b-merged \
     --out-md examples/gemma4-12b-qlora/PILOT_RESULTS.md \
     --out-json examples/gemma4-12b-qlora/pilot_ab_results.json
 ```
@@ -135,7 +164,7 @@ This writes the full evidence (every output from both models + metrics) to [`PIL
 python - <<'PY'
 import torch; from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
-BASE="google/gemma-4-E2B-it"; ADAPTER="/root/aria-pilot/e2b-task-a"; OUT="/root/aria-pilot/e2b-merged"
+BASE="google/gemma-4-E2B-it"; ADAPTER="/root/router-pilot/e2b-task-a"; OUT="/root/router-pilot/e2b-merged"
 base=AutoModelForCausalLM.from_pretrained(BASE, dtype=torch.bfloat16, device_map="cpu")
 PeftModel.from_pretrained(base, ADAPTER).merge_and_unload().save_pretrained(OUT, safe_serialization=True)
 AutoTokenizer.from_pretrained(BASE).save_pretrained(OUT)   # converter needs tokenizer.json/_config
@@ -152,10 +181,10 @@ bash scripts/build_llamacpp_hip.sh         # -> llama.cpp/build-hip/bin/{llama-s
 
 ### 7c. Convert + quantize → GGUF (Q4_K_M)
 ```bash
-python llama.cpp/convert_hf_to_gguf.py /root/aria-pilot/e2b-merged --outtype f16 \
-  --outfile /root/aria-pilot/e2b-f16.gguf
-llama.cpp/build-hip/bin/llama-quantize /root/aria-pilot/e2b-f16.gguf \
-  /root/aria-pilot/e2b-Q4_K_M.gguf Q4_K_M
+python llama.cpp/convert_hf_to_gguf.py /root/router-pilot/e2b-merged --outtype f16 \
+  --outfile /root/router-pilot/e2b-f16.gguf
+llama.cpp/build-hip/bin/llama-quantize /root/router-pilot/e2b-f16.gguf \
+  /root/router-pilot/e2b-Q4_K_M.gguf Q4_K_M
 # E2B: 8.7 GB f16 -> 3.2 GB Q4_K_M
 ```
 
@@ -164,7 +193,7 @@ llama.cpp's `--jinja` engine **mis-renders Gemma-4's `<|turn>` template** — th
 
 ```bash
 # FIX A — OpenAI endpoint with the bundled, known-good template:
-MODEL=/root/aria-pilot/e2b-Q4_K_M.gguf bash examples/gemma4-12b-qlora/serve.sh
+MODEL=/root/router-pilot/e2b-Q4_K_M.gguf bash examples/gemma4-12b-qlora/serve.sh
 # then:
 curl -s localhost:8099/v1/chat/completions -H 'Content-Type: application/json' -d '{
   "messages":[{"role":"system","content":"<SYS>"},

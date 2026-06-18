@@ -8,7 +8,7 @@ predicted target_level. This is how you verify a routing tune worked.
 
 Usage (in WSL, training venv active):
   HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/test_routing.py \
-      --base google/gemma-4-E2B-it --adapter /root/aria-pilot/e2b-task-a
+      --base google/gemma-4-E2B-it --adapter /root/router-pilot/e2b-task-a
 """
 import argparse, os, torch
 
@@ -20,7 +20,7 @@ from peft import PeftModel
 
 # Must MATCH the system prompt the dataset was built with (train == inference).
 SYS = (
-    "You are a HiRAG query-complexity router. Return JSON only (no prose, no markdown): "
+    "You are a query-complexity router. Return JSON only (no prose, no markdown): "
     '{"query_type": "overview|specific|deep_dive|comparison|search", '
     '"target_level": 0|1|2, "confidence": 0.0-1.0, "reasoning": "...", '
     '"keywords": ["..."], "requires_cross_doc": true|false}. '

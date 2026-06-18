@@ -1,0 +1,53 @@
+name: "✅ Hardware / version report"
+description: "Tell us a stack that works (or doesn't) — the most valuable contribution here."
+title: "[hw] <card> · <ROCm/torch> · works? "
+labels: ["hardware-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! This project's durable value is **dated** reports of what works on which card.
+        Please run `make smoke` (or `python scripts/smoke_test.py`) before reporting "works".
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU
+      placeholder: "AMD Radeon AI PRO R9700 (RDNA4, gfx1201, 32 GB)"
+    validations: { required: true }
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - "✅ Training works (smoke test green)"
+        - "⚠️ Works with extra workarounds (described below)"
+        - "❌ Could not get training working"
+    validations: { required: true }
+  - type: input
+    id: os
+    attributes:
+      label: OS / path
+      placeholder: "Windows 11 + WSL2 Ubuntu 24.04  (Track A)  —  or  native Ubuntu 24.04"
+    validations: { required: true }
+  - type: textarea
+    id: versions
+    attributes:
+      label: Exact versions (+ the date you verified)
+      placeholder: |
+        date: 2026-06-15
+        ROCm: 7.2
+        torch: 2.9.1+rocm7.2.0
+        transformers: 5.5.0   peft / trl / accelerate: ...
+        bitsandbytes: 1.33.7.preview
+    validations: { required: true }
+  - type: textarea
+    id: smoke
+    attributes:
+      label: Smoke-test output
+      placeholder: "loss 5.78 → 0.15 (or the failure message)"
+      render: text
+  - type: textarea
+    id: notes
+    attributes:
+      label: Extra workarounds / notes
+      placeholder: "Anything you had to change beyond the pinned recipe."

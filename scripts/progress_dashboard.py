@@ -11,7 +11,7 @@ Drei Quellen, alle generisch:
   3) DATENSÄTZE — --tracks Manifest ODER Auto-Discovery aller *.jsonl in --data-dir.
 
 Beispiele:
-  python scripts/progress_dashboard.py --runs-dir /root/aria-pilot/_runs --open
+  python scripts/progress_dashboard.py --runs-dir /root/router-pilot/_runs --open
   python scripts/progress_dashboard.py --data-dir ./data --tracks ./dashboard.tracks.example.json --open
 
 Manifest (JSON): { "title","subtitle","pipeline":[{phase,status,detail}], "tracks":[{label,file,target,group}] }
