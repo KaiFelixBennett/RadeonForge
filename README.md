@@ -132,6 +132,16 @@ Every number is regenerated from raw A/B JSON by [`make charts`](examples/gemma4
 — nothing is hand-typed. It also **scales to the 12B** on the same card (~11 min to train,
 6.9 GB Q4_K_M, ~53 tok/s, 86 % → 93 %). Full evidence: [**PILOT_REPORT.md**](PILOT_REPORT.md).
 
+**The surprising part:** trained on the *same* data and scored on the *same* eval, the **smallest
+model won** — a fine-tuned **0.8B** router hit **95%**, beating a fine-tuned **12B** (87%). For a
+narrow task, small + tuned beats big + generic (and runs on far less VRAM).
+
+<div align="center">
+
+<img src="charts/10_the_inversion.png" alt="After fine-tuning, smaller is more accurate: Qwen3.5-0.8B 95% vs gemma-4-12B 87%" width="82%">
+
+</div>
+
 ---
 
 ## 🖥️ A real, reusable dashboard — not a README mockup
@@ -144,7 +154,7 @@ offline.**
 
 <div align="center">
 
-<img src="assets/dashboard/dashboard-hero.png" alt="The RadeonForge live training dashboard" width="88%">
+<img src="assets/dashboard/dashboard.gif" alt="A tour of the live training dashboard — HUD, radar fingerprint, scorecard, live charts, roadmap" width="92%">
 
 </div>
 
@@ -164,9 +174,9 @@ schemas + the drop-in recipe: [scripts/DASHBOARD.md](scripts/DASHBOARD.md) ·
 [docs/reuse-your-own-model.md](docs/reuse-your-own-model.md).
 
 <details>
-<summary>▶ Watch it update live · or preview it without a GPU</summary>
+<summary>▶ A single still (browser-framed) · or preview it without a GPU</summary>
 
-<div align="center"><img src="assets/dashboard/dashboard.gif" alt="The dashboard updating live" width="78%"></div>
+<div align="center"><img src="assets/dashboard/dashboard-hero.png" alt="The dashboard — a single frame" width="80%"></div>
 
 No Radeon set up yet? The dashboard can stand in a simulated run so you can explore the whole UI
 first — `python scripts/demo_dashboard.py --open` — then point it at your real training.
@@ -245,7 +255,7 @@ path from *clone* to *my model, my data, my live dashboard*.
 <div align="center">
 <img src="charts/02_accuracy_before_after.png" width="49%">
 <img src="charts/03_policy_comparison.png" width="49%">
-<img src="charts/10_the_inversion.png" width="49%">
+<img src="charts/05_output_length.png" width="49%">
 <img src="charts/12_tokens_per_sec.png" width="49%">
 </div>
 
