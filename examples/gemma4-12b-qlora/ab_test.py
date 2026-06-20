@@ -11,7 +11,7 @@ is the evidence.
 Usage (WSL, training venv active):
   HSA_ENABLE_DXG_DETECTION=1 python examples/gemma4-12b-qlora/ab_test.py \
       --base google/gemma-4-E2B-it \
-      --finetuned /root/aria-pilot/e2b-merged \
+      --finetuned /root/router-pilot/e2b-merged \
       --out-md   /mnt/e/Coding/RadeonForge/examples/gemma4-12b-qlora/PILOT_RESULTS.md \
       --out-json /mnt/e/Coding/RadeonForge/examples/gemma4-12b-qlora/pilot_ab_results.json
 
@@ -27,7 +27,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # Must MATCH the system prompt the dataset was built with (train == inference).
 SYS = (
-    "You are a HiRAG query-complexity router. Return JSON only (no prose, no markdown): "
+    "You are a query-complexity router. Return JSON only (no prose, no markdown): "
     '{"query_type": "overview|specific|deep_dive|comparison|search", '
     '"target_level": 0|1|2, "confidence": 0.0-1.0, "reasoning": "...", '
     '"keywords": ["..."], "requires_cross_doc": true|false}. '
@@ -156,7 +156,7 @@ def main():
 
     base_m, ft_m = metrics(base_rows), metrics(ft_rows)
     data = {
-        "task": "HiRAG query-complexity routing (Task A)",
+        "task": "query-complexity routing (router task)",
         "base_model": args.base,
         "finetuned": args.finetuned or f"{args.base} + adapter:{args.adapter}",
         "gpu": torch.cuda.get_device_name(0),

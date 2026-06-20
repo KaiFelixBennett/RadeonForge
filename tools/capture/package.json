@@ -1,0 +1,10 @@
+{
+  "name": "radeonforge-capture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless capture of the RadeonForge live dashboard -> PNG screenshots + animated GIF.",
+  "dependencies": {
+    "playwright": "^1.61.0"
+  }
+}

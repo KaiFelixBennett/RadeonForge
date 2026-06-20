@@ -1,7 +1,7 @@
 {
-  "task": "HiRAG query-complexity routing (Task A)",
+  "task": "query-complexity routing (router task)",
   "base_model": "Qwen/Qwen3.5-2B",
-  "finetuned": "/root/aria-pilot/qwen2b-merged",
+  "finetuned": "/root/router-pilot/qwen2b-merged",
   "gpu": "AMD Radeon AI PRO R9700",
   "metrics": {
     "base": {

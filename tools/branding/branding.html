@@ -1,0 +1,253 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>RadeonForge — branding</title>
+<style>
+:root{
+  --bg:#04060c; --ink:#0a0f1a; --line:rgba(150,175,210,.16); --line2:rgba(150,175,210,.10);
+  --txt:#f3f7ff; --mut:#8da3c2; --dim:#5f7088;
+  --cyan:#36d4e8; --blue:#5a9bff; --violet:#a98bff; --green:#37d39b; --red:#ff6b6b; --forge:#ff7a3c;
+  --font:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000}
+.card{position:relative;overflow:hidden;color:var(--txt);font-family:var(--font);letter-spacing:-.01em;
+  background:
+    radial-gradient(80% 120% at 86% -10%, rgba(255,122,60,.10), transparent 46%),
+    radial-gradient(70% 90% at 6% 108%, rgba(54,212,232,.10), transparent 50%),
+    linear-gradient(168deg,#05070e 0%,#070c16 60%,#090e18 100%);}
+.card::before{content:"";position:absolute;inset:0;z-index:0;opacity:.45;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:40px 40px;
+  -webkit-mask-image:radial-gradient(130% 120% at 50% -10%,#000,transparent 80%);}
+.card::after{content:"";position:absolute;inset:0;z-index:0;
+  background:radial-gradient(120% 80% at 50% -20%, rgba(90,155,255,.06), transparent 55%);}
+.net{position:absolute;inset:0;z-index:1;width:100%;height:100%}
+.inner{position:relative;z-index:3;width:100%;height:100%}
+
+/* shared */
+.wordmark{display:inline-flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.02em}
+.wordmark .mk{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:17px;
+  background:radial-gradient(circle at 50% 35%,#ffd9a8,#ff7a3c 55%,#c2410c);box-shadow:0 0 20px rgba(255,122,60,.45),inset 0 0 10px rgba(255,225,180,.5)}
+.wordmark .rad{color:#ffb486}.wordmark .for{color:#cfe0ff}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+.hl{background:linear-gradient(96deg,#fff 10%,var(--cyan) 48%,var(--blue) 78%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:rgba(255,255,255,.035);
+  border-radius:9px;padding:7px 12px;font-size:13.5px;font-weight:600;color:#cdd9ee;white-space:nowrap}
+.chip .d{width:7px;height:7px;border-radius:50%}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.foot{color:var(--dim);font-family:var(--mono);font-size:12.5px}
+.panel{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012));
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 24px 60px rgba(0,0,0,.4)}
+
+/* ============ HERO (1280x460) ============ */
+#hero{width:1280px;height:460px}
+#hero .inner{display:grid;grid-template-columns:1.18fr .82fr;gap:46px;padding:50px 56px;align-items:center}
+#hero .wordmark{font-size:23px;margin-bottom:22px}
+#hero h1{font-size:62px;line-height:1.0;font-weight:800;letter-spacing:-.03em;max-width:640px}
+#hero .sub{font-size:18.5px;line-height:1.5;color:#bccbe4;margin:20px 0 24px;max-width:600px}
+#hero .sub b{color:#eaf2ff;font-weight:650}
+#hero .proof{padding:22px 24px}
+#hero .proof .top{display:flex;justify-content:space-between;align-items:baseline}
+#hero .proof .lab{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+#hero .proof .ba{display:flex;align-items:baseline;gap:12px;margin:12px 0 4px}
+#hero .proof .b{font-size:30px;font-weight:750;color:#9aa7bd}
+#hero .proof .ar{color:var(--mut);font-size:18px}
+#hero .proof .g{font-size:46px;font-weight:850;color:var(--green);letter-spacing:-.02em;text-shadow:0 0 26px rgba(55,211,155,.35)}
+#hero .proof .cap{font-size:12.5px;color:var(--mut)}
+#hero .proof .strip{display:flex;gap:8px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)}
+#hero .proof .kv{flex:1}
+#hero .proof .kv .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+#hero .proof .kv .v{font-size:17px;font-weight:750;margin-top:3px}
+
+/* ============ BEFORE / AFTER (1200x440) ============ */
+#ba{width:1200px;height:440px}
+#ba .inner{padding:40px 46px;display:flex;flex-direction:column}
+#ba .head{display:flex;justify-content:space-between;align-items:baseline}
+#ba .head .t{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);font-weight:700}
+#ba .head .t span{color:var(--mut);font-weight:500;letter-spacing:.04em}
+#ba .grid{display:grid;grid-template-columns:1fr 1.35fr;gap:22px;margin-top:22px;flex:1}
+#ba .stat{padding:24px 26px;display:flex;flex-direction:column;justify-content:center}
+#ba .stat .k{font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+#ba .stat .ba{display:flex;align-items:baseline;gap:14px;margin-top:16px}
+#ba .stat .b{font-size:38px;font-weight:700;color:#92a0b8}
+#ba .stat .ar{font-size:22px;color:var(--mut)}
+#ba .stat .g{font-size:64px;font-weight:850;line-height:.85;color:var(--green);letter-spacing:-.03em;text-shadow:0 0 30px rgba(55,211,155,.4)}
+#ba .stat .delta{margin-top:16px;font-size:14.5px;font-weight:700;color:var(--cyan)}
+#ba .chart{padding:18px 22px;position:relative}
+#ba .chart .ct{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--mut)}
+#ba .chart .ct b{color:#dfe9fb;font-weight:650}
+#ba .strip{display:flex;gap:10px;margin-top:20px}
+#ba .strip .kv{flex:1;border:1px solid var(--line);border-radius:12px;padding:12px 15px;background:rgba(255,255,255,.025)}
+#ba .strip .kv .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+#ba .strip .kv .v{font-size:19px;font-weight:800;margin-top:3px}
+#ba .credit{margin-top:16px;display:flex;justify-content:space-between;align-items:center}
+
+/* ============ STEPS (1240x430) ============ */
+#steps{width:1240px;height:430px}
+#steps .inner{padding:40px 48px;display:flex;flex-direction:column}
+#steps h2{font-size:34px;font-weight:800;letter-spacing:-.02em}
+#steps h2 .hl{font-weight:800}
+#steps .sub{font-size:15.5px;color:var(--mut);margin-top:8px}
+#steps .row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:26px;flex:1}
+#steps .step{position:relative;padding:18px 16px 16px;display:flex;flex-direction:column}
+#steps .step .n{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:15px;
+  color:#04121a;background:linear-gradient(135deg,var(--cyan),var(--blue));box-shadow:0 0 16px rgba(54,212,232,.35)}
+#steps .step .nm{font-size:15.5px;font-weight:750;margin-top:14px}
+#steps .step .cmd{font-family:var(--mono);font-size:12px;color:var(--cyan);background:rgba(54,212,232,.08);
+  border:1px solid var(--line2);border-radius:7px;padding:5px 8px;margin-top:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#steps .step .ds{font-size:12.5px;color:var(--mut);margin-top:10px;line-height:1.4;flex:1}
+#steps .step .tm{font-size:11px;color:var(--dim);margin-top:10px;font-variant-numeric:tabular-nums}
+#steps .step .arrow{position:absolute;right:-11px;top:30px;color:var(--line);font-size:18px;z-index:5}
+#steps .step:last-child .arrow{display:none}
+
+/* ============ SOCIAL (1280x640) ============ */
+#social{width:1280px;height:640px}
+#social .inner{display:flex;flex-direction:column;justify-content:center;padding:62px 72px;gap:24px}
+#social .wordmark{font-size:30px}
+#social h1{font-size:72px;line-height:.98;font-weight:850;letter-spacing:-.03em;max-width:1040px}
+#social .sub{font-size:24px;line-height:1.32;color:#c4d2ea;max-width:1000px}
+#social .sub b{color:#eaf2ff;font-weight:650}
+#social .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:6px}
+#social .tile{padding:16px 18px}
+#social .tile .k{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+#social .tile .v{font-size:27px;font-weight:850;margin-top:7px}
+#social .tile .v .ar{color:var(--green)}
+#social .botrow{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+</style></head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="card" id="hero"><canvas class="net"></canvas><div class="inner">
+  <div>
+    <div class="wordmark"><span class="mk">⚒</span><span><span class="rad">Radeon</span><span class="for">Forge</span></span></div>
+    <h1>Fine-tune your own LLM on a <span class="hl">Radeon</span> GPU.</h1>
+    <div class="sub">No NVIDIA, no PhD, no guesswork — a <b>tested, copy-paste path</b> from a blank machine to a model <b>you trained yourself</b>. Comes with a reusable live training dashboard.</div>
+    <div class="chips">
+      <span class="chip"><span class="d" style="background:var(--forge)"></span>Verified on RDNA4 · gfx1201</span>
+      <span class="chip"><span class="d" style="background:var(--cyan)"></span>WSL2 / Linux · ROCm</span>
+      <span class="chip"><span class="d" style="background:var(--green)"></span>5 steps · MIT</span>
+    </div>
+  </div>
+  <div class="panel proof">
+    <div class="top"><span class="lab">You trained this · held-out A/B</span></div>
+    <div class="ba num"><span class="b">79%</span><span class="ar">→</span><span class="g">100%</span></div>
+    <div class="cap">routing accuracy · base → fine-tuned (gemma-4)</div>
+    <svg class="loss" data-points="2.86,0.90,0.28,0.21" width="100%" height="92" viewBox="0 0 360 92" preserveAspectRatio="none" style="margin-top:14px"></svg>
+    <div class="strip">
+      <div class="kv"><div class="k">Trained in</div><div class="v num">~2 min</div></div>
+      <div class="kv"><div class="k">Served</div><div class="v num">~117 t/s</div></div>
+      <div class="kv"><div class="k">On</div><div class="v">one R9700</div></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ===== BEFORE / AFTER ===== -->
+<div class="card" id="ba"><canvas class="net"></canvas><div class="inner">
+  <div class="head">
+    <div class="t">You trained this <span>· same prompt, only the weights differ</span></div>
+    <div class="foot">measured 2026-06-15</div>
+  </div>
+  <div class="grid">
+    <div class="panel stat">
+      <div class="k">Routing accuracy · 14 held-out</div>
+      <div class="ba num"><span class="b">79%</span><span class="ar">→</span><span class="g">100%</span></div>
+      <div class="delta num">+21 points · base → fine-tuned</div>
+    </div>
+    <div class="panel chart">
+      <div class="ct"><span>training loss <b>· it really learns</b></span><span class="num"><b>2.86</b> → <b style="color:var(--green)">0.21</b></span></div>
+      <svg class="loss" data-points="2.86,1.6,0.90,0.45,0.28,0.23,0.21" data-area="1" width="100%" height="150" viewBox="0 0 640 150" preserveAspectRatio="none" style="margin-top:6px"></svg>
+      <div class="foot" style="text-align:center;margin-top:2px">QLoRA · 4-bit · ~2 min on one AMD Radeon AI PRO R9700 (RDNA4)</div>
+    </div>
+  </div>
+  <div class="strip">
+    <div class="kv"><div class="k">Query-type acc</div><div class="v num" style="color:var(--green)">64% → 100%</div></div>
+    <div class="kv"><div class="k">Output length</div><div class="v num">−19% · cheaper</div></div>
+    <div class="kv"><div class="k">Served speed (Q4_K_M)</div><div class="v num">~117 tok/s</div></div>
+    <div class="kv"><div class="k">To run it yourself</div><div class="v">5 commands</div></div>
+  </div>
+</div></div>
+
+<!-- ===== STEPS ===== -->
+<div class="card" id="steps"><canvas class="net"></canvas><div class="inner">
+  <h2>Your first fine-tune, in <span class="hl">5 steps</span>.</h2>
+  <div class="sub">Each step is one command. Run them top to bottom — the smoke test proves your GPU works <i>before</i> you spend real time.</div>
+  <div class="row">
+    <div class="panel step"><div class="n">1</div><div class="nm">Set up</div><div class="cmd">make setup</div><div class="ds">Installs the ROCm + Python stack and handles the known AMD traps for you.</div><div class="tm">~10 min · once</div><div class="arrow">→</div></div>
+    <div class="panel step"><div class="n">2</div><div class="nm">Prove it works</div><div class="cmd">make smoke</div><div class="ds">A 50-step test run. Loss <b style="color:var(--green)">5.78 → 0.15</b> = your GPU can train.</div><div class="tm">~1 min</div><div class="arrow">→</div></div>
+    <div class="panel step"><div class="n">3</div><div class="nm">Train</div><div class="cmd">make train</div><div class="ds">QLoRA on the example data (or your own). Watch it live in the dashboard.</div><div class="tm">~2–11 min</div><div class="arrow">→</div></div>
+    <div class="panel step"><div class="n">4</div><div class="nm">Export</div><div class="cmd">export_gguf.sh</div><div class="ds">Merge your adapter and pack it to a small GGUF (Q4_K_M) for local use.</div><div class="tm">~3 min</div><div class="arrow">→</div></div>
+    <div class="panel step"><div class="n">5</div><div class="nm">Chat with it</div><div class="cmd">serve.sh</div><div class="ds">Talk to <b>your</b> model, running on your own Radeon GPU. ~117 tok/s.</div><div class="tm">instant</div><div class="arrow">→</div></div>
+  </div>
+</div></div>
+
+<!-- ===== SOCIAL ===== -->
+<div class="card" id="social"><canvas class="net"></canvas><div class="inner">
+  <div class="wordmark"><span class="mk">⚒</span><span><span class="rad">Radeon</span><span class="for">Forge</span></span></div>
+  <h1>Fine-tune your own LLM on a <span class="hl">Radeon</span> GPU.</h1>
+  <div class="sub">A tested, copy-paste path from a blank machine to a model <b>you trained yourself</b> — QLoRA via ROCm on Windows/WSL2 — plus a reusable live training dashboard.</div>
+  <div class="tiles">
+    <div class="panel tile"><div class="k">You trained this</div><div class="v num">79% <span class="ar">→</span> 100%</div></div>
+    <div class="panel tile"><div class="k">Served on R9700</div><div class="v num">~117 tok/s</div></div>
+    <div class="panel tile"><div class="k">Prove-it smoke test</div><div class="v num">5.78 → 0.15</div></div>
+    <div class="panel tile"><div class="k">From clone to chat</div><div class="v num">5 steps</div></div>
+  </div>
+  <div class="botrow">
+    <div class="chips">
+      <span class="chip"><span class="d" style="background:var(--forge)"></span>Verified on RDNA4 · gfx1201</span>
+      <span class="chip"><span class="d" style="background:var(--cyan)"></span>ROCm · WSL2 / Linux</span>
+      <span class="chip"><span class="d" style="background:var(--green)"></span>reusable dashboard included</span>
+    </div>
+    <div class="foot">github.com/KaiFelixBennett/RadeonForge</div>
+  </div>
+</div></div>
+
+<script>
+/* faint node constellation (depth, drawn once) */
+function constellation(canvas){
+  const card=canvas.closest('.card'),W=card.offsetWidth,H=card.offsetHeight,DPR=2;
+  canvas.width=W*DPR;canvas.height=H*DPR;const x=canvas.getContext('2d');x.scale(DPR,DPR);
+  const N=Math.round(W*H/16000),pts=[];
+  for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.4,h:198+Math.random()*64});
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<120){x.strokeStyle='hsla('+((a.h+b.h)/2)+',88%,66%,'+(0.045*(1-d/120))+')';x.lineWidth=0.7;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke();}}
+  pts.forEach(p=>{const g=x.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);g.addColorStop(0,'hsla('+p.h+',92%,72%,.42)');g.addColorStop(1,'hsla('+p.h+',92%,72%,0)');x.fillStyle=g;x.beginPath();x.arc(p.x,p.y,p.r*3,0,7);x.fill();});
+}
+/* smooth (Catmull-Rom) loss curve into each .loss svg from data-points (higher value = up) */
+function smooth(P){if(P.length<2)return '';let d='M'+P[0][0].toFixed(1)+','+P[0][1].toFixed(1);
+  for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||P[i+1];
+    const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);}return d;}
+function drawLoss(svg){
+  const vb=svg.getAttribute('viewBox').split(' ').map(Number),W=vb[2],H=vb[3];
+  const vals=svg.dataset.points.split(',').map(Number),area=svg.dataset.area==='1';
+  const padT=16,padB=16,padL=6,padR=area?56:6,iw=W-padL-padR,ih=H-padT-padB;
+  const mx=Math.max.apply(null,vals),mn=Math.min.apply(null,vals),sp=(mx-mn)||1;
+  const P=vals.map((v,i)=>[padL+(vals.length<2?iw:i/(vals.length-1)*iw),padT+(1-(v-mn)/sp)*ih]);
+  const ns='http://www.w3.org/2000/svg';
+  // gridlines
+  for(let k=0;k<=3;k++){const y=padT+ih*k/3,l=document.createElementNS(ns,'line');
+    l.setAttribute('x1',padL);l.setAttribute('x2',padL+iw);l.setAttribute('y1',y);l.setAttribute('y2',y);
+    l.setAttribute('stroke','rgba(255,255,255,.05)');svg.appendChild(l);}
+  const dpath=smooth(P);
+  if(area){const ar=document.createElementNS(ns,'path');ar.setAttribute('d',dpath+' L'+P[P.length-1][0].toFixed(1)+','+(padT+ih)+' L'+P[0][0].toFixed(1)+','+(padT+ih)+' Z');
+    ar.setAttribute('fill','url(#lg'+(svg.__i||0)+')');svg.appendChild(ar);}
+  const defs=document.createElementNS(ns,'defs');const gid='lg'+(svg.__i=Math.floor(Math.random()*1e6));
+  defs.innerHTML='<linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36d4e8" stop-opacity="0.28"/><stop offset="1" stop-color="#36d4e8" stop-opacity="0"/></linearGradient>'+
+    '<filter id="g'+gid+'" x="-20%" y="-40%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>';
+  svg.insertBefore(defs,svg.firstChild);
+  if(area)svg.querySelector('path').setAttribute('fill','url(#'+gid+')');
+  const glow=document.createElementNS(ns,'path');glow.setAttribute('d',dpath);glow.setAttribute('fill','none');
+  glow.setAttribute('stroke','#36d4e8');glow.setAttribute('stroke-width','3.4');glow.setAttribute('filter','url(#g'+gid+')');glow.setAttribute('opacity','.7');svg.appendChild(glow);
+  const ln=document.createElementNS(ns,'path');ln.setAttribute('d',dpath);ln.setAttribute('fill','none');
+  ln.setAttribute('stroke','#7fe9f5');ln.setAttribute('stroke-width','2.4');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);
+  // endpoint dot
+  const e=P[P.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',e[0]);c.setAttribute('cy',e[1]);c.setAttribute('r','4.5');c.setAttribute('fill','#37d39b');svg.appendChild(c);
+  if(area){const t=document.createElementNS(ns,'text');t.setAttribute('x',e[0]+9);t.setAttribute('y',e[1]+4);t.setAttribute('fill','#37d39b');t.setAttribute('font-size','15');t.setAttribute('font-weight','800');t.setAttribute('font-family','ui-monospace,monospace');t.textContent='0.21';svg.appendChild(t);
+    const s=P[0],st=document.createElementNS(ns,'text');st.setAttribute('x',s[0]+4);st.setAttribute('y',s[1]+16);st.setAttribute('fill','#92a0b8');st.setAttribute('font-size','13');st.setAttribute('font-family','ui-monospace,monospace');st.textContent='2.86';svg.appendChild(st);}
+}
+document.querySelectorAll('.card .net').forEach(constellation);
+document.querySelectorAll('svg.loss').forEach(drawLoss);
+document.body.dataset.ready='1';
+</script>
+</body></html>

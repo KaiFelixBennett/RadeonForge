@@ -24,3 +24,17 @@ data/*.jsonl
 wandb/
 runs/
 .DS_Store
+
+# Generated demo data (re-created by `make demo` / scripts/demo_dashboard.py)
+examples/dashboard-demo/
+
+# Capture/branding tooling (Node) — the assets/ outputs themselves ARE committed
+tools/**/node_modules/
+tools/**/_frames/
+tools/**/_vid/
+package-lock.json
+assets/**/_frames/
+assets/**/_vid/
+
+# Generated dataset review pages (make_dataset.py)
+*.review.html

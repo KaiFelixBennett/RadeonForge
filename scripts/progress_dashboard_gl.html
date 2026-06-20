@@ -1,4 +1,4 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8">
+<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Progress · WebGL</title>
 <style>
 :root{--card:rgba(15,27,48,.56);--line:rgba(95,135,190,.30);--cyan:#22d3ee;--green:#10b981;
@@ -27,9 +27,9 @@ h1{font-size:20px;font-weight:700;margin:0 0 2px}.sub{color:var(--mut);font-size
 .term{background:rgba(2,6,14,.82);color:#b9d0ea;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:250px;overflow:auto;margin:0;padding:9px 11px;border-radius:9px;border:1px solid var(--line)}
 .warn{position:fixed;inset:0;display:none;place-items:center;color:var(--mut);z-index:0;text-align:center;padding:20px}
 a{color:var(--cyan)}
-/* Scrim: dämpft die 3D-Knoten unter dem Inhalt -> garantierter Textkontrast, Glow bleibt sichtbar */
+/* Scrim: dims the 3D nodes beneath the content -> guaranteed text contrast, glow stays visible */
 .scrim{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(130% 100% at 50% -10%,rgba(2,4,10,.48),rgba(2,4,10,.74) 60%,rgba(2,4,10,.82))}
-/* ---- HUD-Kacheln (Live-Werte) ---- */
+/* ---- HUD tiles (live values) ---- */
 .hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:10px 0 4px}
 .tile{position:relative;background:linear-gradient(160deg,rgba(34,211,238,.10),rgba(139,92,246,.05));border:1px solid var(--line);border-radius:16px;padding:13px 15px 15px;overflow:hidden;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.45)}
 .tile::after{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple));opacity:.85}
@@ -43,13 +43,13 @@ a{color:var(--cyan)}
 .tbar{height:6px;background:rgba(4,12,24,.7);border-radius:5px;overflow:hidden;margin-top:7px}
 .tfill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue),var(--cyan));box-shadow:0 0 12px rgba(59,156,255,.7);transition:width .6s;border-radius:5px}
 .spark{position:absolute;right:12px;bottom:11px}
-/* ---- Chips (Log-Kopf) ---- */
+/* ---- Chips (log header) ---- */
 .chips{display:inline-flex;gap:8px;flex-wrap:wrap;align-items:center;text-transform:none;letter-spacing:0;vertical-align:middle}
 .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--txt);background:rgba(34,211,238,.08);border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
 .chip b{font-weight:700;color:var(--cyan)}
 .chip.eta{background:rgba(34,211,238,.16);box-shadow:0 0 14px rgba(34,211,238,.25)}.chip.eta b{color:#dffaff}
 .chip svg{width:12px;height:12px;opacity:.85}
-/* ---- Live-„Jetzt"-Banner: zeigt unmissverständlich, was GERADE passiert ---- */
+/* ---- Live "now" banner: shows unmistakably what is happening RIGHT NOW ---- */
 .nowbar{display:flex;align-items:center;gap:13px;flex-wrap:wrap;border-radius:14px;padding:13px 17px;margin:12px 0 6px;border:1px solid var(--line);background:linear-gradient(120deg,rgba(16,185,129,.13),rgba(34,211,238,.06));backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
 .nowbar.idle{background:rgba(15,27,48,.5)}
 .nowbar.warn{background:linear-gradient(120deg,rgba(245,158,11,.16),rgba(239,68,68,.10));border-color:rgba(245,158,11,.55)}
@@ -63,11 +63,11 @@ a{color:var(--cyan)}
 .alert{display:flex;align-items:center;gap:9px;font-size:12.5px;border-radius:10px;padding:8px 13px;border:1px solid}
 .alert.red{background:rgba(239,68,68,.13);border-color:rgba(239,68,68,.5);color:#ffd9d9}
 .alert.amber{background:rgba(245,158,11,.13);border-color:rgba(245,158,11,.5);color:#ffe9c2}
-/* ---- Tooltips (anfängerfreundliche Erklärungen) ---- */
+/* ---- Tooltips (beginner-friendly explanations) ---- */
 .tip{position:relative;cursor:help;border-bottom:1px dotted var(--mut);text-transform:none;letter-spacing:0}
 .tip:hover::after{content:attr(data-tip);position:absolute;left:0;top:150%;z-index:60;width:max-content;max-width:300px;white-space:normal;background:#0a1426;color:#dbe8fb;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:11.5px;font-weight:400;line-height:1.5;box-shadow:0 14px 40px rgba(0,0,0,.65)}
 .tipi{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--line);color:var(--mut);font-size:10px;margin-left:5px;cursor:help;vertical-align:middle}
-/* ---- Scorecard-Panel ---- */
+/* ---- Scorecard panel ---- */
 .sctbl{width:100%;border-collapse:collapse;font-size:12.5px}
 .sctbl th,.sctbl td{padding:8px 9px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
 .sctbl th{color:var(--mut);font-size:11px;text-transform:none;font-weight:600}
@@ -75,7 +75,7 @@ a{color:var(--cyan)}
 .sctbl .mname{font-weight:700;color:var(--txt)}
 .sctbl .good{color:var(--green);font-weight:700}.sctbl .mid{color:var(--amber);font-weight:600}.sctbl .bad{color:var(--mut)}
 .sctbl tr:last-child td{border-bottom:none}
-/* ---- Live-Eval-Panel (Pass/Fail-Grid, füllt sich live) ---- */
+/* ---- Live eval panel (pass/fail grid, fills up live) ---- */
 .edim{margin:9px 0}
 .edim .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:4px}
 .edim .lab b{color:var(--txt);font-weight:700}
@@ -86,9 +86,9 @@ a{color:var(--cyan)}
 </style></head><body>
 <canvas id="gl"></canvas>
 <div class="scrim"></div>
-<div class="warn" id="warn">WebGL nicht verfügbar — Canvas-Variante: <a href="/">/</a></div>
+<div class="warn" id="warn">WebGL not available — Canvas version: <a href="/">/</a></div>
 <div class="wrap">
-  <h1 id="title">Progress</h1><div class="sub" id="sub">lädt …</div>
+  <h1 id="title">Progress</h1><div class="sub" id="sub">loading …</div>
   <div id="nowsec"></div>
   <div id="evalsec"></div>
   <div id="hudsec"></div>
@@ -102,10 +102,10 @@ a{color:var(--cyan)}
   <div id="logsec"></div>
   <div id="root"></div>
   <div class="foot" style="color:var(--mut);font-size:11px;margin-top:26px;border-top:1px solid var(--line);padding-top:10px">
-   RadeonForge · WebGL-3D · Auto-Refresh 3 s · Canvas-Variante: <a href="/">/</a></div>
+   RadeonForge · WebGL-3D · Auto-refresh 3 s · Canvas version: <a href="/">/</a></div>
 </div>
 <script>
-/* ===================== WebGL — glühende Knotenwolke + Energie-Pulse (kein CDN) ===================== */
+/* ===================== WebGL — glowing node cloud + energy pulses (no CDN) ===================== */
 let trainingActive=false;
 (function(){
 const cv=document.getElementById('gl');let gl;
@@ -116,7 +116,7 @@ addEventListener('resize',resize);resize();
 const N=320,pos=[],col=[],P=[];
 for(let i=0;i<N;i++){const t=i/N,phi=Math.acos(1-2*t),th=Math.PI*(1+Math.sqrt(5))*i,r=(i%2?1.0:0.6)+(i%7)*0.02;
  const x=Math.cos(th)*Math.sin(phi)*r,y=Math.sin(th)*Math.sin(phi)*r,z=Math.cos(phi)*r;pos.push(x,y,z);P.push([x,y,z]);
- const f=(x+1.1)/2.2;col.push(0.62-0.40*f,0.32+0.46*f,0.98);}        /* violett -> cyan */
+ const f=(x+1.1)/2.2;col.push(0.62-0.40*f,0.32+0.46*f,0.98);}        /* violet -> cyan */
 const E=[];
 for(let i=0;i<N;i++){const d=[];for(let j=0;j<N;j++)if(i!==j){const dx=P[i][0]-P[j][0],dy=P[i][1]-P[j][1],dz=P[i][2]-P[j][2];d.push([dx*dx+dy*dy+dz*dz,j]);}
  d.sort((a,b)=>a[0]-b[0]);for(let k=0;k<2;k++){const j=d[k][1];if(i<j)E.push([i,j]);}}
@@ -152,8 +152,8 @@ function frame(now){
  const m=mul(persp(1.15,W/H,0.1,100),mul(tr(0,0,-3.05),mul(rY(now*0.00005),rX(Math.sin(now*0.000032)*0.32))));
  draw(m,bL,bLc,pLin,gl.LINES,lpos.length/3,0);
  const k=(trainingActive?1.25:1);
- draw(m,bPos,bCol,pPts,gl.POINTS,N,86*DPR*k);   /* großer weicher Glow (Bloom-Look) */
- draw(m,bPos,bCol,pPts,gl.POINTS,N,30*DPR);      /* heller Kern je Knoten */
+ draw(m,bPos,bCol,pPts,gl.POINTS,N,86*DPR*k);   /* large soft glow (bloom look) */
+ draw(m,bPos,bCol,pPts,gl.POINTS,N,30*DPR);      /* bright core per node */
  const pp=new Float32Array(NP*3),pc=new Float32Array(NP*3);
  for(let i=0;i<NP;i++){const e=E[pul[i].e],a=P[e[0]],b=P[e[1]];pul[i].t+=0.004*k;if(pul[i].t>1){pul[i].t=0;pul[i].e=(Math.random()*E.length)|0;}
   const t=pul[i].t;pp[i*3]=a[0]+(b[0]-a[0])*t;pp[i*3+1]=a[1]+(b[1]-a[1])*t;pp[i*3+2]=a[2]+(b[2]-a[2])*t;pc[i*3]=1;pc[i*3+1]=1;pc[i*3+2]=1;}
@@ -161,19 +161,19 @@ function frame(now){
  gl.bindBuffer(gl.ARRAY_BUFFER,bPulC);gl.bufferData(gl.ARRAY_BUFFER,pc,gl.DYNAMIC_DRAW);
  draw(m,bPul,bPulC,pPts,gl.POINTS,NP,18*DPR*k);
  const cpz=0.6+0.4*Math.sin(now*0.0015*k);
- draw(m,bCore,buf([0.8,0.7,1.0]),pPts,gl.POINTS,1,(150+90*cpz)*DPR);   /* brillanter Kern-Flare */
+ draw(m,bCore,buf([0.8,0.7,1.0]),pPts,gl.POINTS,1,(150+90*cpz)*DPR);   /* brilliant core flare */
  draw(m,bCore,buf([1,1,1]),pPts,gl.POINTS,1,(46+24*cpz)*DPR);
  requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 })();
 
-/* ===================== Daten / Overlay ===================== */
+/* ===================== Data / Overlay ===================== */
 const PAL=['#8b5cf6','#3b9cff','#22d3ee','#10b981','#f59e0b','#ef4444'];
 function esc(s){return (''+s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function bar(p){return '<div class="bar"><div class="fill" style="width:'+(p||0)+'%"></div></div>';}
-function age(s){if(s==null)return '—';if(s<90)return '<span class="dot"></span>vor '+s+' s';if(s<5400)return 'vor '+Math.round(s/60)+' min';return 'vor '+(s/3600).toFixed(1)+' h';}
+function age(s){if(s==null)return '—';if(s<90)return '<span class="dot"></span>'+s+' s ago';if(s<5400)return Math.round(s/60)+' min ago';return (s/3600).toFixed(1)+' h ago';}
 
-/* ---- nicht-lineares Fluss-Diagramm (SVG, datengetrieben aus manifest.flow) ---- */
+/* ---- non-linear flow diagram (SVG, data-driven from manifest.flow) ---- */
 function renderFlow(flow){
  const el=document.getElementById('flowsec');
  if(!flow||!flow.nodes||!flow.nodes.length){el.innerHTML='';return;}
@@ -187,49 +187,49 @@ function renderFlow(flow){
  svg+='<filter id="fglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
  svg+='<rect width="'+w+'" height="'+h+'" rx="12" fill="#06101f"/></defs>';
  svg+='<rect width="'+w+'" height="'+h+'" rx="12" fill="#06101f"/>';
- // ---- Kanten ----
+ // ---- edges ----
  (flow.edges||[]).forEach(e=>{const a=byId[e[0]],b=byId[e[1]];if(!a||!b)return;
   if(e[2]==='loop'){svg+='<path d="M'+(a.x+a.w/2-18)+','+(a.y-a.h/2)+' C'+(a.x+10)+','+(a.y-a.h/2-46)+' '+(a.x-10)+','+(a.y-a.h/2-46)+' '+(a.x-a.w/2+18)+','+(a.y-a.h/2)+'" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#ar_current)" opacity="0.7"/>';
-   svg+='<text x="'+a.x+'" y="'+(a.y-a.h/2-50)+'" fill="#8ea6c8" font-size="11" text-anchor="middle">iteriert (v1→v4)</text>';return;}
+   svg+='<text x="'+a.x+'" y="'+(a.y-a.h/2-50)+'" fill="#8ea6c8" font-size="11" text-anchor="middle">iterated (v1→v4)</text>';return;}
   const mx=(a.x+b.x)/2,d='M'+(a.x+a.w/2)+','+a.y+' C'+mx+','+a.y+' '+mx+','+b.y+' '+(b.x-b.w/2)+','+b.y;
-  // Status der Kante: fertig wenn beide done; aktiv wenn Ziel current
+  // edge status: done when both done; active when target is current
   const flowing=(a.status==='done'&&b.status==='done'),toCur=(b.status==='current');
   const ec=flowing?col.done:(toCur?col.current:'#3b6797');
   svg+='<path d="'+d+'" fill="none" stroke="'+ec+'" stroke-width="2"'+((e[2]==='dash'||(!flowing&&!toCur))?' stroke-dasharray="5 5"':'')+' marker-end="url(#ar_'+(flowing?'done':(toCur?'current':'todo'))+')" opacity="'+(flowing||toCur?'0.9':'0.5')+'"/>';
   if(flowing||toCur)svg+='<path d="'+d+'" fill="none" stroke="'+(flowing?'#bfffe4':'#d8fbff')+'" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="16 360" filter="url(#fglow)" opacity="0.95"><animate attributeName="stroke-dashoffset" from="376" to="0" dur="2.4s" repeatCount="indefinite"/></path>';});
- // ---- Knoten ----
+ // ---- nodes ----
  flow.nodes.forEach(n=>{const c=col[n.status]||'#3b6797',cur=n.status==='current',x0=n.x-n.w/2,y0=n.y-n.h/2;
   svg+='<g'+(cur?' filter="url(#fglow)"':'')+'>';
   svg+='<rect x="'+x0+'" y="'+y0+'" rx="13" width="'+n.w+'" height="'+n.h+'" fill="url(#fg_'+(n.status||'todo')+')" stroke="'+c+'" stroke-width="'+(cur?2.6:1.6)+'"/>';
   if(cur)svg+='<rect x="'+x0+'" y="'+y0+'" rx="13" width="'+n.w+'" height="'+n.h+'" fill="none" stroke="'+c+'" stroke-width="2.6"><animate attributeName="opacity" values="1;.25;1" dur="1.5s" repeatCount="indefinite"/></rect>';
-  // Status-Badge (Kreis + Icon) oben links
+  // status badge (circle + icon) top left
   const ic=n.status==='done'?'✓':(n.status==='goal'?'★':(cur?'●':'·'));
   svg+='<circle cx="'+(x0+16)+'" cy="'+(y0+16)+'" r="9" fill="'+c+'" opacity="'+(n.status==='todo'?'0.5':'0.95')+'"/>';
   svg+='<text x="'+(x0+16)+'" y="'+(y0+20)+'" fill="#06101f" font-size="11" font-weight="800" text-anchor="middle">'+ic+'</text>';
-  // Label + Detail (rechts vom Badge zentriert)
+  // label + detail (centered to the right of the badge)
   svg+='<text x="'+(n.x+8)+'" y="'+(n.y-3)+'" fill="'+(n.status==='todo'?'#cfe0f5':'#fff')+'" font-size="12.5" font-weight="700" text-anchor="middle">'+esc(n.label)+'</text>';
   if(n.detail)svg+='<text x="'+(n.x+8)+'" y="'+(n.y+14)+'" fill="#9fb4d4" font-size="10" text-anchor="middle">'+esc(n.detail)+'</text>';
   svg+='</g>';
-  // "Du bist hier"-Plakette über dem aktuellen Knoten
+  // "You are here" plaque above the current node
   if(cur){const by=y0-30;svg+='<g><rect x="'+(n.x-58)+'" y="'+by+'" rx="9" width="116" height="22" fill="#0a1f33" stroke="'+col.current+'" stroke-width="1.4"><animate attributeName="opacity" values="1;.55;1" dur="1.5s" repeatCount="indefinite"/></rect>'
    +'<path d="M'+(n.x-6)+','+(by+22)+' L'+(n.x+6)+','+(by+22)+' L'+n.x+','+(by+30)+' Z" fill="#0a1f33"/>'
-   +'<text x="'+n.x+'" y="'+(by+15)+'" fill="'+col.current+'" font-size="11" font-weight="700" text-anchor="middle">▶ Du bist hier</text></g>';}});
+   +'<text x="'+n.x+'" y="'+(by+15)+'" fill="'+col.current+'" font-size="11" font-weight="700" text-anchor="middle">▶ You are here</text></g>';}});
  svg+='</svg>';
- el.innerHTML='<div class="sec">Ablauf <span style="color:var(--mut);text-transform:none;letter-spacing:0">· Status live aus Daten</span> <button class="btn" id="flow-dl">SVG ↓</button></div><div class="card" style="padding:10px">'+svg+'</div>';
- var fb=document.getElementById('flow-dl');if(fb)fb.onclick=function(){dl('flowsvg','ablauf.svg');};
+ el.innerHTML='<div class="sec">Pipeline <span style="color:var(--mut);text-transform:none;letter-spacing:0">· status live from data</span> <button class="btn" id="flow-dl">SVG ↓</button></div><div class="card" style="padding:10px">'+svg+'</div>';
+ var fb=document.getElementById('flow-dl');if(fb)fb.onclick=function(){dl('flowsvg','flow.svg');};
 }
 
-/* ---- Vorher/Nachher-Charts (SVG, toggle, download) ---- */
+/* ---- before/after charts (SVG, toggle, download) ---- */
 let chartsOpen=true;
 function renderCharts(res){
  const el=document.getElementById('chartsec');
  if(!res||!res.models||!res.models.length){el.innerHTML='';return;}
  const models=res.models,metrics=res.metrics||[];
- let head='<div class="sec">'+esc(res.title||'Ergebnisse')
-   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· vorher → nachher</span>'
-   +' <span><button class="btn" id="ch-tg">'+(chartsOpen?'ausblenden':'einblenden')+'</button> '
+ let head='<div class="sec">'+esc(res.title||'Results')
+   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· before → after</span>'
+   +' <span><button class="btn" id="ch-tg">'+(chartsOpen?'hide':'show')+'</button> '
    +'<button class="btn" id="ch-dl">SVG ↓</button></span></div>';
- function wire(){var t=document.getElementById('ch-tg');if(t)t.onclick=window.__tg;var c=document.getElementById('ch-dl');if(c)c.onclick=function(){dl('chartsvg','ergebnisse.svg');};}
+ function wire(){var t=document.getElementById('ch-tg');if(t)t.onclick=window.__tg;var c=document.getElementById('ch-dl');if(c)c.onclick=function(){dl('chartsvg','results.svg');};}
  if(!chartsOpen){el.innerHTML=head;wire();return;}
  const n=models.length;
  const SHORT={grounded_ok:'Gate',coverage:'Coverage',refusal_ok:'Refusal',over_refusal:'Over-Ref.'};
@@ -241,25 +241,25 @@ function renderCharts(res){
  let s='<svg id="chartsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;border-radius:12px">';
  s+='<defs><filter id="chGlow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
  s+='<rect width="'+W+'" height="'+H+'" rx="12" fill="#06101f"/>';
- // Trennlinie zur Label-Spalte
+ // divider to the label column
  s+='<line x1="'+(W-padR+1)+'" y1="'+padT+'" x2="'+(W-padR+1)+'" y2="'+(padT+ih)+'" stroke="rgba(255,255,255,.08)"/>';
- // Gitter + Y-Achse
+ // grid + Y axis
  for(let k=0;k<=4;k++){const v=yMax*k/4,y=Y(v);
   s+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';
   s+='<text x="'+(padL-8)+'" y="'+(y+4).toFixed(1)+'" fill="#6f86a8" font-size="11" text-anchor="end">'+Math.round(v)+'</text>';}
- // X-Achse: Lauf-Namen + vorher/nachher
+ // X axis: run names + before/after
  models.forEach((m,i)=>{const x=X(i);
   s+='<line x1="'+x.toFixed(1)+'" y1="'+padT+'" x2="'+x.toFixed(1)+'" y2="'+(padT+ih)+'" stroke="rgba(255,255,255,.04)"/>';
   s+='<text x="'+x.toFixed(1)+'" y="'+(padT+ih+19)+'" fill="#9fb4d4" font-size="12" font-weight="600" text-anchor="middle">'+esc(m.name)+'</text>';});
- if(n>1){s+='<text x="'+X(0).toFixed(1)+'" y="'+(padT+ih+35)+'" fill="#6f86a8" font-size="10" text-anchor="middle">vorher</text>';
-  s+='<text x="'+X(n-1).toFixed(1)+'" y="'+(padT+ih+35)+'" fill="#22d3ee" font-size="10" font-weight="700" text-anchor="middle">nachher</text>';}
- // eine Glow-Linie je Metrik + Marker
+ if(n>1){s+='<text x="'+X(0).toFixed(1)+'" y="'+(padT+ih+35)+'" fill="#6f86a8" font-size="10" text-anchor="middle">before</text>';
+  s+='<text x="'+X(n-1).toFixed(1)+'" y="'+(padT+ih+35)+'" fill="#22d3ee" font-size="10" font-weight="700" text-anchor="middle">after</text>';}
+ // one glow line per metric + marker
  metrics.forEach((mt,mi)=>{const c=PAL[mi%PAL.length];
   const pts=models.map((m,i)=>[X(i),Y(m.values[mt.key]||0)]);
   const poly=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
   s+='<polyline points="'+poly+'" fill="none" stroke="'+c+'" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#chGlow)" opacity="0.95"/>';
   pts.forEach((p,i)=>{s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(i===0||i===n-1?4.5:3)+'" fill="'+c+'"'+((i===n-1)?' filter="url(#chGlow)"':'')+'/>';});});
- // rechte Label-Spalte: Punkt + Kurzname (Linienfarbe) + Endwert (weiß), kollisionsfrei -> ersetzt die alte Legende
+ // right label column: dot + short name (line color) + end value (white), collision-free -> replaces the old legend
  const ends=metrics.map((mt,mi)=>({c:PAL[mi%PAL.length],lab:(SHORT[mt.key]||String(mt.label||mt.key)).slice(0,13),v:(models[n-1].values[mt.key]||0),unit:mt.unit||'',y:Y(models[n-1].values[mt.key]||0)}));
  ends.sort((a,b)=>a.y-b.y);
  for(let i=1;i<ends.length;i++){if(ends[i].y-ends[i-1].y<18)ends[i].y=ends[i-1].y+18;}
@@ -272,9 +272,9 @@ function renderCharts(res){
 }
 window.__tg=function(){chartsOpen=!chartsOpen;renderCharts(window.__res);};
 
-/* ---- Live Tokens/s-Chart — „beeindruckend": Glow-Gradient, Energie-Puls, pulsierender Live-Punkt ---- */
+/* ---- Live Tokens/s chart — "impressive": glow gradient, energy pulse, pulsing live dot ---- */
 let tpsOpen=true;
-// Catmull-Rom -> kubische Bezier: weiche, fließende Kurve statt Zickzack
+// Catmull-Rom -> cubic Bezier: smooth, flowing curve instead of zigzag
 function smoothPath(P){if(P.length<2)return '';let d='M'+P[0][0].toFixed(1)+','+P[0][1].toFixed(1);
  for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||P[i+1];
   const c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6;
@@ -288,11 +288,11 @@ function renderTps(trainings){const el=document.getElementById('tpssec');if(!el)
  const mx=Math.max.apply(null,ser),mn=Math.min.apply(null,ser),avg=ser.reduce((a,b)=>a+b,0)/ser.length;
  const liveDot=t.active?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-right:6px;vertical-align:middle"></span>':'';
  const head='<div class="sec">'+liveDot+'Tokens/s — live'
-   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(t.name)+' · '+ser.length+' Punkte'+(t.sec_per_it?(' · '+t.sec_per_it+' s/Step'):'')+'</span>'
-   +' <span><button class="btn" id="tps-tg">'+(tpsOpen?'ausblenden':'einblenden')+'</button> '
+   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(t.name)+' · '+ser.length+' points'+(t.sec_per_it?(' · '+t.sec_per_it+' s/step'):'')+'</span>'
+   +' <span><button class="btn" id="tps-tg">'+(tpsOpen?'hide':'show')+'</button> '
    +'<button class="btn" id="tps-dl">SVG ↓</button></span></div>';
  function wire(){var g=document.getElementById('tps-tg');if(g)g.onclick=function(){tpsOpen=!tpsOpen;renderTps(trainings);};
-   var d=document.getElementById('tps-dl');if(d)d.onclick=function(){dl('tpssvg','tokens-pro-sekunde.svg');};}
+   var d=document.getElementById('tps-dl');if(d)d.onclick=function(){dl('tpssvg','tokens-per-second.svg');};}
  if(!tpsOpen){el.innerHTML=head;wire();return;}
  const W=960,H=300,padL=64,padR=24,padT=46,padB=30,iw=W-padL-padR,ih=H-padT-padB;
  const span0=(mx-mn)||Math.max(1,mx*0.3);const lo=Math.max(0,mn-span0*0.35),hi=mx+span0*0.30,span=(hi-lo)||1;
@@ -310,39 +310,39 @@ function renderTps(trainings){const el=document.getElementById('tpssec');if(!el)
   +'<radialGradient id="tpsDot"><stop offset="0" stop-color="#eaffff"/><stop offset="0.4" stop-color="#22d3ee"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>'
   +'</defs>';
  s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" rx="12" fill="#071425"/>';
- // Gitter + Y-Achse
+ // grid + Y axis
  for(let k=0;k<=4;k++){const v=lo+span*k/4,y=Y(v);
   s+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';
   s+='<text x="'+(padL-10)+'" y="'+(y+4).toFixed(1)+'" fill="#6f86a8" font-size="12" text-anchor="end">'+Math.round(v)+'</text>';}
- // Fläche + Glow-Linie
+ // area + glow line
  s+='<path d="'+area+'" fill="url(#tpsArea)"/>';
  s+='<path d="'+line+'" fill="none" stroke="url(#tpsLine)" stroke-width="3" stroke-linecap="round" filter="url(#tpsGlow)"/>';
- // Energie-Puls, der die Kurve entlangläuft (nur wenn live + genug Punkte)
+ // energy pulse that runs along the curve (only when live + enough points)
  if(t.active&&ser.length>2){s+='<path d="'+line+'" fill="none" stroke="#d8fbff" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="22 1400" filter="url(#tpsGlow)" opacity="0.95"><animate attributeName="stroke-dashoffset" from="1422" to="0" dur="2.6s" repeatCount="indefinite"/></path>';}
- // jeden Messpunkt sichtbar markieren (ausser dem letzten -> der wird zum Live-Punkt)
+ // mark every measured point visibly (except the last -> it becomes the live dot)
  if(ser.length>1)ser.forEach((v,i)=>{if(i===ser.length-1)return;
    s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="3.4" fill="#08182c" stroke="#5fe0f2" stroke-width="2"/>';});
- // Live-Punkt: pulsierender Ring + Kern
+ // live dot: pulsing ring + core
  s+='<circle cx="'+lx+'" cy="'+ly+'" r="6" fill="url(#tpsDot)">'+(t.active?'<animate attributeName="r" values="6;15;6" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.9;0.2;0.9" dur="1.8s" repeatCount="indefinite"/>':'')+'</circle>';
  s+='<circle cx="'+lx+'" cy="'+ly+'" r="4" fill="#eaffff" filter="url(#tpsGlow)"/>';
- // Große Live-Zahl (oben)
+ // large live number (top)
  s+='<text x="'+padL+'" y="32" fill="#eaf2ff" font-size="30" font-weight="800" filter="url(#tpsGlow)">'+Math.round(cur)+'</text>';
  s+='<text x="'+(padL+Math.max(58,String(Math.round(cur)).length*19))+'" y="32" fill="#7fd9ec" font-size="14" font-weight="600">tok/s</text>';
  s+='<text x="'+(W-padR)+'" y="32" fill="#6f86a8" font-size="13" text-anchor="end">Ø '+Math.round(avg)+'  ·  min '+Math.round(mn)+'  ·  max '+Math.round(mx)+'</text>';
  s+='</svg>';
  el.innerHTML=head+'<div class="card" style="padding:10px">'+s+'</div>';
  wire();}
-/* ---- Live Loss-Chart (Glow-Linie, runter = besser; gleiche Optik wie t/s) ---- */
+/* ---- Live Loss chart (glow line, down = better; same look as t/s) ---- */
 let lossOpen=true;
 function renderLoss(trainings){const el=document.getElementById('losssec');if(!el)return;
  let runs=(trainings||[]).filter(t=>t.loss_series&&t.loss_series.length>1);
  if(!runs.length){el.innerHTML='';return;}
- runs=runs.slice().sort((a,b)=>(b.age_secs||0)-(a.age_secs||0));   // aktive/jüngste zuletzt -> oben gezeichnet
+ runs=runs.slice().sort((a,b)=>(b.age_secs||0)-(a.age_secs||0));   // active/most recent last -> drawn on top
  const primary=runs.find(t=>t.active)||runs[runs.length-1];
  const liveDot=primary.active?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 8px var(--purple);margin-right:6px;vertical-align:middle"></span>':'';
  const head='<div class="sec">'+liveDot+'Loss — Training'
-   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+runs.length+' Läufe · ↓ besser · je Lauf eine geglättete Linie (EMA), X = Fortschritt 0→100 %</span>'
-   +' <span><button class="btn" id="loss-tg">'+(lossOpen?'ausblenden':'einblenden')+'</button> '
+   +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+runs.length+' runs · ↓ better · one smoothed line per run (EMA), X = progress 0→100 %</span>'
+   +' <span><button class="btn" id="loss-tg">'+(lossOpen?'hide':'show')+'</button> '
    +'<button class="btn" id="loss-dl">SVG ↓</button></span></div>';
  function wire(){var g=document.getElementById('loss-tg');if(g)g.onclick=function(){lossOpen=!lossOpen;renderLoss(trainings);};
    var d=document.getElementById('loss-dl');if(d)d.onclick=function(){dl('losssvg','loss.svg');};}
@@ -358,10 +358,10 @@ function renderLoss(trainings){const el=document.getElementById('losssec');if(!e
  for(let k=0;k<=4;k++){const v=lo+span*k/4,y=Y(v);
   s+='<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';
   s+='<text x="'+(padL-8)+'" y="'+(y+4).toFixed(1)+'" fill="#7e6fa8" font-size="12" text-anchor="end">'+v.toFixed(2)+'</text>';}
- s+='<text x="'+(padL+iw/2)+'" y="'+(padT+ih+24)+'" fill="#6f86a8" font-size="11" text-anchor="middle">Trainingsfortschritt 0 → 100 %</text>';
- // eine geglättete (EMA) Linie pro Lauf, X normiert auf Fortschritt (Läufe haben verschiedene Step-Zahlen)
+ s+='<text x="'+(padL+iw/2)+'" y="'+(padT+ih+24)+'" fill="#6f86a8" font-size="11" text-anchor="middle">Training progress 0 → 100 %</text>';
+ // one smoothed (EMA) line per run, X normalized to progress (runs have different step counts)
  runs.forEach((t,ri)=>{const c=PAL[ri%PAL.length],sr=t.loss_series,act=t.active;
-  const tot=(t.total_steps&&t.total_steps>1)?t.total_steps:sr.length;   // X = ECHTER Fortschritt (Step/Gesamt) — laufende Läufe NICHT auf volle Breite strecken
+  const tot=(t.total_steps&&t.total_steps>1)?t.total_steps:sr.length;   // X = REAL progress (step/total) — do NOT stretch running runs to full width
   const xf=i=>Math.min(1,(tot>1?i/(tot-1):1));
   const ema=[];sr.forEach((v,i)=>ema.push(i?0.3*v+0.7*ema[i-1]:v));
   const Pe=ema.map((v,i)=>[Xf(xf(i)),Y(v)]);
@@ -370,12 +370,12 @@ function renderLoss(trainings){const el=document.getElementById('losssec');if(!e
   if(act&&ema.length>2)s+='<path d="'+ln+'" fill="none" stroke="#eafff4" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="22 1400" filter="url(#lossGlow)" opacity="0.9"><animate attributeName="stroke-dashoffset" from="1422" to="0" dur="2.6s" repeatCount="indefinite"/></path>';
   const lf=xf(sr.length-1),ex=Xf(lf).toFixed(1),ey=Y(ema[ema.length-1]);
   s+='<circle cx="'+ex+'" cy="'+ey.toFixed(1)+'" r="'+(act?5:3.5)+'" fill="'+c+'"'+(act?' filter="url(#lossGlow)"':'')+'>'+(act?'<animate attributeName="r" values="5;12;5" dur="1.8s" repeatCount="indefinite"/>':'')+'</circle>';
-  if(act)s+='<text x="'+ex+'" y="'+(ey-12).toFixed(1)+'" fill="'+c+'" font-size="10" font-weight="700" text-anchor="middle">'+Math.round(lf*100)+'% (läuft)</text>';});
- // Legende rechts: Lauf-Name + End-Loss
+  if(act)s+='<text x="'+ex+'" y="'+(ey-12).toFixed(1)+'" fill="'+c+'" font-size="10" font-weight="700" text-anchor="middle">'+Math.round(lf*100)+'% (running)</text>';});
+ // legend right: run name + end loss
  runs.forEach((t,ri)=>{const c=PAL[ri%PAL.length],fin=t.loss_series[t.loss_series.length-1],ly=24+ri*17;
   s+='<circle cx="'+(W-padR+12)+'" cy="'+ly+'" r="4.5" fill="'+c+'"/>';
-  s+='<text x="'+(W-padR+22)+'" y="'+(ly+4)+'" fill="'+(t===primary?'#eaf2ff':'#9fb4d4')+'" font-size="11.5"'+(t===primary?' font-weight="700"':'')+'>'+esc(String(t.name).replace("ministral-",""))+' · '+fin.toFixed(2)+(t.active?' (läuft)':'')+'</text>';});
- // große Live-Zahl = aktueller Loss des primären Laufs
+  s+='<text x="'+(W-padR+22)+'" y="'+(ly+4)+'" fill="'+(t===primary?'#eaf2ff':'#9fb4d4')+'" font-size="11.5"'+(t===primary?' font-weight="700"':'')+'>'+esc(String(t.name).replace("ministral-",""))+' · '+fin.toFixed(2)+(t.active?' (running)':'')+'</text>';});
+ // large live number = current loss of the primary run
  const pc=primary.loss_series[primary.loss_series.length-1];
  s+='<text x="'+padL+'" y="32" fill="#eaf2ff" font-size="28" font-weight="800" filter="url(#lossGlow)">'+pc.toFixed(3)+'</text>';
  s+='<text x="'+(padL+86)+'" y="32" fill="#9fe6c0" font-size="12" font-weight="600">Loss · '+esc(String(primary.name).replace("ministral-",""))+'</text>';
@@ -385,7 +385,7 @@ function renderLoss(trainings){const el=document.getElementById('losssec');if(!e
 function dl(id,name){const s=document.getElementById(id);if(!s)return;const blob=new Blob(['<?xml version="1.0"?>\n'+s.outerHTML],{type:'image/svg+xml'});
  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
 
-/* ---- Live-HUD: glühende Kacheln für die Trainings-Kennzahlen ---- */
+/* ---- Live HUD: glowing tiles for the training metrics ---- */
 const ICON={
  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
  steps:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h4v-4h4v-4h4V7h4"/></svg>',
@@ -404,46 +404,46 @@ function tile(k,v,u,sub,o){o=o||{};
   +'<div class="sub2">'+(sub||'')+'</div>'+(o.spark||'')+'</div>';}
 function renderHud(){const el=document.getElementById('hudsec');if(!el)return;
  const t=window.__hudTr,lg=window.__log;
- if(!t||!t.active){el.innerHTML='';return;}   // HUD nur während ein Lauf live ist
+ if(!t||!t.active){el.innerHTML='';return;}   // HUD only while a run is live
  const pct=(t.pct!=null)?t.pct:((t.step!=null&&t.total_steps)?Math.round(t.step/t.total_steps*100):null);
  const T=[];
- T.push(tile('Fortschritt',(t.step!=null?t.step:'–'),'/'+(t.total_steps||'?'),
+ T.push(tile('Progress',(t.step!=null?t.step:'–'),'/'+(t.total_steps||'?'),
    (pct!=null?('<div class="tbar"><div class="tfill" style="width:'+pct+'%"></div></div>'):''),{accent:true,icon:ICON.steps}));
- if(lg&&lg.eta) T.push(tile('verbleibend','<span style="font-size:21px">'+lg.eta+'</span>','','bis fertig',{accent:true,icon:ICON.clock}));
- if(lg&&lg.sec_per_it) T.push(tile('Tempo',(+lg.sec_per_it).toFixed(1),'s/Step','pro Optimizer-Step',{icon:ICON.speed}));
- if(t.tps!=null) T.push(tile('Durchsatz',t.tps,'tok/s','',{icon:ICON.bolt,spark:(t.tps_series&&t.tps_series.length>1?tileSpark(t.tps_series):'')}));
+ if(lg&&lg.eta) T.push(tile('Remaining','<span style="font-size:21px">'+lg.eta+'</span>','','to finish',{accent:true,icon:ICON.clock}));
+ if(lg&&lg.sec_per_it) T.push(tile('Speed',(+lg.sec_per_it).toFixed(1),'s/step','per optimizer step',{icon:ICON.speed}));
+ if(t.tps!=null) T.push(tile('Throughput',t.tps,'tok/s','',{icon:ICON.bolt,spark:(t.tps_series&&t.tps_series.length>1?tileSpark(t.tps_series):'')}));
  if(t.loss!=null){const s=t.loss_series||(lg&&lg.loss)||[];let sub='';
    if(s.length>=4){const A=0.3,e=[];s.forEach((v,i)=>e.push(i?A*v+(1-A)*e[i-1]:v));
      const start=s[0],now=e[e.length-1],mn=Math.min.apply(null,s),drop=start>0?Math.round((1-now/start)*100):0;
-     // EHRLICH: Gesamttrend statt Step-Rauschen. ▼ = gefallen (gut), Tief = bisher bestes.
-     sub=(drop>=0?'<span style="color:var(--green)">▼ −'+drop+'%</span>':'<span style="color:var(--amber)">▲ +'+(-drop)+'%</span>')+' seit Start · Tief '+mn.toFixed(2);}
-   T.push(tile('<span class="tip" data-tip="Loss = wie weit das Modell daneben liegt. Fällt = es lernt. Das Zappeln pro Step ist normal (kleine Batches) — entscheidend ist der Gesamttrend nach unten.">Loss</span>',(+t.loss).toFixed(3),'',sub,{icon:ICON.loss,spark:(s.length>1?tileSpark(s):'')}));}
- if(t.epoch!=null) T.push(tile('Epoche',(+t.epoch).toFixed(2),(t.epochs?'/'+t.epochs:''),'',{icon:ICON.epoch}));
+     // HONEST: overall trend instead of step noise. ▼ = fallen (good), Low = best so far.
+     sub=(drop>=0?'<span style="color:var(--green)">▼ −'+drop+'%</span>':'<span style="color:var(--amber)">▲ +'+(-drop)+'%</span>')+' since start · Low '+mn.toFixed(2);}
+   T.push(tile('<span class="tip" data-tip="Loss = how far off the model is. Falling = it is learning. The jitter per step is normal (small batches) — what matters is the overall downward trend.">Loss</span>',(+t.loss).toFixed(3),'',sub,{icon:ICON.loss,spark:(s.length>1?tileSpark(s):'')}));}
+ if(t.epoch!=null) T.push(tile('Epoch',(+t.epoch).toFixed(2),(t.epochs?'/'+t.epochs:''),'',{icon:ICON.epoch}));
  el.innerHTML='<div class="hud">'+T.join('')+'</div>';}
 
-/* ---- Live-„Jetzt"-Banner: was passiert GERADE + proaktive Health-Alerts + Tab-Titel + Benachrichtigung ---- */
+/* ---- Live "now" banner: what is happening RIGHT NOW + proactive health alerts + tab title + notification ---- */
 function fmtDur(sec){sec=Math.round(sec);const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return h?(h+'h'+('0'+m).slice(-2)):(m+' min');}
 function fmtFinish(sec){const d=new Date(Date.now()+sec*1000);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
 function notify(title,body){try{if(window.Notification&&Notification.permission==='granted')new Notification(title,{body:body});}catch(e){}}
-function maybeNotify(t){const a=(t&&t.active)?t.name:null;if(window.__wasActive&&!a)notify('✓ Lauf fertig',window.__wasActive+' ist durch.');window.__wasActive=a;}
+function maybeNotify(t){const a=(t&&t.active)?t.name:null;if(window.__wasActive&&!a)notify('✓ Run finished',window.__wasActive+' is done.');window.__wasActive=a;}
 function renderNow(){const el=document.getElementById('nowsec');if(!el)return;
  const t=window.__hudTr,lg=window.__log,g=window.__gpu,al=[];
- let cls='idle',what='Kein aktiver Lauf',det='Bereit für den nächsten Lauf.',fin='';
+ let cls='idle',what='No active run',det='Ready for the next run.',fin='';
  if(t&&t.active){cls='live';
   const pct=(t.step!=null&&t.total_steps)?Math.round(t.step/t.total_steps*100):null;
-  what='Training läuft · '+esc(t.name);
-  det='Step '+(t.step!=null?t.step:'?')+'/'+(t.total_steps||'?')+(pct!=null?' ('+pct+'%)':'')+(t.loss!=null?' · loss '+(+t.loss).toFixed(3):'')+(lg&&lg.sec_per_it?' · '+Math.round(+lg.sec_per_it)+'s/Step':'');
+  what='Training · '+esc(t.name);
+  det='Step '+(t.step!=null?t.step:'?')+'/'+(t.total_steps||'?')+(pct!=null?' ('+pct+'%)':'')+(t.loss!=null?' · loss '+(+t.loss).toFixed(3):'')+(lg&&lg.sec_per_it?' · '+Math.round(+lg.sec_per_it)+'s/step':'');
   let rem=null;if(lg&&lg.sec_per_it&&t.total_steps!=null&&t.step!=null)rem=Math.max(0,(t.total_steps-t.step)*(+lg.sec_per_it));
-  if(rem!=null)fin='⏳ noch '+fmtDur(rem)+'<br>fertig ~'+fmtFinish(rem)+' Uhr';else if(lg&&lg.eta)fin='⏳ noch '+esc(lg.eta);
+  if(rem!=null)fin='⏳ '+fmtDur(rem)+' left<br>done ~'+fmtFinish(rem);else if(lg&&lg.eta)fin='⏳ '+esc(lg.eta)+' left';
   document.title='▶ '+t.step+'/'+t.total_steps+' · '+String(t.name).replace('ministral-','');
-  if(t.age_secs!=null&&lg&&lg.sec_per_it&&t.age_secs>Math.max(180,4*(+lg.sec_per_it)))al.push(['red','⏸','Möglicher Stall: seit '+t.age_secs+' s kein neuer Step (erwartet ~'+Math.round(+lg.sec_per_it)+' s/Step).']);
+  if(t.age_secs!=null&&lg&&lg.sec_per_it&&t.age_secs>Math.max(180,4*(+lg.sec_per_it)))al.push(['red','⏸','Possible stall: no new step for '+t.age_secs+' s (expected ~'+Math.round(+lg.sec_per_it)+' s/step).']);
   if(t.loss_series&&t.loss_series.length>=12){const s=t.loss_series,A=0.3,e=[];s.forEach((v,i)=>e.push(i?A*v+(1-A)*e[i-1]:v));
     const mn=Math.min.apply(null,e),now=e[e.length-1],sustained=e.slice(-3).every(x=>x>mn*1.4),frac=(t.step!=null&&t.total_steps)?t.step/t.total_steps:0;
-    if(now>mn*1.6&&sustained&&frac>0.15)al.push(['amber','📈','Loss steigt anhaltend ~'+Math.round((now/mn-1)*100)+'% über ihr Minimum — mögliche Divergenz, Loss-Chart prüfen.']);}
- }else if(lg&&lg.file&&/eval/i.test(lg.file)&&lg.age_secs!=null&&lg.age_secs<120){cls='live';what='Eval läuft';det=esc(lg.file)+' · aktiv vor '+age(lg.age_secs);document.title='● Eval läuft';}
- else{document.title='bunker.ai · Dashboard';}
- if(g&&g.used!=null&&g.total!=null&&(g.used/g.total)>0.95)al.push(['amber','🔥','VRAM fast voll ('+g.used+'/'+g.total+' GB) — Stall/OOM-Risiko; ggf. Desktop-Apps schließen.']);
- if(lg&&lg.lines&&lg.lines.length){const last=lg.lines.slice(-25).join('\n');if(/error|exception|traceback|out of memory|alloc failed/i.test(last))al.push(['red','❌','Fehler/OOM im Live-Log erkannt — bitte prüfen.']);}
+    if(now>mn*1.6&&sustained&&frac>0.15)al.push(['amber','📈','Loss rising steadily ~'+Math.round((now/mn-1)*100)+'% above its minimum — possible divergence, check the loss chart.']);}
+ }else if(lg&&lg.file&&/eval/i.test(lg.file)&&lg.age_secs!=null&&lg.age_secs<120){cls='live';what='Eval running';det=esc(lg.file)+' · active '+age(lg.age_secs);document.title='● Eval running';}
+ else{document.title='RadeonForge · Dashboard';}
+ if(g&&g.used!=null&&g.total!=null&&(g.used/g.total)>0.95)al.push(['amber','🔥','VRAM nearly full ('+g.used+'/'+g.total+' GB) — stall/OOM risk; consider closing desktop apps.']);
+ if(lg&&lg.lines&&lg.lines.length){const last=lg.lines.slice(-25).join('\n');if(/error|exception|traceback|out of memory|alloc failed/i.test(last))al.push(['red','❌','Error/OOM detected in the live log — please check.']);}
  maybeNotify(t);
  const barCls=al.some(x=>x[0]==='red')?'warn':cls;
  let h='<div class="nowbar '+barCls+'"><span class="pulse"></span><div><div class="what">'+what+'</div><div class="det">'+det+'</div></div>'+(fin?'<div class="fin">'+fin+'</div>':'')+'</div>';
@@ -451,26 +451,26 @@ function renderNow(){const el=document.getElementById('nowsec');if(!el)return;
  el.innerHTML=h;}
 try{if(window.Notification&&Notification.permission==='default')Notification.requestPermission();}catch(e){}
 
-/* ---- Scorecard (GENERISCH: rendert axes/models aus scorecard.json — projekt-agnostisch) ---- */
+/* ---- Scorecard (GENERIC: renders axes/models from scorecard.json — project-agnostic) ---- */
 function _scoreColor(p){return p==null?'':(p>=90?'good':(p>=60?'mid':'bad'));}
 function renderScore(sc){const el=document.getElementById('scoresec');if(!el)return;
  if(!sc||!sc.axes||!sc.models||!Object.keys(sc.models).length){el.innerHTML='';return;}
  const axes=sc.axes,models=Object.keys(sc.models),detail=sc.detail||{};
  const th=axes.map(a=>'<th><span class="tip" data-tip="'+esc(a.tip||'')+'">'+esc(a.label||a.key)+'</span></th>').join('');
- let h='<div class="sec">Scorecard <span class="tipi tip" data-tip="Vorher → Nachher. Über die Spaltentitel fahren für Erklärungen. Grün ≥90%, gelb ≥60%. Werte = bestandene Fälle bzw. %.">i</span>'
-  +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· vorher → nachher</span></div>'
-  +'<div class="card" style="overflow-x:auto"><table class="sctbl"><tr><th>Modell</th>'+th+'</tr>';
+ let h='<div class="sec">Scorecard <span class="tipi tip" data-tip="Before → After. Hover over the column titles for explanations. Green ≥90%, amber ≥60%. Values = passed cases or %.">i</span>'
+  +' <span style="color:var(--mut);text-transform:none;letter-spacing:0">· before → after</span></div>'
+  +'<div class="card" style="overflow-x:auto"><table class="sctbl"><tr><th>Model</th>'+th+'</tr>';
  models.forEach(m=>{h+='<tr><td class="mname">'+esc(m)+'</td>';
   axes.forEach(a=>{const pct=sc.models[m][a.key];const txt=(detail[m]&&detail[m][a.key]!=null)?detail[m][a.key]:(pct!=null?pct+'%':null);
    h+=(txt==null)?'<td class="bad">—</td>':'<td class="'+_scoreColor(pct)+'">'+esc(''+txt)+'</td>';});
   h+='</tr>';});
  el.innerHTML=h+'</table></div>';}
 
-/* ---- Radar/Spider: Behavioral-Fingerprint base vs … über alle Achsen (generisch) ---- */
+/* ---- Radar/Spider: behavioral fingerprint base vs … across all axes (generic) ---- */
 function renderRadar(sc){const el=document.getElementById('radarsec');if(!el)return;
  if(!sc||!sc.axes||!sc.models){el.innerHTML='';return;}
  const axes=sc.axes,full=Object.keys(sc.models).filter(m=>axes.every(a=>sc.models[m][a.key]!=null));
- if(axes.length<3||full.length<1){el.innerHTML='';return;}   // Radar erst sinnvoll ab 3 Achsen + 1 voll bewertetem Modell
+ if(axes.length<3||full.length<1){el.innerHTML='';return;}   // radar only meaningful from 3 axes + 1 fully scored model
  const W=520,H=360,cx=W/2,cy=H/2+6,R=Math.min(W,H)/2-60,n=axes.length;
  const ang=i=>(-Math.PI/2+i/n*2*Math.PI),pt=(i,r)=>[cx+Math.cos(ang(i))*R*r,cy+Math.sin(ang(i))*R*r];
  let s='<svg id="radarsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="100%" style="display:block;max-width:560px;margin:0 auto">';
@@ -484,23 +484,23 @@ function renderRadar(sc){const el=document.getElementById('radarsec');if(!el)ret
   pts.forEach(p=>{s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3" fill="'+c+'"/>';});});
  s+='</svg>';
  const lg=full.map((m,mi)=>'<span style="display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:12px"><span style="width:10px;height:10px;border-radius:2px;background:'+PAL[mi%PAL.length]+';display:inline-block"></span>'+esc(m)+'</span>').join('');
- el.innerHTML='<div class="sec">Modell-Fingerprint <span class="tipi tip" data-tip="Radar über alle Bewertungs-Achsen: außen = besser (100%). Je größer die Fläche, desto stärker insgesamt. Vorher/Nachher überlagert.">i</span></div><div class="card"><div style="margin-bottom:6px">'+lg+'</div>'+s+'</div>';}
+ el.innerHTML='<div class="sec">Model fingerprint <span class="tipi tip" data-tip="Radar across all evaluation axes: outer = better (100%). The larger the area, the stronger overall. Before/after overlaid.">i</span></div><div class="card"><div style="margin-bottom:6px">'+lg+'</div>'+s+'</div>';}
 
-/* ---- Live-Eval: Pass/Fail-Grid je Dimension, füllt sich während der Eval (generisch) ---- */
+/* ---- Live eval: pass/fail grid per dimension, fills up during the eval (generic) ---- */
 function renderEvalLive(ev){const el=document.getElementById('evalsec');if(!el)return;
  if(!ev||!ev.dims||ev.age_secs==null||ev.age_secs>180){el.innerHTML='';return;}
  const dims=ev.dims,keys=Object.keys(dims);if(!keys.length){el.innerHTML='';return;}
  const tDone=keys.reduce((a,k)=>a+dims[k].done,0),tPass=keys.reduce((a,k)=>a+dims[k].pass,0),live=ev.status==='running';
- let h='<div class="sec">'+(live?'<span class="dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan);margin:0 6px 0 0"></span>':'')+'Eval — live <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(ev.tag||'')+' · '+tPass+'/'+tDone+' bestanden</span></div><div class="card">';
+ let h='<div class="sec">'+(live?'<span class="dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan);margin:0 6px 0 0"></span>':'')+'Eval — live <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+esc(ev.tag||'')+' · '+tPass+'/'+tDone+' passed</span></div><div class="card">';
  keys.forEach(k=>{const d=dims[k],pct=d.done?Math.round(d.pass/d.done*100):0,cells=ev.cases.filter(c=>c.dim===k);
-  h+='<div class="edim"><div class="lab"><b>'+esc(k)+'</b><span>'+d.pass+'/'+d.done+(d.total?(' von '+d.total):'')+' · '+pct+'%</span></div><div class="egrid">';
+  h+='<div class="edim"><div class="lab"><b>'+esc(k)+'</b><span>'+d.pass+'/'+d.done+(d.total?(' of '+d.total):'')+' · '+pct+'%</span></div><div class="egrid">';
   for(let i=0;i<(d.total||d.done);i++){const c=cells[i];h+='<span class="edot'+(c?(c.ok?' ok':' bad'):'')+'"></span>';}
   h+='</div></div>';});
  el.innerHTML=h+'</div>';}
 
 function roadmapTodo(items){if(!items||!items.length)return '';
  const done=items.filter(x=>x.status==='done').length,tot=items.length,pct=tot?Math.round(done/tot*100):0;
- let h='<div class="sec">Bis zum voll trainierten Modell <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+done+'/'+tot+' ✓ · '+pct+'%</span></div>';
+ let h='<div class="sec">To a fully trained model <span style="color:var(--mut);text-transform:none;letter-spacing:0">· '+done+'/'+tot+' ✓ · '+pct+'%</span></div>';
  h+='<div class="card"><div class="bar" style="margin:0 0 14px"><div class="fill" style="width:'+pct+'%"></div></div>';
  items.forEach(x=>{const st=x.status||'todo';
   const ico=st==='done'?'<span style="color:var(--green);font-weight:800">✓</span>'
@@ -511,35 +511,35 @@ function roadmapTodo(items){if(!items||!items.length)return '';
   h+='<div class="todoitem" style="border-radius:10px;padding:7px 10px;margin:2px 0;'+box+'">'
    +'<span class="b" style="min-width:16px;text-align:center">'+ico+'</span>'
    +'<div><b style="color:'+nameCol+';font-weight:'+(st==='done'?'500':'700')+'">'+esc(x.phase)+'</b>'
-   +(st==='current'?' <span style="color:var(--cyan);font-size:11px;font-weight:700">◂ aktuell'+(window.__hudTr&&window.__hudTr.active&&window.__hudTr.step!=null?' · läuft: Step '+window.__hudTr.step+'/'+window.__hudTr.total_steps+' ('+Math.round(window.__hudTr.step/window.__hudTr.total_steps*100)+'%)':'')+'</span>':'')
+   +(st==='current'?' <span style="color:var(--cyan);font-size:11px;font-weight:700">◂ current'+(window.__hudTr&&window.__hudTr.active&&window.__hudTr.step!=null?' · running: Step '+window.__hudTr.step+'/'+window.__hudTr.total_steps+' ('+Math.round(window.__hudTr.step/window.__hudTr.total_steps*100)+'%)':'')+'</span>':'')
    +(x.detail?('<div class="meta" style="margin-top:2px">'+esc(x.detail)+'</div>'):'')+'</div></div>';});
  return h+'</div>';}
-function trCard(t){const live=t.active?'<span class="badge live">läuft · GPU</span>':(t.stale?'<span class="badge">abgebrochen</span>':'<span class="badge">'+esc(t.status||'—')+'</span>');
+function trCard(t){const live=t.active?'<span class="badge live">running · GPU</span>':(t.stale?'<span class="badge">stalled</span>':'<span class="badge">'+esc(t.status||'—')+'</span>');
  const prog=(t.step!=null&&t.total_steps!=null)?('Step '+t.step+'/'+t.total_steps):(t.status||'');
- const ep=(t.epoch!=null)?(' · Epoche '+(+t.epoch).toFixed(2)+(t.epochs?('/'+t.epochs):'')):'';const loss=(t.loss!=null)?(' · loss '+(+t.loss).toFixed(4)):'';
+ const ep=(t.epoch!=null)?(' · Epoch '+(+t.epoch).toFixed(2)+(t.epochs?('/'+t.epochs):'')):'';const loss=(t.loss!=null)?(' · loss '+(+t.loss).toFixed(4)):'';
  const tps=(t.tps!=null)?(' · ≈'+t.tps+' tok/s'):'';
  let h='<div class="card"><div class="row"><span class="name">'+esc(t.name)+'</span>'+live+'</div><div class="row" style="margin-top:6px"><span class="big">'+prog+ep+loss+tps+'</span><span class="meta">'+age(t.age_secs)+'</span></div>';
  if(t.pct!=null)h+=bar(t.pct);
- if(t.tps_series&&t.tps_series.length>1)h+='<div class="meta" style="margin-top:9px">Tokens/s (Verlauf):'+spark(t.tps_series)+'</div>';
+ if(t.tps_series&&t.tps_series.length>1)h+='<div class="meta" style="margin-top:9px">Tokens/s (history):'+spark(t.tps_series)+'</div>';
  return h+'</div>';}
-function dsCard(d){const live=d.active?'<span class="badge live">läuft</span>':'<span class="badge">idle</span>';
+function dsCard(d){const live=d.active?'<span class="badge live">running</span>':'<span class="badge">idle</span>';
  let h='<div class="card"><div class="row"><span class="name">'+esc(d.label)+'</span>'+live+'</div><div class="row" style="margin-top:6px"><span class="big"><b>'+d.count+'</b></span>'+(d.target?' <span class="tgt">/ '+d.target+'</span>':'')+(d.pct!=null?(' · '+d.pct+'%'):'')+'<span class="meta" style="float:right">'+age(d.age_secs)+'</span></div>';
  if(d.target)h+=bar(d.pct);return h+'</div>';}
 function grp(t,items,r,e){const h='<div class="sec">'+t+'</div>';return items.length?h+items.map(r).join(''):h+'<div class="empty">'+e+'</div>';}
 async function tick(){try{const j=await(await fetch('/api/progress',{cache:'no-store'})).json();window.__res=j.results;
  trainingActive=(j.trainings||[]).some(t=>t.active);
  document.title=j.title+' · WebGL';document.getElementById('title').textContent=j.title;
- document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'Stand '+j.generated_at+(trainingActive?'  ·  ● Training aktiv':'');
+ document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'as of '+j.generated_at+(trainingActive?'  ·  ● training active':'');
  renderFlow(j.flow);renderCharts(j.results);renderTps(j.trainings);renderLoss(j.trainings);
  window.__hudTr=(j.trainings||[]).find(t=>t.active)||null;renderHud();renderNow();renderScore(j.scorecard);renderRadar(j.scorecard);renderEvalLive(j.eval_live);
  let html=roadmapTodo(j.pipeline);
- html+=grp('Modell-Training',j.trainings||[],trCard,'noch kein Lauf');
+ html+=grp('Model training',j.trainings||[],trCard,'no run yet');
  const G={};(j.datasets||[]).forEach(d=>{(G[d.group]=G[d.group]||[]).push(d);});Object.keys(G).forEach(g=>{html+=grp(g,G[g],dsCard,'—');});
  document.getElementById('root').innerHTML=html;
-}catch(e){document.getElementById('sub').textContent='Fehler: '+e;}}
+}catch(e){document.getElementById('sub').textContent='Error: '+e;}}
 tick();setInterval(tick,3000);
 
-/* ---- Live-Log (folgt der neuesten *.log) + Loss-Sparkline ---- */
+/* ---- Live log (follows the most recent *.log) + loss sparkline ---- */
 let logOpen=true;
 function spark(loss){if(!loss||loss.length<2)return '';const w=300,h=36,mx=Math.max.apply(null,loss),mn=Math.min.apply(null,loss);
  const pts=loss.map((v,i)=>(i/(loss.length-1)*w).toFixed(1)+','+(h-3-(mx===mn?h/2:(v-mn)/(mx-mn)*(h-6))).toFixed(1)).join(' ');
@@ -549,27 +549,27 @@ async function tickLog(){try{const j=await(await fetch('/api/log',{cache:'no-sto
  if(!j||!j.file){el.innerHTML='';return;}
  const idle=(j.age_secs!=null&&j.age_secs>90);
  const chips='<span class="chips">'
-   +(j.eta?'<span class="chip eta">'+ICON.clock+'noch <b>'+esc(j.eta)+'</b></span>':'')
-   +(j.sec_per_it?'<span class="chip">'+ICON.speed+'<b>'+(+j.sec_per_it).toFixed(1)+'</b> s/Step</span>':'')
+   +(j.eta?'<span class="chip eta">'+ICON.clock+'<b>'+esc(j.eta)+'</b> left</span>':'')
+   +(j.sec_per_it?'<span class="chip">'+ICON.speed+'<b>'+(+j.sec_per_it).toFixed(1)+'</b> s/step</span>':'')
    +'<span class="chip">'+ICON.file+esc(j.file)+'</span>'
    +'<span class="chip"'+(idle?' style="opacity:.7"':'')+'>'+ICON.refresh+esc(age(j.age_secs))+'</span>'
-   +(idle?'<span class="chip" style="color:var(--mut)">ruht · kein aktiver Lauf</span>':'')+'</span>';
- const head='<div class="sec"><span>Live-Log '+chips+'</span> <button class="btn" id="log-tg">'+(logOpen?'ausblenden':'einblenden')+'</button></div>';
+   +(idle?'<span class="chip" style="color:var(--mut)">idle · no active run</span>':'')+'</span>';
+ const head='<div class="sec"><span>Live log '+chips+'</span> <button class="btn" id="log-tg">'+(logOpen?'hide':'show')+'</button></div>';
  if(!logOpen){el.innerHTML=head;const t=document.getElementById('log-tg');if(t)t.onclick=function(){logOpen=!logOpen;tickLog();};return;}
  const ls=(j.loss&&j.loss.length)?('loss '+j.loss[j.loss.length-1].toFixed(3)+spark(j.loss)):'';
- el.innerHTML=head+'<div class="card"><div class="meta" style="margin-bottom:6px">Loss-Verlauf: '+ls+'</div><pre class="term" id="termpre">'+(j.lines||[]).map(esc).join('\n')+'</pre></div>';
+ el.innerHTML=head+'<div class="card"><div class="meta" style="margin-bottom:6px">Loss history: '+ls+'</div><pre class="term" id="termpre">'+(j.lines||[]).map(esc).join('\n')+'</pre></div>';
  const t=document.getElementById('log-tg');if(t)t.onclick=function(){logOpen=!logOpen;tickLog();};
  const pre=document.getElementById('termpre');if(pre)pre.scrollTop=pre.scrollHeight;
 }catch(e){}}
-(function L(){tickLog().finally(function(){setTimeout(L,1000);});})();   /* 1×/s, sequenziell (wartet auf Antwort) */
+(function L(){tickLog().finally(function(){setTimeout(L,1000);});})();   /* 1×/s, sequential (waits for response) */
 
-/* ---- GPU-Telemetrie (portabel; Panel nur falls verfügbar) ---- */
+/* ---- GPU telemetry (portable; panel only if available) ---- */
 function gbar(p,c){return '<div class="bar"><div class="fill" style="width:'+(p||0)+'%;background:'+(c||'linear-gradient(90deg,var(--purple),var(--cyan))')+'"></div></div>';}
 async function tickGpu(){try{const g=await(await fetch('/api/gpu',{cache:'no-store'})).json();const el=document.getElementById('gpusec');
- window.__gpu=g;renderNow();   // VRAM für den Health-Alert verfügbar machen
+ window.__gpu=g;renderNow();   // make VRAM available for the health alert
  if(!g||(g.util==null&&g.used==null)){el.innerHTML='';return;}
  let h='<div class="sec">GPU</div><div class="card"><div class="row"><span class="name">'+esc(g.name||'GPU')+'</span>';
- if(g.util!=null)h+='<span class="meta">Auslastung '+g.util+'%</span>';h+='</div>';
+ if(g.util!=null)h+='<span class="meta">Utilization '+g.util+'%</span>';h+='</div>';
  if(g.util!=null)h+=gbar(g.util);
  if(g.used!=null){h+='<div class="row" style="margin-top:8px"><span class="meta">VRAM '+g.used+(g.total!=null?(' / '+g.total):'')+' GB</span></div>';if(g.total!=null)h+=gbar(Math.round(g.used/g.total*100),'linear-gradient(90deg,#3b9cff,#10b981)');}
  el.innerHTML=h+'</div>';
