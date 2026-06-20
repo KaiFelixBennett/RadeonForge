@@ -285,6 +285,8 @@ RadeonForge/
 - **Built on:** AMD ROCm, PyTorch-ROCm,
   [bitsandbytes](https://github.com/bitsandbytes-foundation/bitsandbytes),
   [TRL/PEFT](https://github.com/huggingface/trl), [llama.cpp](https://github.com/ggml-org/llama.cpp).
-- **License:** [MIT](LICENSE) — use it, fork it, ship it.
+- **License:** [MIT](LICENSE) — use it, fork it, ship it. If you ship the **live dashboard** in
+  a product, please keep its small footer credit / a link back here — attribution is appreciated
+  (a request, not an added condition). Built by [@KaiFelixBennett](https://github.com/KaiFelixBennett).
 
 <div align="center"><br><sub>Fine-tuning on the GPU you already own. If RadeonForge made it click for you, a ⭐ helps the next Radeon owner find it.</sub></div>
