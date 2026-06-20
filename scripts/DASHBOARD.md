@@ -88,3 +88,8 @@ network, but don't leave it open on networks you don't control. Firewall rule (W
 ```powershell
 New-NetFirewallRule -DisplayName 'dashboard-8765' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8765 -Profile Any
 ```
+
+## Credit
+This dashboard engine is part of [RadeonForge](https://github.com/KaiFelixBennett/RadeonForge) by
+[@KaiFelixBennett](https://github.com/KaiFelixBennett). It renders a small footer credit/link by
+default — if you reuse it (especially in a product), please keep that credit in place. Thanks! ★

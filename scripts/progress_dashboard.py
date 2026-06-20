@@ -381,7 +381,7 @@ transition:width .5s ease;box-shadow:0 0 14px rgba(59,156,255,.55)}
 </style></head><body>
 <canvas id="bg"></canvas>
 <div class="wrap"><h1 id="title">Progress</h1><div class="sub" id="sub">loading …</div><div id="root"></div>
-<div class="foot">RadeonForge live dashboard · auto-refresh 3 s · <code>/api/progress</code></div></div>
+<div class="foot"><a href="https://github.com/KaiFelixBennett/RadeonForge" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:none">⚒ RadeonForge</a> dashboard · by <a href="https://github.com/KaiFelixBennett" target="_blank" rel="noopener" style="color:var(--mut)">@KaiFelixBennett</a> · auto-refresh 3 s · <code>/api/progress</code></div></div>
 <script>
 /* ===================== 3D node cloud (canvas, iridescent, slow) ===================== */
 const cv=document.getElementById('bg'),cx=cv.getContext('2d');let W,H,DPR;

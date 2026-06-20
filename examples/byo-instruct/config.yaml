@@ -1,0 +1,33 @@
+# RadeonForge — "bring your own model" example (tiny, non-gated, fast).
+# Trains a small instruct model on data YOU made with scripts/make_dataset.py.
+# End-to-end on one AMD Radeon (RDNA4/gfx1201) in a couple of minutes.
+#
+#   make data            # -> data/example.jsonl (review + clean it)
+#   python examples/gemma4-12b-qlora/train_qlora.py --config examples/byo-instruct/config.yaml
+
+model_id: Qwen/Qwen2.5-0.5B-Instruct       # ~0.5 B, no gating, ships a chat template
+dataset: data/example.jsonl                 # the cleaned set from `make data`
+output_dir: byo-instruct-adapter            # LoRA adapter is saved here
+progress_file: data/_runs/byo-instruct.json # lights up the live dashboard (make demo's engine)
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: all-linear
+
+train:
+  epochs: 4
+  learning_rate: 2.0e-4
+  per_device_batch_size: 1
+  grad_accum: 2
+  max_length: 1024
+  seed: 42
+  logging_steps: 1                          # tick the dashboard ~every step
+
+  # --- gfx1201 workarounds (do not change without re-running scripts/smoke_test.py) ---
+  optim: adamw_torch                        # NEVER paged_adamw_* / adamw_bnb_8bit
+  attn_implementation: sdpa                 # math SDPA (flash disabled in code)
+  bf16: true
+  gradient_checkpointing: true
+  load_in_4bit: true                        # QLoRA: 4-bit NF4 weights
