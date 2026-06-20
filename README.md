@@ -28,6 +28,27 @@
 
 ---
 
+## 💡 Why fine-tune at all? (the payoff)
+
+You don't *always* need to — a good prompt goes far. But when you want a model to do **your**
+task **reliably**, fine-tuning pays off in ways prompting can't:
+
+- **It bakes the behaviour into the weights.** Stop fighting the model with ever-longer system
+  prompts — teach it once and it just *does* the thing (your format, your tone, your rules).
+- **Small + local beats big + cloud for a narrow task.** In our own example a **0.5 GB**
+  fine-tuned router scored **95%** — *higher* than a 6.9 GB general model (87%) — and runs on the
+  GPU you already own at ~117 tok/s. Cheaper per call, faster, and it fits in VRAM.
+- **You own it.** No per-token API bills, no rate limits, no data leaving your machine. It runs
+  **offline**, on your hardware — real data sovereignty.
+- **Consistency.** Predictable structure (valid JSON every time) and shorter outputs (**−19%** in
+  our example → cheaper and faster on every single call).
+
+> **Honest caveat:** fine-tuning teaches *behaviour, format and style* — not fresh facts. For
+> up-to-date or private knowledge, pair a fine-tune with retrieval (RAG); they're complementary,
+> not either/or.
+
+---
+
 ## 🛠️ Train your own model — 5 commands
 
 Fine-tuning has a reputation for being hard. On AMD it has a reputation for being *impossible*.
