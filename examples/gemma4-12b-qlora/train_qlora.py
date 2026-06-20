@@ -30,16 +30,16 @@ from trl import SFTTrainer, SFTConfig
 
 
 class ProgressCallback(TrainerCallback):
-    """Opt-in: schreibt Live-Status (Step/Epoche/Loss) als JSON für progress_dashboard.py.
-    Aktiv nur, wenn cfg['progress_file'] gesetzt ist. Reine Stdlib, funktioniert auch über
-    /mnt/e aus WSL heraus."""
+    """Opt-in: writes live status (step/epoch/loss) as JSON for progress_dashboard.py.
+    Active only when cfg['progress_file'] is set. Pure stdlib, also works across
+    /mnt/e from inside WSL."""
     def __init__(self, path: str):
         import os
         self.path = path
         os.makedirs(os.path.dirname(path), exist_ok=True)
         self.total = None
-        self._ptok = None; self._ptime = None; self._tps = []   # Tokens/s-Verlauf
-        self._loss = []                                          # Loss-Verlauf (fuer Live-Loss-Chart)
+        self._ptok = None; self._ptime = None; self._tps = []   # tokens/s history
+        self._loss = []                                          # loss history (for the live loss chart)
 
     def _write(self, state, status):
         import json, os, time
@@ -121,8 +121,8 @@ def main() -> None:
     # SFTTrainer applies the model's chat template + assistant-only loss for us.
     ds = load_dataset("json", data_files=cfg["dataset"], split="train")
 
-    # "Alles festhalten": Snapshot von Config + Datenmenge neben den Lauf schreiben (Windows-lesbar,
-    # falls progress_file auf /mnt/... liegt). Macht jeden künftigen Lauf selbst-dokumentierend.
+    # "Capture everything": write a snapshot of config + dataset size next to the run (Windows-readable
+    # if progress_file lives on /mnt/...). Makes every future run self-documenting.
     try:
         import json as _json, time as _time
         _md = os.path.dirname(cfg.get("progress_file") or "") or cfg["output_dir"]
@@ -132,17 +132,17 @@ def main() -> None:
             _json.dump({"config": cfg, "dataset_rows": len(ds), "started": _time.time()},
                        _f, ensure_ascii=False, default=str, indent=2)
     except Exception as _e:
-        print("run_meta konnte nicht geschrieben werden:", _e)
+        print("run_meta could not be written:", _e)
 
-    # completion_only_loss (Loss NUR auf der Antwort) nur setzen, wenn die TRL-Version es kennt
-    # UND die Daten prompt/completion-Format haben. Bei prompt-completion ist es ohnehin der Default.
+    # completion_only_loss (loss ONLY on the answer): only set it if this TRL version supports it
+    # AND the data is in prompt/completion format. For prompt/completion it's the default anyway.
     import inspect
     _extra = {}
     if "completion_only_loss" in inspect.signature(SFTConfig.__init__).parameters \
             and tr.get("completion_only_loss") is not None:
         _extra["completion_only_loss"] = tr["completion_only_loss"]
-    # pad_to_multiple_of: erzwingt eine KONSTANTE Sequenzform pro Batch (z.B. 4096), damit der
-    # Triton-AMD-Flash-Kernel auf gfx1201 nur EINMAL kompiliert (sonst Recompile-Stall pro Laenge).
+    # pad_to_multiple_of: forces a CONSTANT sequence shape per batch (e.g. 4096) so the
+    # Triton-AMD flash kernel on gfx1201 compiles only ONCE (otherwise a recompile stall per length).
     if "pad_to_multiple_of" in inspect.signature(SFTConfig.__init__).parameters \
             and tr.get("pad_to_multiple_of") is not None:
         _extra["pad_to_multiple_of"] = tr["pad_to_multiple_of"]
@@ -159,7 +159,7 @@ def main() -> None:
         bf16=tr.get("bf16", True),
         gradient_checkpointing=tr.get("gradient_checkpointing", True),
         gradient_checkpointing_kwargs={"use_reentrant": False},
-        logging_steps=tr.get("logging_steps", 5),   # =1 -> Dashboard-Kachel tickt ~jeden Step
+        logging_steps=tr.get("logging_steps", 5),   # =1 -> dashboard tile ticks ~every step
         save_strategy=tr.get("save_strategy", "no"),   # "steps" -> reboot-sichere Checkpoints
         save_steps=tr.get("save_steps", 500),
         save_total_limit=tr.get("save_total_limit", 3),
