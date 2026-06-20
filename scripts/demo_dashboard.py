@@ -80,23 +80,23 @@ def _series(n: int, hi: float, lo: float, seed: int):
 
 
 # ── routing dataset generator (doubles as a usable sample) ───────────────────────
-_OVERVIEW = ["Welche Dokumente kennst du?", "Gib mir einen Überblick über die Inhalte.",
-             "Liste alle verfügbaren Berichte auf.", "Was ist alles im Wissensspeicher?"]
-_COMPARE = ["Vergleiche die Aussagen aus beiden Verträgen.",
-            "Worin unterscheiden sich Bericht A und Bericht B?",
-            "Stelle die beiden Angebote gegenüber.", "Was ist der Unterschied zwischen V1 und V2?"]
-_SPECIFIC = ["Was steht in Abschnitt 3.2 zum Thema Haftung?",
-             "Welche Frist nennt das Dokument für die Kündigung?",
-             "Wie hoch ist die im Vertrag genannte Vergütung?"]
-_DEEP = ["Erkläre die Architektur des Retrieval-Systems im Detail.",
-         "Wie funktioniert das Routing über mehrere Ebenen?",
-         "Beschreibe den vollständigen Deployment-Prozess."]
-_SEARCH = ["Finde alle Stellen, die 'Service Mesh' erwähnen.",
-           "Wo wird der Token-Refresh beim Login behandelt?",
-           "Suche Passagen zu Rate-Limiting."]
+_OVERVIEW = ["What documents do you know about?", "Give me an overview of the contents.",
+             "List all available reports.", "What's in the knowledge base?"]
+_COMPARE = ["Compare the statements in both contracts.",
+            "How do report A and report B differ?",
+            "Put the two offers side by side.", "What's the difference between V1 and V2?"]
+_SPECIFIC = ["What does section 3.2 say about liability?",
+             "What notice period does the document state for termination?",
+             "How much is the compensation named in the contract?"]
+_DEEP = ["Explain the architecture of the retrieval system in detail.",
+         "How does routing across multiple levels work?",
+         "Describe the full deployment process."]
+_SEARCH = ["Find every passage that mentions 'service mesh'.",
+           "Where is the token refresh on login handled?",
+           "Search for passages about rate limiting."]
 _CATS = [("overview", 0, _OVERVIEW), ("comparison", 0, _COMPARE), ("specific", 1, _SPECIFIC),
          ("deep_dive", 2, _DEEP), ("search", 2, _SEARCH)]
-_SYS = ("Du bist ein Query-Router. Klassifiziere die Anfrage und gib NUR JSON zurück: "
+_SYS = ("You are a query router. Classify the request and return ONLY JSON: "
         '{"query_type": <overview|comparison|specific|deep_dive|search>, "target_level": <0|1|2>}.')
 
 
@@ -145,11 +145,11 @@ def seed(reseed: bool = False) -> None:
     # scorecard (base vs fine-tuned, E2B held-out) — drives table + radar fingerprint
     _write_json(DEMO / "scorecard.json", {
         "axes": [
-            {"key": "route", "label": "Routing-Acc", "tip": "Anteil korrekt geroutete Anfragen (target_level)."},
-            {"key": "type", "label": "Type-Acc", "tip": "Korrekt erkannter Anfrage-Typ."},
-            {"key": "json", "label": "JSON-valide", "tip": "Anteil syntaktisch valider JSON-Ausgaben."},
-            {"key": "policy", "label": "Compare-Policy", "tip": "Dokument-Vergleiche korrekt auf Zusammenfassung (L0) geroutet."},
-            {"key": "eff", "label": "Effizienz", "tip": "Normierter Score aus kürzerer Ausgabe (-19%) + schnellerem Serving."},
+            {"key": "route", "label": "Routing acc", "tip": "Share of correctly routed requests (target_level)."},
+            {"key": "type", "label": "Type acc", "tip": "Correctly recognized request type."},
+            {"key": "json", "label": "JSON valid", "tip": "Share of syntactically valid JSON outputs."},
+            {"key": "policy", "label": "Compare-Policy", "tip": "Document comparisons correctly routed to a summary (L0)."},
+            {"key": "eff", "label": "Efficiency", "tip": "Normalized score from shorter output (-19%) + faster serving."},
         ],
         "models": {
             "base": {"route": 79, "type": 64, "json": 100, "policy": 0, "eff": 55},
@@ -169,10 +169,10 @@ def seed(reseed: bool = False) -> None:
             {"name": "fine-tuned", "values": {"route": 100, "type": 100, "policy": 100, "json": 100}},
         ],
         "metrics": [
-            {"key": "route", "label": "Routing-Acc", "unit": "%"},
-            {"key": "type", "label": "Type-Acc", "unit": "%"},
+            {"key": "route", "label": "Routing acc", "unit": "%"},
+            {"key": "type", "label": "Type acc", "unit": "%"},
             {"key": "policy", "label": "Compare-Policy", "unit": "%"},
-            {"key": "json", "label": "JSON-valide", "unit": "%"},
+            {"key": "json", "label": "JSON valid", "unit": "%"},
         ],
     })
 
@@ -181,7 +181,7 @@ def seed(reseed: bool = False) -> None:
         "title": "RadeonForge — gemma-4 QLoRA router",
         "subtitle": "gemma-4 · QLoRA 4-bit · AMD Radeon AI PRO R9700 (RDNA4 · gfx1201)",
         "flow": {"w": 1000, "h": 300, "nodes": [
-            {"id": "data", "label": "Daten", "detail": "158 Beispiele", "status": "done", "x": 120, "y": 150, "w": 150, "h": 52,
+            {"id": "data", "label": "Data", "detail": "158 examples", "status": "done", "x": 120, "y": 150, "w": 150, "h": 52,
              "done_if": {"dataset": "routing_train.jsonl", "min": 100}},
             {"id": "train", "label": "QLoRA", "detail": "4-bit · LoRA", "status": "todo", "x": 330, "y": 150, "w": 150, "h": 52,
              "done_if": {"run": DONE_RUN, "status": "done"}, "active_if": {"any_run_active": True}},
@@ -192,19 +192,19 @@ def seed(reseed: bool = False) -> None:
             {"id": "serve", "label": "Serve", "detail": "llama.cpp HIP", "status": "goal", "x": 930, "y": 150, "w": 120, "h": 52},
         ], "edges": [["data", "train"], ["train", "gguf"], ["gguf", "eval"], ["eval", "serve"]]},
         "pipeline": [
-            {"phase": "GPU-Stack geprüft", "status": "done", "detail": "doctor.sh + smoke_test.py grün (loss 5.78 → 0.15)"},
-            {"phase": "Datensatz aufgebaut", "status": "todo", "detail": "158 Routing-Beispiele, balanciert",
+            {"phase": "GPU stack verified", "status": "done", "detail": "doctor.sh + smoke_test.py green (loss 5.78 → 0.15)"},
+            {"phase": "Dataset built", "status": "todo", "detail": "158 routing examples, balanced",
              "done_if": {"dataset": "routing_train.jsonl", "min": 100}},
-            {"phase": "QLoRA-Training (E2B)", "status": "done", "detail": "3 Epochen, ~2 min auf R9700"},
-            {"phase": "QLoRA-Training (12B)", "status": "todo", "detail": "2 Epochen, ~11 min auf R9700",
+            {"phase": "QLoRA training (E2B)", "status": "done", "detail": "3 epochs, ~2 min on R9700"},
+            {"phase": "QLoRA training (12B)", "status": "todo", "detail": "2 epochs, ~11 min on R9700",
              "done_if": {"run": LIVE_RUN, "status": "done"}, "active_if": {"run": LIVE_RUN, "running": True}},
-            {"phase": "Merge → GGUF (Q4_K_M)", "status": "todo", "detail": "6.9 GB, llama.cpp HIP-Backend"},
+            {"phase": "Merge → GGUF (Q4_K_M)", "status": "todo", "detail": "6.9 GB, llama.cpp HIP backend"},
             {"phase": "Held-out A/B + Serving", "status": "todo", "detail": "79% → 100% · ~117 tok/s",
              "done_if": {"result": "fine-tuned", "metric": "route", "min": 90}},
         ],
         "tracks": [
-            {"label": "Routing-Trainingsdaten", "file": "routing_train.jsonl", "target": 158, "group": "Datensätze"},
-            {"label": "Held-out Eval-Set", "file": "routing_eval.jsonl", "target": 21, "group": "Datensätze"},
+            {"label": "Routing training data", "file": "routing_train.jsonl", "target": 158, "group": "Datasets"},
+            {"label": "Held-out eval set", "file": "routing_eval.jsonl", "target": 21, "group": "Datasets"},
         ],
     })
 

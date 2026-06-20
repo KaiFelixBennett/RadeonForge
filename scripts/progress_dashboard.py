@@ -1,21 +1,21 @@
 #!/usr/bin/env python
-"""RadeonForge — wiederverwendbares Live-Dashboard für Trainings-Läufe & Datensätze.
+"""RadeonForge — reusable live dashboard for training runs & datasets.
 
-Eine Datei, nur Python-Stdlib (kein CDN), offline-tauglich. Dient eine HTML-Seite unter /
-und eine JSON-API unter /api/progress. Auto-Refresh alle 3 s. Animierter 3D-Canvas-Hintergrund
-(iridescente Knotenwolke, langsam rotierend/driftend) — pulsiert stärker, während ein Training läuft.
+One file, Python stdlib only (no CDN), offline-capable. Serves one HTML page at /
+and a JSON API at /api/progress. Auto-refresh every 3 s. Animated 3D canvas background
+(iridescent node cloud, slowly rotating/drifting) — pulses more strongly while a training is running.
 
-Drei Quellen, alle generisch:
-  1) ROADMAP    — optionale `pipeline` im Manifest: [{phase,status:done|current|todo,detail}].
-  2) TRAININGS  — <runs-dir>/*.json vom ProgressCallback in train_qlora.py (Step/Epoche/Loss).
-  3) DATENSÄTZE — --tracks Manifest ODER Auto-Discovery aller *.jsonl in --data-dir.
+Three sources, all generic:
+  1) ROADMAP    — optional `pipeline` in the manifest: [{phase,status:done|current|todo,detail}].
+  2) TRAININGS  — <runs-dir>/*.json from the ProgressCallback in train_qlora.py (step/epoch/loss).
+  3) DATASETS   — --tracks manifest OR auto-discovery of all *.jsonl in --data-dir.
 
-Beispiele:
+Examples:
   python scripts/progress_dashboard.py --runs-dir /root/router-pilot/_runs --open
   python scripts/progress_dashboard.py --data-dir ./data --tracks ./dashboard.tracks.example.json --open
 
 Manifest (JSON): { "title","subtitle","pipeline":[{phase,status,detail}], "tracks":[{label,file,target,group}] }
-"subtitle" eignet sich z. B. für "Teacher: <Modell> · Student: <Modell>" (projekt-konfigurierbar).
+"subtitle" is well suited e.g. for "Teacher: <model> · Student: <model>" (project-configurable).
 """
 from __future__ import annotations
 
@@ -31,14 +31,14 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ACTIVE_SECS = 90
-CFG = {}   # gesetzt in main(): data_dir, runs_dir, tracks, title
+CFG = {}   # set in main(): data_dir, runs_dir, tracks, title
 _HERE = pathlib.Path(__file__).resolve().parent
-GL_FILE = _HERE / "progress_dashboard_gl.html"   # optionale WebGL-Variante unter /gl
+GL_FILE = _HERE / "progress_dashboard_gl.html"   # optional WebGL variant at /gl
 
 
 def report_training(runs_dir, name: str, *, status: str = "running", step=None,
                     total_steps=None, epoch=None, epochs=None, loss=None, note: str = "") -> None:
-    """Schreibt/aktualisiert <runs-dir>/<name>.json. Reine Stdlib, aus jedem Prozess (auch WSL)."""
+    """Writes/updates <runs-dir>/<name>.json. Pure stdlib, from any process (including WSL)."""
     d = pathlib.Path(runs_dir)
     d.mkdir(parents=True, exist_ok=True)
     (d / f"{name}.json").write_text(json.dumps({
@@ -68,19 +68,19 @@ def _manifest() -> dict:
 
 
 def _load_tracks():
-    """-> list[(label, filename, target, group)] aus Manifest oder Auto-Discovery."""
+    """-> list[(label, filename, target, group)] from manifest or auto-discovery."""
     data_dir = CFG.get("data_dir")
     listed = []
     seen = set()
     man = _manifest()
     if man:
         for t in man.get("tracks", []):
-            listed.append((t["label"], t["file"], t.get("target"), t.get("group", "Datensätze")))
+            listed.append((t["label"], t["file"], t.get("target"), t.get("group", "Datasets")))
             seen.add(t["file"])
     if data_dir:
         for p in sorted(pathlib.Path(data_dir).glob("*.jsonl")):
             if p.name not in seen:
-                listed.append((p.name, p.name, None, "Weitere"))
+                listed.append((p.name, p.name, None, "More"))
     return listed
 
 
@@ -98,7 +98,7 @@ def collect() -> dict:
     trainings = []
     runs_dir = pathlib.Path(CFG["runs_dir"]) if CFG.get("runs_dir") else None
     if runs_dir and runs_dir.exists():
-        # NUR Status-JSONs, NICHT die <name>.meta.json (Config-Snapshots) -> sonst "undefined"-Karten
+        # ONLY status JSONs, NOT the <name>.meta.json (config snapshots) -> otherwise "undefined" cards
         for p in sorted(x for x in runs_dir.glob("*.json") if not x.name.endswith(".meta.json")):
             try:
                 d = json.loads(p.read_text(encoding="utf-8"))
@@ -110,7 +110,7 @@ def collect() -> dict:
             st, tot = d.get("step"), d.get("total_steps")
             d["age_secs"] = round(age)
             d["active"] = age < ACTIVE_SECS and d.get("status") == "running"
-            d["stale"] = (d.get("status") == "running" and age >= ACTIVE_SECS)   # "running" aber tot
+            d["stale"] = (d.get("status") == "running" and age >= ACTIVE_SECS)   # "running" but dead
             d["pct"] = (round(100 * st / tot) if (st and tot) else None)
             trainings.append(d)
     man = _manifest()
@@ -128,7 +128,7 @@ def collect() -> dict:
             scorecard = json.loads((data_dir / "scorecard.json").read_text(encoding="utf-8"))
         except Exception:
             scorecard = {}
-    # Live-Eval: jüngste data/_eval/<tag>.json (von eval_progress.EvalProgress) -> Live-Panel
+    # Live eval: newest data/_eval/<tag>.json (from eval_progress.EvalProgress) -> live panel
     eval_live = {}
     edir = (data_dir / "_eval") if data_dir else None
     if edir and edir.exists():
@@ -151,7 +151,7 @@ def collect() -> dict:
 
 
 def _cond_met(c, trainings, ds_by_file, res_models) -> bool:
-    """Wertet eine Daten-Bedingung gegen den Live-Stand aus (für datengetriebenen Flow)."""
+    """Evaluates a data condition against the live state (for the data-driven flow)."""
     if isinstance(c, list):
         return all(_cond_met(x, trainings, ds_by_file, res_models) for x in c)
     if not isinstance(c, dict):
@@ -183,8 +183,8 @@ def _cond_met(c, trainings, ds_by_file, res_models) -> bool:
 
 
 def _resolve_flow(flow, trainings, datasets, results):
-    """Status jedes Flow-Knotens datengetrieben ableiten: done_if/active_if gegen echte Daten.
-    'current' rückt automatisch auf den ersten unfertigen Knoten -> 'Du bist hier' ist immer korrekt."""
+    """Derive each flow node's status data-driven: done_if/active_if against real data.
+    'current' automatically advances to the first unfinished node -> 'You are here' is always correct."""
     if not flow or not flow.get("nodes"):
         return flow
     ds_by_file = {d["file"]: d for d in datasets}
@@ -208,7 +208,7 @@ def _resolve_flow(flow, trainings, datasets, results):
 
 
 def _resolve_pipeline(pipeline, trainings, datasets, results):
-    """Gleiche Daten-Auflösung für die Roadmap-Phasen (optional je Phase via done_if/active_if)."""
+    """Same data resolution for the roadmap phases (optional per phase via done_if/active_if)."""
     if not pipeline:
         return pipeline
     ds_by_file = {d["file"]: d for d in datasets}
@@ -229,7 +229,7 @@ def _resolve_pipeline(pipeline, trainings, datasets, results):
     return out
 
 
-# ── GPU-Telemetrie: portabel & graceful (probiert mehrere Tools, blendet sonst aus) ──
+# ── GPU telemetry: portable & graceful (tries multiple tools, otherwise hides itself) ──
 _GPU = {"cmd": None, "kind": None, "tried": False, "cache": None, "ts": 0.0}
 
 
@@ -245,7 +245,7 @@ def _gpu_probe():
         ("nvidia", ["nvidia-smi", "--query-gpu=name,utilization.gpu,memory.used,memory.total",
                     "--format=csv,noheader,nounits"]),
         ("rocm", ["rocm-smi", "--showuse", "--showmeminfo", "vram", "--json"]),
-        ("win", ["powershell", "-NoProfile", "-Command", _WIN_PS]),   # Windows-Host (AMD/NVIDIA), für WSL2-GPU
+        ("win", ["powershell", "-NoProfile", "-Command", _WIN_PS]),   # Windows host (AMD/NVIDIA), for WSL2 GPU
         ("wsl-rocm", ["wsl", "rocm-smi", "--showuse", "--showmeminfo", "vram", "--json"]),
     ]
     for kind, cmd in cands:
@@ -278,7 +278,7 @@ def gpu_stats() -> dict:
                    "total": round(float(tot) / 1024, 1)}
         elif _GPU["kind"] == "win":
             u, m = out.strip().split("|")
-            res = {"name": "GPU (Windows-Host)", "util": min(100, round(float(u)))}
+            res = {"name": "GPU (Windows host)", "util": min(100, round(float(u)))}
             if float(m) > 0:
                 res["used"] = round(float(m) / 1e9, 1)
         else:
@@ -309,13 +309,13 @@ def gpu_stats() -> dict:
     return res
 
 
-_BAR = re.compile(r"\d+%\||\d+/\d+ \[|it/s\]|s/it\]")           # tqdm-Fortschrittszeilen
+_BAR = re.compile(r"\d+%\||\d+/\d+ \[|it/s\]|s/it\]")           # tqdm progress lines
 _LOSS = re.compile(r"'loss':\s*'?([0-9.]+)")
 
 
 def tail_log(n=42):
-    """Tail der zuletzt geänderten *.log im log-dir (generisch, folgt der aktiven Phase).
-    Filtert tqdm-Balken raus (zeigt nur die aktuelle Fortschrittszeile), extrahiert Loss-Serie."""
+    """Tail of the most recently modified *.log in log-dir (generic, follows the active phase).
+    Filters out tqdm bars (shows only the current progress line), extracts loss series."""
     d = CFG.get("log_dir") or CFG.get("data_dir")
     if not d:
         return {}
@@ -342,7 +342,7 @@ def tail_log(n=42):
             "lines": lines, "loss": loss, "eta": eta, "sec_per_it": sit}
 
 
-PAGE = """<!doctype html><html lang="de"><head><meta charset="utf-8">
+PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Progress</title>
 <style>
 :root{--card:rgba(17,30,52,.58);--line:rgba(90,130,185,.28);--cyan:#22d3ee;--green:#10b981;
@@ -380,10 +380,10 @@ transition:width .5s ease;box-shadow:0 0 14px rgba(59,156,255,.55)}
 .foot{color:var(--mut);font-size:11px;margin-top:26px;border-top:1px solid var(--line);padding-top:10px}
 </style></head><body>
 <canvas id="bg"></canvas>
-<div class="wrap"><h1 id="title">Progress</h1><div class="sub" id="sub">lädt …</div><div id="root"></div>
-<div class="foot">RadeonForge Live-Dashboard · Auto-Refresh 3 s · <code>/api/progress</code></div></div>
+<div class="wrap"><h1 id="title">Progress</h1><div class="sub" id="sub">loading …</div><div id="root"></div>
+<div class="foot">RadeonForge live dashboard · auto-refresh 3 s · <code>/api/progress</code></div></div>
 <script>
-/* ===================== 3D-Knotenwolke (Canvas, iridescent, langsam) ===================== */
+/* ===================== 3D node cloud (canvas, iridescent, slow) ===================== */
 const cv=document.getElementById('bg'),cx=cv.getContext('2d');let W,H,DPR;
 function resize(){DPR=Math.min(window.devicePixelRatio||1,2);W=cv.width=innerWidth*DPR;H=cv.height=innerHeight*DPR;}
 addEventListener('resize',resize);resize();
@@ -396,9 +396,9 @@ let pulses=[],trainingActive=false;
 function hsl(h,s,l,a){return 'hsla('+(((h%360)+360)%360)+','+s+'%,'+l+'%,'+a+')';}
 function frame(now){
  cx.clearRect(0,0,W,H);cx.globalCompositeOperation='lighter';
- const hd=now*0.0012;                                          /* sehr langsamer Farb-Drift */
+ const hd=now*0.0012;                                          /* very slow color drift */
  const cxp=W*(0.5+Math.sin(now*0.000022)*0.12),cyp=H*(0.5+Math.cos(now*0.000017)*0.08),scale=Math.min(W,H)*0.32,CAM=4.2;
- const ay=now*0.000017,ax=Math.sin(now*0.000012)*0.25;        /* sehr langsame Rotation, große Kameradistanz */
+ const ay=now*0.000017,ax=Math.sin(now*0.000012)*0.25;        /* very slow rotation, large camera distance */
  const ca=Math.cos(ay),sa=Math.sin(ay),cb=Math.cos(ax),sb=Math.sin(ax);
  const proj=nodes.map(n=>{let x=n.x*ca-n.z*sa,z=n.x*sa+n.z*ca,y=n.y;let y2=y*cb-z*sb,z2=y*sb+z*cb;
   const persp=CAM/(CAM-z2);return{sx:cxp+x*scale*persp,sy:cyp+y2*scale*persp,depth:(z2+1.25)/2.5,persp,hue:230-x*46+hd+n.hj};});
@@ -424,26 +424,26 @@ function frame(now){
  requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
 
-/* ===================== Daten / Render ===================== */
+/* ===================== Data / Render ===================== */
 function bar(p){return '<div class="bar"><div class="fill" style="width:'+(p||0)+'%"></div></div>';}
-function age(s){if(s==null)return '—';if(s<90)return '<span class="dot"></span>vor '+s+' s';
- if(s<5400)return 'vor '+Math.round(s/60)+' min';return 'vor '+(s/3600).toFixed(1)+' h';}
+function age(s){if(s==null)return '—';if(s<90)return '<span class="dot"></span>'+s+' s ago';
+ if(s<5400)return Math.round(s/60)+' min ago';return (s/3600).toFixed(1)+' h ago';}
 function roadmap(items){if(!items||!items.length)return '';
  const done=items.filter(x=>x.status==='done').length,cur=items.find(x=>x.status==='current');
- let h='<div class="sec">Gesamtprozess</div><div class="card"><div class="rmhead"><b>'+done+'/'+items.length+
-   '</b> Phasen erledigt'+(cur?(' · aktuell: <b>'+cur.phase+'</b>'):'')+'</div><div class="rm">';
+ let h='<div class="sec">Overall process</div><div class="card"><div class="rmhead"><b>'+done+'/'+items.length+
+   '</b> phases done'+(cur?(' · current: <b>'+cur.phase+'</b>'):'')+'</div><div class="rm">';
  let n=0;items.forEach(x=>{n++;const ic=x.status==='done'?'✓':(x.status==='current'?'●':n);
   h+='<div class="step '+x.status+'"><div class="ic">'+ic+'</div><div><div class="ph">'+x.phase+'</div>'+
      (x.detail?('<div class="dt">'+x.detail+'</div>'):'')+'</div></div>';});
  return h+'</div></div>';}
-function trCard(t){const live=t.active?'<span class="badge live">läuft · GPU</span>':'<span class="badge">'+(t.status||'—')+'</span>';
+function trCard(t){const live=t.active?'<span class="badge live">running · GPU</span>':'<span class="badge">'+(t.status||'—')+'</span>';
  const prog=(t.step!=null&&t.total_steps!=null)?('Step '+t.step+'/'+t.total_steps):(t.status||'');
- const ep=(t.epoch!=null)?(' · Epoche '+(+t.epoch).toFixed(2)+(t.epochs?('/'+t.epochs):'')):'';
+ const ep=(t.epoch!=null)?(' · epoch '+(+t.epoch).toFixed(2)+(t.epochs?('/'+t.epochs):'')):'';
  const loss=(t.loss!=null)?(' · loss '+(+t.loss).toFixed(4)):'';
  let h='<div class="card"><div class="row"><span class="name">'+t.name+'</span>'+live+'</div>'+
   '<div class="row" style="margin-top:6px"><span class="big">'+prog+ep+loss+'</span><span class="meta">'+age(t.age_secs)+'</span></div>';
  if(t.pct!=null)h+=bar(t.pct);if(t.note)h+='<div class="meta" style="margin-top:6px">'+t.note+'</div>';return h+'</div>';}
-function dsCard(d){const live=d.active?'<span class="badge live">läuft</span>':'<span class="badge">idle</span>';
+function dsCard(d){const live=d.active?'<span class="badge live">running</span>':'<span class="badge">idle</span>';
  const cnt='<span class="big"><b>'+d.count+'</b></span>'+(d.target?' <span class="tgt">/ '+d.target+'</span>':'');
  const pct=d.pct!=null?(' · '+d.pct+'%'):'';
  let h='<div class="card"><div class="row"><span class="name">'+d.label+'</span>'+live+'</div>'+
@@ -455,13 +455,13 @@ async function tick(){try{
  const j=await(await fetch('/api/progress',{cache:'no-store'})).json();
  trainingActive=(j.trainings||[]).some(t=>t.active);
  document.title=j.title;document.getElementById('title').textContent=j.title;
- document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'Stand '+j.generated_at+(trainingActive?'  ·  ● Training aktiv':'');
+ document.getElementById('sub').textContent=(j.subtitle?j.subtitle+'  ·  ':'')+'as of '+j.generated_at+(trainingActive?'  ·  ● training active':'');
  let html=roadmap(j.pipeline);
- html+=grp('Modell-Training',j.trainings||[],trCard,'noch kein Lauf registriert');
+ html+=grp('Model training',j.trainings||[],trCard,'no run registered yet');
  const groups={};(j.datasets||[]).forEach(d=>{(groups[d.group]=groups[d.group]||[]).push(d);});
  Object.keys(groups).forEach(g=>{html+=grp(g,groups[g],dsCard,'—');});
  document.getElementById('root').innerHTML=html;
-}catch(e){document.getElementById('sub').textContent='Fehler: '+e;}}
+}catch(e){document.getElementById('sub').textContent='Error: '+e;}}
 tick();setInterval(tick,3000);
 </script></body></html>"""
 
@@ -482,7 +482,7 @@ class H(BaseHTTPRequestHandler):
             ctype = "application/json; charset=utf-8"
         elif self.path.startswith("/gl"):
             body = (GL_FILE.read_bytes() if GL_FILE.exists()
-                    else b"<p>progress_dashboard_gl.html fehlt</p>")
+                    else b"<p>progress_dashboard_gl.html missing</p>")
             ctype = "text/html; charset=utf-8"
         else:
             body = PAGE.encode("utf-8")
@@ -496,10 +496,10 @@ class H(BaseHTTPRequestHandler):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="RadeonForge Live-Progress-Dashboard")
-    ap.add_argument("--data-dir", help="Ordner mit *.jsonl (Datensatz-Fortschritt; optional)")
-    ap.add_argument("--runs-dir", help="Ordner mit Trainings-Status-JSONs (Default: <data-dir>/_runs)")
-    ap.add_argument("--log-dir", help="Ordner mit *.log fürs Live-Log (Default: <data-dir>)")
+    ap = argparse.ArgumentParser(description="RadeonForge live progress dashboard")
+    ap.add_argument("--data-dir", help="Folder with *.jsonl (dataset progress; optional)")
+    ap.add_argument("--runs-dir", help="Folder with training status JSONs (default: <data-dir>/_runs)")
+    ap.add_argument("--log-dir", help="Folder with *.log for the live log (default: <data-dir>)")
     ap.add_argument("--tracks", help="Manifest (JSON: title/subtitle/pipeline/tracks; optional)")
     ap.add_argument("--title", default="Training-Progress")
     ap.add_argument("--port", type=int, default=8765)
@@ -519,7 +519,7 @@ def main():
                 "tracks": args.tracks, "title": title})
 
     url = f"http://{args.host}:{args.port}/"
-    print(f"Dashboard '{title}' auf  {url}   (Strg+C beendet)")
+    print(f"Dashboard '{title}' at  {url}   (Ctrl+C stops it)")
     print(f"  data-dir={args.data_dir}  runs-dir={runs_dir}  tracks={args.tracks}")
     if args.open:
         import webbrowser
@@ -527,7 +527,7 @@ def main():
     try:
         ThreadingHTTPServer((args.host, args.port), H).serve_forever()
     except KeyboardInterrupt:
-        print("\n(Dashboard beendet)")
+        print("\n(Dashboard stopped)")
 
 
 if __name__ == "__main__":
