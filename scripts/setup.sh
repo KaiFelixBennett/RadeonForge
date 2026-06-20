@@ -51,8 +51,12 @@ fi
 
 # ── 2. ROCm present? (we don't install the base stack — that's a documented manual step) ──
 say "Checking ROCm / GPU visibility"
-if command -v rocminfo >/dev/null 2>&1 && rocminfo 2>/dev/null | grep -qi gfx; then
-  ok "rocminfo sees a GPU: $(rocminfo 2>/dev/null | grep -i -m1 'gfx' | tr -s ' ')"
+# NB: on some WSL setups `rocminfo` prints a valid GPU yet exits non-zero — so we capture its
+# output and check for a gfx line instead of trusting the exit code (under `set -o pipefail`,
+# `rocminfo | grep` would otherwise mis-report a working GPU as "not found").
+GFX="$(rocminfo 2>/dev/null | grep -i -m1 'gfx' | tr -s ' ')" || true
+if [ -n "$GFX" ]; then
+  ok "rocminfo sees a GPU:$GFX"
 else
   die "ROCm not found / no GPU visible. Install it first (RUNBOOK §2a):
      wget https://repo.radeon.com/amdgpu-install/7.2/ubuntu/noble/amdgpu-install_7.2.70200-1_all.deb
@@ -90,7 +94,16 @@ else
   pip install --no-deps "$BNB_WHL" && ok "bitsandbytes installed" || die "bnb install failed — see RUNBOOK §2e"
 fi
 
-# ── 7. Verify: doctor + smoke test (the real reproducibility guarantee) ──
+# ── 7. Runtime env vars (WSL GPU discovery + allocator) — for this shell AND future ones ──
+say "Setting runtime env vars (HSA_ENABLE_DXG_DETECTION, PYTORCH_ALLOC_CONF)"
+export HSA_ENABLE_DXG_DETECTION=1
+export PYTORCH_ALLOC_CONF="expandable_segments:True"
+for kv in 'export HSA_ENABLE_DXG_DETECTION=1' 'export PYTORCH_ALLOC_CONF=expandable_segments:True'; do
+  grep -qxF "$kv" "$HOME/.bashrc" 2>/dev/null || echo "$kv" >> "$HOME/.bashrc"
+done
+ok "env vars set + persisted to ~/.bashrc"
+
+# ── 8. Verify: doctor + smoke test (the real reproducibility guarantee) ──
 say "Verifying the environment"
 bash "$HERE/scripts/doctor.sh" || die "doctor.sh reported problems — fix them before training"
 say "Smoke test: 50-step 4-bit QLoRA (fails loudly if loss→0/NaN)"
