@@ -14,7 +14,7 @@ minutes — no prior experience assumed. The companion page
   helper, not the thing you ship). Using a strong model to create training data for a smaller
   one is called **knowledge distillation**. The teacher can be:
   - **local** — a model on your own GPU via [Ollama](https://ollama.com) (free, private), or
-  - **cloud** — an API like Claude or OpenAI (higher quality, costs money + needs a key).
+  - **cloud** — a hosted API (OpenAI, Anthropic, …) — higher quality, but costs money + needs a key.
 
 You don't *have* to use a teacher. If you already have good `(input → output)` pairs, just
 [convert](#3-convert--you-already-have-data) them. The teacher only saves you the work of
@@ -86,7 +86,7 @@ the ideal output for each.
 ```bash
 python scripts/make_dataset.py label --inputs my_questions.txt \
   --system "You are a helpful support agent." \
-  --provider anthropic --model claude-opus-4-8 --out data/support_sft.jsonl
+  --provider openai --model gpt-4o-mini --out data/support_sft.jsonl
 ```
 *(Cloud providers read `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` from your environment.)*
 

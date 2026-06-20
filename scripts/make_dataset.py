@@ -21,7 +21,7 @@ Examples
   python scripts/make_dataset.py generate --task "answer cooking questions" \
       --system "You are a concise cooking assistant." --n 50 --provider ollama --model llama3.1
   python scripts/make_dataset.py label --inputs my_questions.txt \
-      --system "You are a helpful support agent." --provider anthropic --model claude-opus-4-8 --out data/sft.jsonl
+      --system "You are a helpful support agent." --provider openai --model gpt-4o-mini --out data/sft.jsonl
   python scripts/make_dataset.py convert --in pairs.csv --user-col question --assistant-col answer --out data/sft.jsonl
   python scripts/make_dataset.py review --in data/sft.jsonl
 """
