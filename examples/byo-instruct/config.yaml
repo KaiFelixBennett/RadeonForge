@@ -5,7 +5,7 @@
 #   make data            # -> data/example.jsonl (review + clean it)
 #   python examples/gemma4-12b-qlora/train_qlora.py --config examples/byo-instruct/config.yaml
 
-model_id: Qwen/Qwen2.5-0.5B-Instruct       # ~0.5 B, no gating, ships a chat template
+model_id: Qwen/Qwen3.5-0.8B                 # ~0.8 B — RadeonForge's own "best & smallest" router base
 dataset: data/example.jsonl                 # the cleaned set from `make data`
 output_dir: byo-instruct-adapter            # LoRA adapter is saved here
 progress_file: data/_runs/byo-instruct.json # lights up the live dashboard (make demo's engine)
