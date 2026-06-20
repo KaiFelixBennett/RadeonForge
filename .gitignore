@@ -38,3 +38,9 @@ assets/**/_vid/
 
 # Generated dataset review pages (make_dataset.py)
 *.review.html
+
+# LoRA adapter outputs (e.g. byo-instruct-adapter)
+*-adapter/
+
+# Dashboard run-status outputs
+_runs/
