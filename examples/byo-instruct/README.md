@@ -1,7 +1,7 @@
 # Bring your own model — a tiny, end-to-end example
 
 The smallest possible "I trained my own LLM" loop, on one AMD Radeon (RDNA4/gfx1201):
-a ~0.5 B non-gated instruct model, fine-tuned on data **you** generated. ~2 minutes.
+a ~0.8 B model, fine-tuned on data **you** generated. ~2 minutes.
 
 ```bash
 # 1) make some data with a teacher (local Ollama = free; or --provider anthropic/openai)
@@ -16,7 +16,8 @@ python examples/gemma4-12b-qlora/train_qlora.py --config examples/byo-instruct/c
 # 3) the LoRA adapter lands in ./byo-instruct-adapter — merge + serve like the main example
 ```
 
-Why `Qwen/Qwen2.5-0.5B-Instruct`? It's tiny, **not gated** (no HF login), ships a chat template,
-and trains in a couple of minutes — perfect for a first run. Swap `model_id` in
-[config.yaml](config.yaml) for any model you like (gemma-4, Llama, Mistral, a bigger Qwen …);
-the recipe is the same. Full reuse guide: [docs/reuse-your-own-model.md](../../docs/reuse-your-own-model.md).
+Why `Qwen/Qwen3.5-0.8B`? It's the very model the [charts](../../charts/) crown as **"best &
+smallest"** (a fine-tuned 0.8 B router beat the 6.9 B model — 95% vs 87%), it's tiny and trains in
+a couple of minutes — a perfect first run. Swap `model_id` in [config.yaml](config.yaml) for any
+model you like (gemma-4, Llama, Mistral, a bigger Qwen …); the recipe is the same. Full reuse
+guide: [docs/reuse-your-own-model.md](../../docs/reuse-your-own-model.md).
