@@ -13,7 +13,10 @@ echo "== RadeonForge doctor =="
 
 echo "[1] GPU visible to ROCm"
 if command -v rocminfo >/dev/null 2>&1; then
-  if rocminfo 2>/dev/null | grep -qi gfx1201; then pass "rocminfo lists gfx1201 (RDNA4)"
+  # NB: rocminfo can exit non-zero on WSL yet still print the GPU — capture its output and
+  # grep the string (don't pipe rocminfo directly, or `pipefail` mis-reads a working GPU).
+  ROCM_OUT="$(rocminfo 2>/dev/null)" || true
+  if printf '%s' "$ROCM_OUT" | grep -qi gfx1201; then pass "rocminfo lists gfx1201 (RDNA4)"
   else fail "rocminfo found but gfx1201 NOT listed — install rocdxg-roct (librocdxg) + 'export HSA_ENABLE_DXG_DETECTION=1'; ensure an Adrenalin WSL2 driver provides /dev/dxg"; fi
 else fail "rocminfo not found — ROCm not installed (see docs/track-a-wsl2-rocm.md)"; fi
 

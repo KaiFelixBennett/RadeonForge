@@ -263,24 +263,43 @@ ax.set_xlim(28, 104); ax.set_ylim(-0.6, len(order2) - 0.4)
 ax.set_title("Base → fine-tuned: the small models LEAP, the big one crawls\nThe 12B starts highest (80%) yet ends lowest (87%); Qwen-0.8B leaps 50→95%")
 save(fig, "11_dumbbell_base_to_ft.png")
 
-# 12) Decode speed — same engine (transformers) = fair model comparison
-_tps = os.path.join(HERE, "tps.json")
-if os.path.exists(_tps):
-    tps = json.load(open(_tps))
-    order = sorted(ALL, key=lambda m: m[2])
-    vals = [tps.get(m[0], 0) for m in order]
-    fig, ax = plt.subplots(figsize=(9.5, 6))
-    bars = ax.bar(range(len(order)), vals, color=[m[3] for m in order], width=0.6)
-    for b, v in zip(bars, vals):
-        ax.annotate(f"{v:.0f} tok/s", (b.get_x() + b.get_width() / 2, v), textcoords="offset points",
-                    xytext=(0, 4), ha="center", fontweight="bold")
-    ax.set_xticks(range(len(order))); ax.set_xticklabels([f"{m[0]}\n{m[2]} GB" for m in order])
-    ax.set_ylabel("Decode speed (tokens/sec)"); ax.set_ylim(0, max(vals) + 12)
-    ax.set_title("Decode speed — same engine (transformers, R9700)\nSmaller = faster: Qwen-0.8B leads; the 12B is slowest")
-    fig.text(0.5, -0.02, "Note: gemma-4 also runs on llama.cpp at ~2-3x these numbers (E2B ~117, 12B ~53 tok/s); "
-                         "Qwen3.5 has no llama.cpp runtime yet, so it serves via the transformers mini-service.",
-             ha="center", fontsize=9, color="#555")
-    save(fig, "12_tokens_per_sec.png")
+# 12) Decode speed — transformers vs llama.cpp (the REAL serving runtime), R9700
+# llama.cpp = ROCm/HIP, Q4_K_M, -ngl 99 -fa 1, measured 2026-06-15 via llama-bench
+# (gemma-12B 11.9B & Ministral-14B 13.5B = 52 tok/s); gemma-E2B ~117 from the pilot.
+# transformers (bf16) numbers from tps.json. Corrects the earlier chart that showed
+# ONLY the slow transformers path and undersold the deployable models ~3-4x.
+from matplotlib.patches import Patch
+tps_tf = json.load(open(os.path.join(HERE, "tps.json"))) if os.path.exists(os.path.join(HERE, "tps.json")) else {}
+# (label, size GB, transformers t/s | None, llama.cpp t/s | None, color)
+rows12 = [
+    ("gemma-4-E2B",     3.2, tps_tf.get("gemma-4-E2B"),  117,  C_E2B),
+    ("gemma-4-12B",     6.9, tps_tf.get("gemma-4-12B"),    52, C_12B),
+    ("Ministral-3-14B", 7.7, None,                         52, "#0ea5e9"),
+    ("Qwen3.5-0.8B",    0.5, tps_tf.get("Qwen3.5-0.8B"), None, C_QWEN08),
+    ("Qwen3.5-2B",      1.2, tps_tf.get("Qwen3.5-2B"),   None, C_QWEN2B),
+]
+xs = list(range(len(rows12))); w = 0.38
+fig, ax = plt.subplots(figsize=(10.5, 6))
+for i, (name, gb, tf, lcpp, c) in enumerate(rows12):
+    if tf is not None:
+        ax.bar(i - w / 2, tf, w, color=C_BASE)
+        ax.annotate(f"{tf:.0f}", (i - w / 2, tf), textcoords="offset points",
+                    xytext=(0, 3), ha="center", fontsize=10, color="#555")
+    if lcpp is not None:
+        ax.bar(i + w / 2, lcpp, w, color=c)
+        ax.annotate(f"{lcpp:.0f}", (i + w / 2, lcpp), textcoords="offset points",
+                    xytext=(0, 3), ha="center", fontsize=11, fontweight="bold")
+    else:
+        ax.annotate("no llama.cpp\nruntime yet", (i + w / 2, 3), ha="center", va="bottom",
+                    fontsize=8, color="#999")
+allvals = [v for _, _, tf, lcpp, _ in rows12 for v in (tf, lcpp) if v]
+ax.set_xticks(xs); ax.set_xticklabels([f"{r[0]}\n{r[1]} GB" for r in rows12])
+ax.set_ylabel("Decode speed (tokens/sec)"); ax.set_ylim(0, max(allvals) + 18)
+ax.legend(handles=[Patch(color=C_BASE, label="transformers (bf16)"),
+                   Patch(color="#444", label="llama.cpp ROCm (Q4_K_M, -fa)")], loc="upper right")
+ax.set_title("Decode speed — transformers vs llama.cpp on the R9700 (Q4_K_M)\n"
+             "The deployable models run ~3-4x faster on llama.cpp — gemma-12B: 15 -> 52 tok/s")
+save(fig, "12_tokens_per_sec.png")
 
 # 13) Router decision — accuracy vs real serving latency (deployable options)
 pts13 = [

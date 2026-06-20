@@ -1,31 +1,31 @@
 {
-  "_hinweis": "Kopiere diese Datei, passe Werte an, starte: python scripts/progress_dashboard.py --data-dir <deine-daten> --tracks <diese-datei> --open . Reine Stdlib (kein pip install). Flow + Pipeline leiten ihren Status LIVE aus echten Daten ab, wenn du done_if/active_if setzt (siehe DASHBOARD.md).",
-  "title": "Mein Fine-Tuning",
-  "subtitle": "Teacher: <dein-teacher-modell> · Student: <dein-finetune-modell>",
+  "_comment": "Copy this file, adjust the values, and run: python scripts/progress_dashboard.py --data-dir <your-data> --tracks <this-file> --open . Pure stdlib (no pip install). Flow + pipeline derive their status LIVE from real data when you set done_if/active_if (see DASHBOARD.md).",
+  "title": "My fine-tune",
+  "subtitle": "Teacher: <your-teacher-model> · Student: <your-finetuned-model>",
   "flow": {
     "w": 1000, "h": 430,
     "nodes": [
-      {"id": "data", "label": "Daten", "detail": "Sammeln + Gate", "status": "done", "x": 130, "y": 210, "w": 160, "h": 52,
+      {"id": "data", "label": "Data", "detail": "Collect + gate", "status": "done", "x": 130, "y": 210, "w": 160, "h": 52,
         "done_if": {"dataset": "train.jsonl", "min": 100}},
       {"id": "train", "label": "Training", "detail": "SFT", "status": "todo", "x": 400, "y": 210, "w": 160, "h": 52,
-        "done_if": {"run": "mein-run", "status": "done"},
+        "done_if": {"run": "my-run", "status": "done"},
         "active_if": {"any_run_active": true}},
       {"id": "eval", "label": "Eval", "detail": "Benchmark", "status": "todo", "x": 670, "y": 210, "w": 160, "h": 52,
         "done_if": {"result": "tuned", "metric": "score", "min": 90}},
-      {"id": "goal", "label": "Fertiges Modell", "detail": "einsatzfähig", "status": "goal", "x": 900, "y": 210, "w": 150, "h": 52}
+      {"id": "goal", "label": "Finished model", "detail": "ready to ship", "status": "goal", "x": 900, "y": 210, "w": 150, "h": 52}
     ],
     "edges": [["data", "train"], ["train", "eval"], ["eval", "goal"]]
   },
   "pipeline": [
-    {"phase": "Daten vorbereiten", "status": "todo", "detail": "Sammeln + Qualitäts-Gate",
+    {"phase": "Prepare data", "status": "todo", "detail": "Collect + quality gate",
       "done_if": {"dataset": "train.jsonl", "min": 100}},
-    {"phase": "Training", "status": "todo", "detail": "SFT-Lauf",
-      "done_if": {"run": "mein-run", "status": "done"}, "active_if": {"any_run_active": true}},
-    {"phase": "Eval / Benchmark", "status": "todo", "detail": "referenzierbar",
+    {"phase": "Training", "status": "todo", "detail": "SFT run",
+      "done_if": {"run": "my-run", "status": "done"}, "active_if": {"any_run_active": true}},
+    {"phase": "Eval / benchmark", "status": "todo", "detail": "referenceable",
       "done_if": {"result": "tuned", "metric": "score", "min": 90}}
   ],
   "tracks": [
-    {"label": "Trainingsdaten", "file": "train.jsonl", "target": 1000, "group": "Daten"},
-    {"label": "Eval-Set", "file": "eval.jsonl", "target": null, "group": "Daten"}
+    {"label": "Training data", "file": "train.jsonl", "target": 1000, "group": "Data"},
+    {"label": "Eval set", "file": "eval.jsonl", "target": null, "group": "Data"}
   ]
 }

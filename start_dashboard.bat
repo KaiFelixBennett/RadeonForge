@@ -1,28 +1,14 @@
 @echo off
-setlocal
+REM RadeonForge — one-click LIVE dashboard demo (no GPU, no WSL, no install).
+REM Runs the brand-neutral demo with simulated training so you see the full UI in ~10 s.
+REM Needs only Python 3.8+ on PATH (pure stdlib). Change --port if 8765 is taken.
 chcp 65001 >nul
-title RadeonForge Dashboard (Engine-Demo) - http://localhost:8766/gl
-
-REM ============================================================
-REM  Startet die generische RadeonForge-Dashboard-Engine auf den
-REM  Beispieldaten (examples/gemma4-12b-qlora). Projektneutral,
-REM  reines Python-stdlib. Laeuft auf Port 8766 (parallel zum
-REM  ARIA-Dashboard auf 8765 nutzbar).
-REM  Vollansicht (3D + Charts + HUD):  http://localhost:8766/gl
-REM ============================================================
-
-set "PORT=8766"
-set "DATA=/mnt/e/Coding/RadeonForge/examples/gemma4-12b-qlora"
-set "TRACKS=/mnt/e/Coding/RadeonForge/scripts/dashboard.tracks.example.json"
+title RadeonForge - Live Dashboard Demo (http://localhost:8765/gl)
 echo.
-echo   RadeonForge-Dashboard (Engine + Beispieldaten) auf Port %PORT%
-echo   Vollbild : http://localhost:%PORT%/gl   (oeffnet automatisch)
+echo   RadeonForge - live dashboard demo
+echo   Opening http://localhost:8765/gl   (close this window to stop)
 echo.
-
-start "" /b powershell -NoProfile -Command "Start-Sleep 5; Start-Process 'http://localhost:%PORT%/gl'"
-
-wsl -d Ubuntu -u root -- bash -lic "pkill -f 'examples/gemma4-12b-qlora' 2>/dev/null; sleep 1; python3 /mnt/e/Coding/RadeonForge/scripts/progress_dashboard.py --data-dir %DATA% --tracks %TRACKS% --host 0.0.0.0 --port %PORT%"
-
+python "%~dp0scripts\demo_dashboard.py" --port 8765 --open
 echo.
-echo   Dashboard beendet.
+echo   Dashboard stopped.
 pause
