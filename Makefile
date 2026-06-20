@@ -20,6 +20,9 @@ doctor: ## environment health check (driver/ROCm/torch/bnb/HF)
 smoke: ## 50-step QLoRA smoke test — proves the loss actually falls
 	$(PY) scripts/smoke_test.py
 
+data: ## make a sample dataset with the offline teacher + open the review page
+	$(PY) scripts/make_dataset.py generate --example --provider mock --n 12 --out data/example.jsonl
+
 train: ## run the worked Gemma-4 QLoRA example
 	$(PY) examples/gemma4-12b-qlora/train_qlora.py --config examples/gemma4-12b-qlora/config.yaml
 
@@ -32,4 +35,4 @@ assets: ## regenerate dashboard screenshots + GIF + branding (needs Node + ffmpe
 clean: ## remove generated demo data
 	rm -rf examples/dashboard-demo
 
-.PHONY: help demo setup doctor smoke train charts assets clean
+.PHONY: help demo setup doctor smoke data train charts assets clean

@@ -48,7 +48,7 @@ git clone https://github.com/KaiFelixBennett/RadeonForge && cd RadeonForge
 |---|---|---|---|
 | **1** | `make setup` | Installs the ROCm + Python stack and **handles the known AMD traps for you** (the librocdxg bridge, the bitsandbytes & Triton install order). Run once, inside WSL2. | a green environment check |
 | **2** | `make smoke` | A 50-step test run on a tiny model. This is the honest part: it **fails loudly** if your box *can't* train, so you never waste an hour. | `loss 5.78 → 0.15  ✓ this box can train` |
-| **3** | `make train` | QLoRA fine-tunes the example model on the example data (or swap in your own). Watch it **live** in the dashboard. | the loss falling, in real time |
+| **3** | `make train` | QLoRA fine-tunes the example model on the example data ([make your own](docs/training-data-101.md)). Watch it **live** in the dashboard. | the loss falling, in real time |
 | **4** | `bash examples/gemma4-12b-qlora/export_gguf.sh` | Merges your adapter and packs it into a small **GGUF (Q4_K_M)** so it runs locally. | `23.8 GB → 6.9 GB` |
 | **5** | `bash examples/gemma4-12b-qlora/serve.sh` | Serves **your** model on your own Radeon GPU, OpenAI-compatible. | a model you can chat with, ~117 tok/s |
 
@@ -64,6 +64,27 @@ git clone https://github.com/KaiFelixBennett/RadeonForge && cd RadeonForge
 
 No `make`? Every step is a single command — see the [Makefile](Makefile). On Windows the
 training steps run inside WSL2; the dashboard runs anywhere.
+
+### 🧩 Step 3, deeper: bring your own data
+
+Step 3 trains on the example data. To teach the model *your* task, you need a handful of
+`(input → ideal answer)` examples. [`scripts/make_dataset.py`](scripts/make_dataset.py) gets you
+there **three ways**, and always opens a **review page** so you can eyeball the labels first
+(the one rule that matters most). See it in 10 seconds with the offline teacher — no model, no key:
+
+```bash
+make data        # drafts a sample set + opens the keep/drop/edit review page in your browser
+```
+
+| You have… | Use | What happens |
+|---|---|---|
+| just an idea | `make_dataset.py generate --task "…"` | a **teacher** model drafts N diverse examples |
+| a list of inputs | `make_dataset.py label --inputs q.txt` | a teacher writes the ideal answer for each |
+| existing pairs (CSV/JSONL) | `make_dataset.py convert --in pairs.csv` | reformatted to chat-JSONL — **no teacher needed** |
+
+The teacher is **pluggable** — run it **locally on your Radeon** via [Ollama](https://ollama.com)
+(free, private) or use a cloud API (`--provider ollama|anthropic|openai`). New to *teacher vs.
+student* and how data must look? → [**docs/training-data-101.md**](docs/training-data-101.md).
 
 ---
 
