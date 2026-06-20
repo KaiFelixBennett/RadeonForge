@@ -25,6 +25,11 @@ Each row is a conversation whose **last assistant turn is the behaviour you want
 strings. Review the labels *before* training (a wrong-but-confident dataset trains a
 wrong-but-confident model).
 
+> **No dataset yet?** [`scripts/make_dataset.py`](../scripts/make_dataset.py) builds one three
+> ways — **generate** (a teacher drafts examples), **label** (a teacher answers your inputs), or
+> **convert** (reformat existing CSV/JSONL) — and opens a review page each time. Beginner intro:
+> [training-data-101.md](training-data-101.md). Try it now: `make data`.
+
 ## 2. Your config — copy and edit 4 lines
 
 Copy [`examples/gemma4-12b-qlora/config.yaml`](../examples/gemma4-12b-qlora/config.yaml) and change:
